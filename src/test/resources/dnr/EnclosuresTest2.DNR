@@ -1,0 +1,8 @@
+	    foo:String << ``value: `` + ~
+	                  ``5 - 7``
+  	  	~:This is a comment.:~
+
+  	  	bar:Integer  <<  [3 + 4]
+        :`foo` + ~
+		b
+

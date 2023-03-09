@@ -1,0 +1,15 @@
+EnclosuresTest:Type << ``
+
+    main << () :: ``
+        a:Integer << 2
+
+        {pi}:Float << 3.14
+        }Aaron Carson{:String << ``Aaron Carson``
+
+        `avl_98.~* 2.1 \^^>>?` << *
+
+        _.|._    *~.{invalid << ``This is not a valid form of syntax.``}.~*    _.|._
+
+        :[`Aaron Carson`   *    5]
+    ``
+``

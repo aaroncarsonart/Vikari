@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Vikari_Interpreter {
+public class LanguageInterpreter {
 
     private File rootFile;
     private File rootDirectory;
@@ -18,7 +18,7 @@ public class Vikari_Interpreter {
     // NOTE: if you load the interpreter without a file,
     // then you enter repl mode.
     // This will be implemented at a later time.
-    public Vikari_Interpreter() {
+    public LanguageInterpreter() {
     }
 
     // The call structure of the interpreter should be as follows:
@@ -40,7 +40,7 @@ public class Vikari_Interpreter {
     // formal AtonementCrystal definition:
     // MyDnrCrystalDefinition.DNR
 
-    public Vikari_Interpreter(String dnrFileOrTypeName) {
+    public LanguageInterpreter(String dnrFileOrTypeName) {
         try {
             // If the filename ends in .dnr or .DNR, then it is a valid DNR filename.
             if (dnrFileOrTypeName.endsWith(".dnr") || dnrFileOrTypeName.endsWith(".DNR")) {                 if (fileExists(dnrFileOrTypeName)) {
@@ -165,5 +165,8 @@ public class Vikari_Interpreter {
 
     // Sequentially executes all statements in the root crystal's definition file.
     public void execute() {
+        Lexer lexer = new Lexer();
+        lexer.analyzeAtonementCrystalDefinitionFile(rootFile);
+
     }
 }

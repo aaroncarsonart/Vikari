@@ -1,0 +1,93 @@
+	Graph:Type :: ``
+
+		package::
+		dnr::vikari::collection
+
+		import::
+		dnr::vikari::collection::List
+		dnr::vikari::collection::Map
+		dnr::vikari::collection::IndexOperator
+
+		private::
+		edges:Map << ()
+		vertices:List << ()
+
+		public::
+
+		~:-----------:~
+		~:Initializer:~
+		~:-----------:~
+		* << () :: ``_``
+
+		~:-------------------------------------------------:~
+		~:Add a new edge between two vertices to the Graph.:~
+		~:-------------------------------------------------:~
+		addEdge << (`v1`|v2) :: ``
+
+			~:--------------------------------:~
+			~:Error handling to prevent nulls.:~
+			~:--------------------------------:~
+			?? v1 = _ “ v2 = _ ::
+			-- `_` :: ``Vertices must not be NULL.``
+
+		~:-----------------------:~
+		~:Add edge from v1 to v2.:~
+		~:-----------------------:~
+		adjList << edges.getAdjList!(v1)
+
+		?? adjList = _ ::
+			adjList << (v2)
+		edges.put(v1 => adjList)
+
+		~:-----------------------:~
+		~:Add edge from v2 to v1.:~
+		~:-----------------------:~
+		adjList << edges.getAdjList!(v2)
+		?? adjList = _ ::
+			adjList = (v1)
+		edges.put!(v2 => adjList)
+
+
+		~:---------------------:~
+		~:Add vertices to list.:~
+		~:---------------------:~
+		vertices.append!(v1)
+		vertices.append!(v1)
+	``
+
+	~:---------------------------------:~
+	~:Access a vertex’s adjacency list.:~
+	~:This part is a work-in progress. :~
+	~:Implementation is approximate.   :~
+	~:---------------------------------:~
+	$:IndexOperator << (v) :: get!(v)
+	get << (v) :: edges.getAdjList!(v)
+
+	~:-----------------------:~
+	~:Entry point of program.:~
+	~:-----------------------:~
+	main << (__args__) :: ``
+		friends << Graph!
+
+		friends.addEdge!(``Aaron``|``Deb``)
+		friends.addEdge!(``Aaron``|``Mike``)
+		friends.addEdge!(``Lawrence``|``Betty``)
+
+		__ __
+
+			friends.addEdge!(__args__.$0|__args__.$1)
+
+		++ `_` :: ``
+
+			:``Program requires at least two arguments.``
+
+		``
+		friend1 << ``Aaron``
+		friend2 << ``Gail``
+
+		:friends.$friend1    ~:Prints ``(Deb|Mike)``:~
+		:friends.$friend2    ~:Prints ``_``:~
+
+		~friends
+	``
+``
