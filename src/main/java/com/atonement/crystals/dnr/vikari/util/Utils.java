@@ -1,5 +1,7 @@
 package com.atonement.crystals.dnr.vikari.util;
 
+import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
+
 import java.util.List;
 
 public class Utils {
@@ -33,5 +35,39 @@ public class Utils {
                 }
             }
         System.out.println("]");
+    }
+
+    public static boolean isLongNumber(String string) {
+        try {
+            Long.valueOf(string);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isDecimalNumber(String string) {
+        try {
+            Double.valueOf(string);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return string != null && string.contains(".");
+    }
+
+    public static String stripEnclosure(String enclosedString, String startEnclosure, String endEnclosure) {
+        if (!enclosedString.startsWith(startEnclosure)) {
+            throw new Vikari_LexerException("String missing start enclosure: " + startEnclosure);
+        }
+        if (!enclosedString.endsWith(endEnclosure)) {
+            throw new Vikari_LexerException("String missing end enclosure: " + startEnclosure);
+        }
+        int startIndex = startEnclosure.length();
+        int endIndex = enclosedString.length() - endEnclosure.length();
+        return enclosedString.substring(startIndex, endIndex);
+    }
+
+    public static boolean isWhitespace(String identifier) {
+        return identifier != null && identifier.matches("[ \\t]+");
     }
 }

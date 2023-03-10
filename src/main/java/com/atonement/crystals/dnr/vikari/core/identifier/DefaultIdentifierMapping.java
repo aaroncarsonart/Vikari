@@ -4,22 +4,41 @@ import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
 import com.atonement.crystals.dnr.vikari.core.FunctionOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.comment.CommentPrefixCrystal;
 import com.atonement.crystals.dnr.vikari.core.comment.CommentSuffixCrystal;
+import com.atonement.crystals.dnr.vikari.core.keyword.ConditionalBranchCrystal;
+import com.atonement.crystals.dnr.vikari.core.keyword.LoopCrystal;
 import com.atonement.crystals.dnr.vikari.core.keyword.ReturnOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.keyword.error.CatchCrystal;
-import com.atonement.crystals.dnr.vikari.core.keyword.ConditionalBranchCrystal;
+import com.atonement.crystals.dnr.vikari.core.keyword.error.ThrowCrystal;
 import com.atonement.crystals.dnr.vikari.core.keyword.label.ImportCrystal;
-import com.atonement.crystals.dnr.vikari.core.keyword.LoopCrystal;
+import com.atonement.crystals.dnr.vikari.core.keyword.label.PackageCrystal;
 import com.atonement.crystals.dnr.vikari.core.keyword.label.PrivateAccessModifierCrystal;
 import com.atonement.crystals.dnr.vikari.core.keyword.label.PublicAccessModifierCrystal;
-import com.atonement.crystals.dnr.vikari.core.keyword.error.ThrowCrystal;
 import com.atonement.crystals.dnr.vikari.core.literal.BooleanLiteralCrystal;
 import com.atonement.crystals.dnr.vikari.core.literal.SwordCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.angelguard.CatchAllCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.ConcatenateOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.ConstructorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.DotOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.Ecalyippe_Nipyonne_Dyumdyennai_Crystal;
+import com.atonement.crystals.dnr.vikari.core.operator.FeatherCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.KeyValuePairOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.angelguard.LeftFeatherFallCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.KnowledgeOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.LineContinuationOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.angelguard.CatchAllCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.angelguard.LeftFeatherFallCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.angelguard.RightFeatherFallCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.LeftAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.RightAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.bool.LeftLogicalAndAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.bool.LeftOrAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.bool.RightAndAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.bool.RightOrAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.LeftAddAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.LeftDivideAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.LeftMultiplyAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.LeftSubtractAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.RightAddAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.RightMultiplyAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.RightSubtractAssignmentOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.comparison.EqualsComparisonOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.comparison.GreaterThanComparisonOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.comparison.GreaterThanOrEqualsComparisonOperatorCrystal;
@@ -28,54 +47,36 @@ import com.atonement.crystals.dnr.vikari.core.operator.comparison.LessThanOrEqua
 import com.atonement.crystals.dnr.vikari.core.operator.curriculum.StudentOfStudentsCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.curriculum.TeacherOfTeachersCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.logical.LogicalAndOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.logical.LogicalNotOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.logical.LogicalOrOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.prefix.CopyConstructorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.prefix.DeleteOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.DotOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.Ecalyippe_Nipyonne_Dyumdyennai_Crystal;
-import com.atonement.crystals.dnr.vikari.core.operator.prefix.FieldMemberAccessPrefixCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.prefix.HarmonizedFieldMemberAccessPrefixCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.prefix.IndexOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.KnowledgeOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.math.AddOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.math.LeftDivideOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.math.ModulusOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.math.MultiplyOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.math.NegateCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.logical.LogicalNotOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.math.PercentCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.math.RightDivideOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.math.SubtractCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.math.AddOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.ConcatenateOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.FeatherCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.LeftAddAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.bool.LeftLogicalAndAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.LeftAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.LeftDivideAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.LeftMultiplyAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.bool.LeftOrAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.LeftSubtractAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.RightAddAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.bool.RightAndAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.RightAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.RightMultiplyAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.bool.RightOrAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.math.RightSubtractAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.prefix.CopyConstructorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.prefix.DeleteOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.prefix.FieldMemberAccessPrefixCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.prefix.HarmonizedFieldMemberAccessPrefixCrystal;
+import com.atonement.crystals.dnr.vikari.core.operator.prefix.IndexOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.EscapedLeftCaptureQuotationCrystal;
+import com.atonement.crystals.dnr.vikari.core.separator.LeftCurlyBracketCrystal;
+import com.atonement.crystals.dnr.vikari.core.separator.LeftSquareBracketCrystal;
+import com.atonement.crystals.dnr.vikari.core.separator.MultipleStatementSeparatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.separator.QuaternityOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.separator.RightCurlyBracketCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.emotion.FearCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.emotion.LeftFearCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.emotion.LoveCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.emotion.RightFearCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.quotation.BacktickCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.quotation.CaptureQuotationCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.LeftCurlyBracketCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.list.LeftParenthesisCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.list.ListElementSeparatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.MultipleStatementSeparatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.QuaternityOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.RightCurlyBracketCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.list.RightParenthesisCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.LeftSquareBracketCrystal;
+import com.atonement.crystals.dnr.vikari.core.separator.quotation.BacktickCrystal;
+import com.atonement.crystals.dnr.vikari.core.separator.quotation.CaptureQuotationCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.quotation.EscapedRightCaptureQuotationCrystal;
 
 public enum DefaultIdentifierMapping {
@@ -92,6 +93,7 @@ public enum DefaultIdentifierMapping {
     PUBLIC_ACCESS_MODIFIER("public", PublicAccessModifierCrystal.class),
     PRIVATE_ACCESS_MODIFIER("private", PrivateAccessModifierCrystal.class),
     IMPORT("import", ImportCrystal.class),
+    PACKAGE("package", PackageCrystal.class),
 
     // Literals
     TRUE("true", BooleanLiteralCrystal.class),
@@ -188,33 +190,40 @@ public enum DefaultIdentifierMapping {
 
     // two curriculums
     TEACHER_OF_TEACHERS("*~.", TeacherOfTeachersCrystal.class),
-    STUDENT_OF_STUDENTS(".~*", StudentOfStudentsCrystal.class),
+    STUDENT_OF_STUDENTS(".~*", StudentOfStudentsCrystal.class);
 
-    ;
-
+    /**
+     * Create A new DefaultIdentifierMapping between its identifier and its concrete Crystal class type.
+     * @param identifier The default string identifier to map.
+     * @param type The concrete Crystal class type to map the identifer string to.
+     */
     DefaultIdentifierMapping(String identifier, Class<? extends AtonementCrystal> type) {
         this.identifier = identifier;
         this.type = type;
     }
 
-    /**
-     * The identifier's default string representation in Vikari.
-     */
-    final String identifier;
+    private final String identifier;
+    private final Class<? extends AtonementCrystal> type;
 
     /**
-     * The class type for the identifer.
+     * @return The identifier's default string representation in Vikari.
      */
-    final Class<? extends AtonementCrystal> type;
-
     public String getIdentifier() {
         return identifier;
     }
 
+    /**
+     * @return the concrete Crystal class type for the identifer.
+     */
     public Class<? extends AtonementCrystal> getType() {
         return type;
     }
 
+    /**
+     * Get the mapping for the following identifier, if it exists, else null.
+     * @param identifier The identifier to get the mapping for.
+     * @return The mapping for the identifier, if it exists, else n ull.
+     */
     public static DefaultIdentifierMapping getMapping(String identifier) {
         for (DefaultIdentifierMapping mapping : DefaultIdentifierMapping.values()) {
             if (mapping.identifier.equals(identifier)) {

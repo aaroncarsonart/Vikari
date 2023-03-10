@@ -7,6 +7,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * Splits an input string according to all default identifiers that won't
+ * match against ordinary unquoted identifiers.
+ */
 public class BinaryParseTree {
 
     class BinaryParseTreeNode {
@@ -22,12 +26,20 @@ public class BinaryParseTree {
     private BinaryParseTreeNode rootNode;
 
     public BinaryParseTree(List<String> defaultIdentifiersList) {
-
         defaultIdentifiersList.sort(Comparator.comparingInt(String::length).reversed());
 
         // split on whitespace first
         defaultIdentifiersList.add(0, " ");
         defaultIdentifiersList.add(1, "\t");
+
+        // remove keywords that would clash with other identifiers
+        defaultIdentifiersList.remove(DefaultIdentifierMapping.PACKAGE.getIdentifier());
+        defaultIdentifiersList.remove(DefaultIdentifierMapping.IMPORT.getIdentifier());
+        defaultIdentifiersList.remove(DefaultIdentifierMapping.PUBLIC_ACCESS_MODIFIER.getIdentifier());
+        defaultIdentifiersList.remove(DefaultIdentifierMapping.PRIVATE_ACCESS_MODIFIER.getIdentifier());
+        defaultIdentifiersList.remove(DefaultIdentifierMapping.TRUE.getIdentifier());
+        defaultIdentifiersList.remove(DefaultIdentifierMapping.FALSE.getIdentifier());
+        defaultIdentifiersList.remove(DefaultIdentifierMapping.SWORD.getIdentifier());
 
         this.defaultIdentifiersList = defaultIdentifiersList;
     }
@@ -36,10 +48,8 @@ public class BinaryParseTree {
         rootNode = splitAndAddNode(text);
     }
 
-
     private BinaryParseTreeNode splitAndAddNode(String text) {
         for (String identifier : defaultIdentifiersList) {
-//            System.out.println(identifier);
             String[] strings = text.split(Pattern.quote(identifier), 2);
             if (strings.length == 2) {
                 BinaryParseTreeNode node = new BinaryParseTreeNode(identifier);
@@ -75,7 +85,7 @@ public class BinaryParseTree {
         return tokensList;
     }
 
-    public void listFrominOrderTraversal(BinaryParseTreeNode treeNode, List<String> tokensList) {
+    private void listFrominOrderTraversal(BinaryParseTreeNode treeNode, List<String> tokensList) {
         if (treeNode.left != null) {
             listFrominOrderTraversal(treeNode.left, tokensList);
         }

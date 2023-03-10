@@ -1,7 +1,6 @@
 package com.atonement.crystals.dnr.vikari;
 
 import com.atonement.crystals.dnr.vikari.interpreter.LanguageInterpreter;
-import com.atonement.crystals.dnr.vikari.interpreter.Lexer;
 
 public class Main {
     public static void main(String[] args) {

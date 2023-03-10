@@ -3,7 +3,7 @@ package com.atonement.crystals.dnr.vikari.interpreter;
 import com.atonement.crystals.dnr.vikari.core.Statement;
 import com.atonement.crystals.dnr.vikari.core.identifier.DefaultIdentifierMapping;
 import com.atonement.crystals.dnr.vikari.error.Vikari_IOException;
-import com.atonement.crystals.dnr.vikari.util.Pair;
+import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
 import com.atonement.crystals.dnr.vikari.util.Utils;
 
 import java.io.BufferedReader;
@@ -50,6 +50,8 @@ public class Lexer {
         // ----------------------------------------------------
         List<List<String>> statementStringTokensList = readFileAsBasicStringTokens(sourceFile);
         statementStringTokensList = collapseEnclosuresOfStringTokens(statementStringTokensList);
+
+        // TODO add logic for converting list of string tokens into list of AtonementCrystals.
 
         return null;
     }
@@ -142,10 +144,6 @@ public class Lexer {
         System.out.println("Collapse string tokens.");
         System.out.println("--------------------------------------------------------");
 
-
-        // ---------------------
-        // 1: Collapse comments.
-        // ---------------------
         int numberOfLines = statementsAsStringTokens.size();
 
         String commentPrefix = DefaultIdentifierMapping.COMMENT_PREFIX_CRYSTAL.getIdentifier();
@@ -157,15 +155,15 @@ public class Lexer {
 
         List<List<String>> collapsedLines = new ArrayList<>();
         for (int lineNumber = 0; lineNumber <  numberOfLines; lineNumber++) {
-            List<String> line = statementsAsStringTokens.get(0);
+            List<String> line = statementsAsStringTokens.get(lineNumber);
             List<String> collapsedLine = new ArrayList<>();
 
             String nextToken;
             for (int tokenNumber = 0; tokenNumber < line.size(); tokenNumber++) {
                 String token = line.get(tokenNumber);
-                System.out.println("tokenNumber: " + tokenNumber);
-                System.out.println("token: " + token);
-                System.out.println("[COLLAPSE]");
+//                System.out.println("tokenNumber: " + tokenNumber);
+//                System.out.println("token: " + token);
+//                System.out.println("[COLLAPSE]");
 
                 // ----------------------
                 // 1: Collapse comments.
@@ -181,64 +179,206 @@ public class Lexer {
                         collapsedLine = new ArrayList<>();
                         tokenNumber = 0;
                         lineNumber++;
-                        line = statementsAsStringTokens.get(lineNumber);
-                        result = collapseEnclosure(null, commentSuffix, tokenNumber, line);
 
+                        // Throw an error if missing comment suffix `:~` token.
+                        try {
+                            line = statementsAsStringTokens.get(lineNumber);
+                        } catch (IndexOutOfBoundsException e) {
+                            throw new Vikari_LexerException("Missing comment suffix token `:~` at end of comment after: ``" + nextToken + "``.");
+                        }
+
+                        result = collapseEnclosure(null, commentSuffix, tokenNumber, line);
                         tokenNumber = result.columnIndex;
                         nextToken = result.collapsedString;
                         finished = result.finished;
                     }
-//                }
+                }
 
-//                // collapse Janspirical crystals
-//                else if (token.equals(leftCurlyBracket)) {
-//                    Pair<Integer, String> comment = collapseEnclosure(leftCurlyBracket, rightCurlyBracket, tokenNumber, line);
-//                    tokenNumber = comment.getKey();
-//                    nextToken = comment.getValue();
-//                }
-//
-//                // collapse Rapnirical crystals
-//                else if (token.equals(rightCurlyBracket)) {
-//                    Pair<Integer, String> comment = collapseEnclosure(rightCurlyBracket, leftCurlyBracket, tokenNumber, line);
-//                    tokenNumber = comment.getKey();
-//                    nextToken = comment.getValue();
-//                }
-//
-//                // collapse capture quotations
-//                else if (token.equals(captureQuotation)) {
-//                    Pair<Integer, String> comment = collapseEnclosure(captureQuotation, captureQuotation, tokenNumber, line);
-//                    tokenNumber = comment.getKey();
-//                    nextToken = comment.getValue();
-//                }
-//
-//                // collapse backtick quotations
-//                else if (token.equals(backtickQuotation)) {
-//                    Pair<Integer, String> comment = collapseEnclosure(backtickQuotation, backtickQuotation, tokenNumber, line);
-//                    tokenNumber = comment.getKey();
-//                    nextToken = comment.getValue();
-                } else {
+                // --------------------------------
+                // 2: Collapse capture quotations.
+                // --------------------------------
+                else if (token.equals(captureQuotation)) {
+                    CollapseEnclosureResult result = collapseEnclosure(captureQuotation, captureQuotation, tokenNumber, line);
+                    tokenNumber = result.columnIndex;
+                    nextToken = result.collapsedString;
+                    boolean finished = result.finished;
+                    while (!finished) {
+                        collapsedLine.add(nextToken);
+                        collapsedLines.add(collapsedLine);
+                        collapsedLine = new ArrayList<>();
+                        tokenNumber = 0;
+                        lineNumber++;
+
+                        // Throw an error if missing ending capture quotation `` token.
+                        try {
+                            line = statementsAsStringTokens.get(lineNumber);
+                        } catch (IndexOutOfBoundsException e) {
+                            throw new Vikari_LexerException("Missing comment suffix token ``:~`` at end of comment after: ``" + nextToken + "``.");
+                        }
+                        result = collapseEnclosure(null, captureQuotation, tokenNumber, line);
+                        tokenNumber = result.columnIndex;
+                        nextToken = result.collapsedString;
+                        finished = result.finished;
+                    }
+                }
+
+                // ---------------------------------
+                // 3: Collapse backtick quotations.
+                // ---------------------------------
+                else if (token.equals(backtickQuotation)) {
+                    CollapseEnclosureResult result = collapseEnclosure(backtickQuotation, backtickQuotation, tokenNumber, line);
+                    tokenNumber = result.columnIndex;
+                    nextToken = result.collapsedString;
+                    boolean finished = result.finished;
+                    if (!finished) {
+                        throw new Vikari_LexerException("Single-backtick-quotation of an identifier is missing " +
+                                "a closing quote: " + nextToken);
+                    }
+                    String unquotedNextToken = Utils.stripEnclosure(nextToken, backtickQuotation, backtickQuotation);
+                    if (Utils.isWhitespace(unquotedNextToken)) {
+                        throw new Vikari_LexerException("Single-backtick-quoted identifiers cannot contain only " +
+                                "whitespace: " + nextToken);
+                    }
+                    if (nextToken.contains("\t")) {
+                        throw new Vikari_LexerException("Single-backtick-quoted identifiers cannot contain tab " +
+                                "characters: " + nextToken);
+                    }
+                }
+
+                // ----------------------------------
+                // 4: Collapse Janspirical crystals.
+                // ----------------------------------
+                else if (token.equals(leftCurlyBracket)) {
+                    CollapseEnclosureResult result = collapseEnclosure(leftCurlyBracket, rightCurlyBracket, tokenNumber, line);
+                    tokenNumber = result.columnIndex;
+                    nextToken = result.collapsedString;
+                    boolean finished = result.finished;
+                    if (!finished) {
+                        throw new Vikari_LexerException("Single-backtick quotation of an identifier is missing " +
+                                "a closing quote: " + nextToken);
+                    }
+                    if (nextToken.contains("`")) {
+                        throw new Vikari_LexerException("Backticks not allowed in Janspirical crystal identifiers.");
+                    }
+                    String unquotedNextToken = Utils.stripEnclosure(nextToken, leftCurlyBracket, rightCurlyBracket);
+                    if (Utils.isWhitespace(unquotedNextToken)) {
+                        throw new Vikari_LexerException("Janspirical crystal identifiers cannot contain only " +
+                                "whitespace: " + nextToken);
+                    }
+                    if (nextToken.contains("\t")) {
+                        throw new Vikari_LexerException("Janspirical crystal identifiers cannot contain tab " +
+                                "characters: " + nextToken);
+                    }
+                }
+
+                // ---------------------------------
+                // 5: Collapse Rapnirical crystals.
+                // ---------------------------------
+                else if (token.equals(rightCurlyBracket)) {
+                    CollapseEnclosureResult result = collapseEnclosure(rightCurlyBracket, leftCurlyBracket, tokenNumber, line);
+                    tokenNumber = result.columnIndex;
+                    nextToken = result.collapsedString;
+                    boolean finished = result.finished;
+                    if (!finished) {
+                        throw new Vikari_LexerException("Single-backtick quotation of an identifier is missing " +
+                                "a closing quote: " + nextToken);
+                    }
+                    if (nextToken.contains("`")) {
+                        throw new Vikari_LexerException("Backticks not allowed in Rapnirical crystal identifiers.");
+                    }
+                    String unquotedNextToken = Utils.stripEnclosure(nextToken, rightCurlyBracket, leftCurlyBracket);
+                    if (Utils.isWhitespace(unquotedNextToken)) {
+                        throw new Vikari_LexerException("Rapnirical crystal identifiers cannot contain only " +
+                                "whitespace: " + nextToken);
+                    }
+                    if (nextToken.contains("\t")) {
+                        throw new Vikari_LexerException("Rapnirical crystal identifiers cannot contain tab " +
+                                "characters: " + nextToken);
+                    }
+                }
+
+                // -------------------------------------------
+                // 6: Collapse decimal number literal values.
+                // -------------------------------------------
+                else if (Utils.isLongNumber(token)) {
+                    if (tokenNumber + 2 < line.size()) {
+                        String maybeDot = line.get(tokenNumber + 1);
+                        String maybeInteger = line.get(tokenNumber + 2);
+                        if (maybeDot.equals(".") && Utils.isLongNumber(maybeInteger)) {
+                            String newDecimalToken = token + maybeDot + maybeInteger;
+                            nextToken = newDecimalToken;
+                            tokenNumber += 2;
+                        } else {
+                            nextToken = token;
+                        }
+                    } else {
+                        nextToken = token;
+                    }
+                }
+
+                // ------------------------
+                // 7: Collapse whitespace.
+                // ------------------------
+                else if (Utils.isWhitespace(token)) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(token);
+
+                    int i = tokenNumber + 1;
+                    while (i < line.size()) {
+                        String followingToken = line.get(i);
+                        if (Utils.isWhitespace(followingToken)) {
+                            sb.append(followingToken);
+                            i++;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    String whitespace = sb.toString();
+                    nextToken = whitespace;
+
+                    // The algorithm always walks one more step forward than necessary.
+                    // So back up one!
+                    tokenNumber = i - 1;
+                }
+
+                // ----------------------------------------------
+                // 8: Regular token, so just add it to the list.
+                // ----------------------------------------------
+                else {
                     nextToken = token;
                 }
                 collapsedLine.add(nextToken);
-
-                System.out.println("tokenNumber: " + tokenNumber);
-                System.out.println("nextToken: " + nextToken);
-                System.out.println("-------------------------------------");
-
             }
+
+            // ------------------------------------------------------------
+            // 9: Make a second-pass to collapse negative number literals.
+            // ------------------------------------------------------------
+            List<String> negativeNumbersCollapsedLine = new ArrayList<>();
+
+            for (int tokenNumber = 0; tokenNumber < collapsedLine.size(); tokenNumber++) {
+                String token = collapsedLine.get(tokenNumber);
+                // Set default value now to cover all else-cases.
+                nextToken = token;
+                if (token.equals(DefaultIdentifierMapping.NEGATE.getIdentifier())) {
+                    String followingToken = collapsedLine.get(tokenNumber + 1);
+                    if (Utils.isDecimalNumber(followingToken) || Utils.isLongNumber(followingToken)) {
+                        nextToken = token + followingToken;
+                        tokenNumber++;
+                    }
+                }
+                negativeNumbersCollapsedLine.add(nextToken);
+            }
+            collapsedLine = negativeNumbersCollapsedLine;
             collapsedLines.add(collapsedLine);
         }
 
-
-        // 2: Collapse capture quotations.
-        // 3: Collapse backtick quotations.
-        // 4: Collapse RapniricalCrystalQuotations.
-        // 5: Collapse RapniricalCrystalQuotations.
-        // 6: Collapse line continuations.
-        // 7: collapse whitespace.
         return collapsedLines;
     }
 
+    /**
+     * For holding the result of the collapseEnclosure method.
+     */
     class CollapseEnclosureResult {
         int columnIndex;
         String collapsedString;
@@ -271,7 +411,7 @@ public class Lexer {
             sb.append(nextToken);
             startIndex = i;
         }
-//
+
         int columnIndex = startIndex;
         String collapsedString = sb.toString();
         boolean finished = endOfEnclosure.equals(nextToken);

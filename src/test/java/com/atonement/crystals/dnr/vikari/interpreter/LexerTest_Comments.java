@@ -1,5 +1,6 @@
 package com.atonement.crystals.dnr.vikari.interpreter;
 
+import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -8,11 +9,12 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 
 /**
- * Test all necessary functionality of lexical analysis of DNR source files
- * into individual string tokens. Specifically regarding the handling of
- * comment enclosure collapsions.
+ * Test that comment crystal enclosed text (i.e. ~:foo:~) are properly
+ * collapsed down into a singular string after the lexical analysis step.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_Comments {
@@ -38,7 +40,7 @@ public class LexerTest_Comments {
 
         String expectedToken = sourceString;
         String actualToken = statementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed comment.");
+        assertEquals(expectedToken, actualToken, "Malformed string literal.");
     }
 
     @Test
@@ -64,7 +66,7 @@ public class LexerTest_Comments {
 
         String expectedToken = "~:This is a comment";
         String actualToken = firstStatementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed comment.");
+        assertEquals(expectedToken, actualToken, "Malformed string literal.");
 
         // Test the second statement's tokens
         List<String> secondStatementTokens = listOfStatementTokens.get(1);
@@ -75,7 +77,7 @@ public class LexerTest_Comments {
 
         expectedToken = "across two lines.:~";
         actualToken = secondStatementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed comment.");
+        assertEquals(expectedToken, actualToken, "Malformed string literal.");
     }
 
     @Test
@@ -102,7 +104,7 @@ public class LexerTest_Comments {
 
         String expectedToken = "~:This is a comment";
         String actualToken = firstStatementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed comment.");
+        assertEquals(expectedToken, actualToken, "Malformed string literal.");
 
         // Test the second statement's tokens
         List<String> secondStatementTokens = listOfStatementTokens.get(1);
@@ -113,7 +115,7 @@ public class LexerTest_Comments {
 
         expectedToken = "across three lines";
         actualToken = secondStatementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed comment.");
+        assertEquals(expectedToken, actualToken, "Malformed string literal.");
 
 
         // Test the third statement's tokens
@@ -125,7 +127,7 @@ public class LexerTest_Comments {
 
         expectedToken = "to test enclosures.:~";
         actualToken = thirdStatementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed comment.");
+        assertEquals(expectedToken, actualToken, "Malformed string literal.");
     }
 
     @Test
@@ -149,7 +151,7 @@ public class LexerTest_Comments {
 
         String expectedToken = "~:`a` is approximately: [pi * 100].:~";
         String actualToken = statementTokens.get(6);
-        assertEquals(expectedToken, actualToken, "Malformed comment.");
+        assertEquals(expectedToken, actualToken, "Malformed string literal.");
     }
 
     @Test
@@ -175,7 +177,7 @@ public class LexerTest_Comments {
 
         String expectedToken = "~:`a` is approximately: [pi * 100].";
         String actualToken = firstStatementTokens.get(6);
-        assertEquals(expectedToken, actualToken, "Malformed comment.");
+        assertEquals(expectedToken, actualToken, "Malformed string literal.");
 
         // second statement
         List<String> secondStatementTokens = listOfStatementTokens.get(1);
@@ -186,7 +188,7 @@ public class LexerTest_Comments {
 
         expectedToken = "But sometimes, we prefer to use tau instead!:~";
         actualToken = secondStatementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed comment.");
+        assertEquals(expectedToken, actualToken, "Malformed string literal.");
     }
 
     @Test
@@ -212,7 +214,7 @@ public class LexerTest_Comments {
 
         String expectedToken = "~:`a` is approximately: [pi * 100].";
         String actualToken = firstStatementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed comment.");
+        assertEquals(expectedToken, actualToken, "Malformed string literal.");
 
         // second statement
         List<String> secondStatementTokens = listOfStatementTokens.get(1);
@@ -223,6 +225,37 @@ public class LexerTest_Comments {
 
         expectedToken = "But sometimes, we prefer to use tau instead!:~";
         actualToken = secondStatementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed comment.");
+        assertEquals(expectedToken, actualToken, "Malformed string literal.");
+    }
+
+    @Test
+    @Order(7)
+    public void testLexer_StringAnalysis_CommentEnclosure_ErrorHandlingForUnclosedComment_SingleLine() {
+        String sourceString = "~:`a` is approximately: [pi * 100].";
+        Lexer lexer = new Lexer();
+        List<List<String>> listOfStatementTokens = lexer.readStringAsBasicStringTokens(sourceString);
+        try {
+            lexer.collapseEnclosuresOfStringTokens(listOfStatementTokens);
+        } catch (Vikari_LexerException e) {
+            // success
+            return;
+        }
+        fail("Missing exception for malformed string literal missing a suffix token `:~` at end of comment.");
+    }
+
+    @Test
+    @Order(8)
+    public void testLexer_StringAnalysis_CommentEnclosure_ErrorHandlingForUnclosedComment_MultiLine() {
+        String sourceString = "~:`a` is approximately: [pi * 100].\n" +
+                "However, I forgot to close this comment!";
+        Lexer lexer = new Lexer();
+        List<List<String>> listOfStatementTokens = lexer.readStringAsBasicStringTokens(sourceString);
+        try {
+            lexer.collapseEnclosuresOfStringTokens(listOfStatementTokens);
+        } catch (Vikari_LexerException e) {
+            // success
+            return;
+        }
+        fail("Missing exception for malformed string literal missing a suffix token `:~` at end of comment.");
     }
 }
