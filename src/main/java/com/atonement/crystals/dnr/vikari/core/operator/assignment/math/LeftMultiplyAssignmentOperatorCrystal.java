@@ -1,15 +1,17 @@
 package com.atonement.crystals.dnr.vikari.core.operator.assignment.math;
 
 import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.DefaultIdentifierMapping;
+import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
 
 /**
- * The left divide assignment operator `/<<` offers a shorthand syntax for dividing
- * the left operand by the right operand, and then assigning the result to the
- * left-hand operand.
+ * The left multiply assignment operator *<< offers a shorthand syntax for
+ * multiplying the left operand by the right operand, and then assigning
+ * the result to the left operand.
  */
 public class LeftMultiplyAssignmentOperatorCrystal extends AtonementCrystal {
+
     public LeftMultiplyAssignmentOperatorCrystal() {
-        super(DefaultIdentifierMapping.LEFT_MULTIPLY_ASSIGNMENT.getIdentifier());
+        super(TokenType.LEFT_MULTIPLY_ASSIGNMENT.getIdentifier());
     }
+
 }

@@ -1,13 +1,15 @@
 package com.atonement.crystals.dnr.vikari.core.keyword.error;
 
 import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.DefaultIdentifierMapping;
+import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
 
 /**
- * The catch identifier `++` catches an explicitly identified Vikari.
+ * The catch crystal `++` begins a catch statement.
  */
 public class CatchCrystal extends AtonementCrystal {
+
     public CatchCrystal() {
-        super(DefaultIdentifierMapping.CATCH.getIdentifier());
+        super(TokenType.CATCH.getIdentifier());
     }
+
 }

@@ -1,13 +1,15 @@
 package com.atonement.crystals.dnr.vikari.core.keyword.error;
 
 import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.DefaultIdentifierMapping;
+import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
 
 /**
- * The throw identifier `--` throws a new Vikari.
+ * The throw crystal `--` begins a throw statement.
  */
 public class ThrowCrystal extends AtonementCrystal {
+
     public ThrowCrystal() {
-        super(DefaultIdentifierMapping.THROW.getIdentifier());
+        super(TokenType.THROW.getIdentifier());
     }
+
 }

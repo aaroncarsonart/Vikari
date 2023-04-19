@@ -1,14 +1,15 @@
 package com.atonement.crystals.dnr.vikari.core.separator.list;
 
 import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.DefaultIdentifierMapping;
+import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
 
 /**
- * A right-parenthesis character `)` denotes the beginning of a
- * list literal constructor.
+ * A right-parenthesis ) denotes the ending of a list literal.
  */
 public class RightParenthesisCrystal extends AtonementCrystal {
+
     public RightParenthesisCrystal() {
-        super(DefaultIdentifierMapping.RIGHT_PARENTHESIS.getIdentifier());
+        super(TokenType.RIGHT_PARENTHESIS.getIdentifier());
     }
+
 }

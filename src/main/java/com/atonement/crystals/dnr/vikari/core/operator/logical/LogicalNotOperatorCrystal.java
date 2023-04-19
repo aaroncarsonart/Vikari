@@ -1,16 +1,16 @@
 package com.atonement.crystals.dnr.vikari.core.operator.logical;
 
 import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.DefaultIdentifierMapping;
+import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
 
 /**
- * The not operator ', which is a singular single-quote character and
- * not to be confused with a singular backtick `, is used to signify
- * the logical operation of NOT (value).
+ * The unary logical NOT operator ' applies the logical NOT operation
+ * to the right operand.
  */
 public class LogicalNotOperatorCrystal extends AtonementCrystal {
 
     public LogicalNotOperatorCrystal() {
-        super(DefaultIdentifierMapping.LOGICAL_NOT.getIdentifier());
+        super(TokenType.LOGICAL_NOT.getIdentifier());
     }
+
 }

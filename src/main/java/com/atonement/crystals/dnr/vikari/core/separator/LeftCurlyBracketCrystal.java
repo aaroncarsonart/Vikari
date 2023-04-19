@@ -1,17 +1,23 @@
 package com.atonement.crystals.dnr.vikari.core.separator;
 
 import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.DefaultIdentifierMapping;
+import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
 
 /**
- * A left-curly-bracket character `{` denotes one-half of the
- * direction of either beginning or ending an Atonement Field
- * projection enclosure. Along with `}`, this alone determines
- * if a crystal's identifier is to be understood as being either
- * {Janspirical} or }Rapnirical{.}
+ * A variable name in a declaration enclosed in a pair of curly
+ * brackets { } denotes that variable is a constant.<br/>
+ * <br/>
+ * Constants cannot be reassigned. Functions overloaded with different
+ * type signatures can be defined as constant on an individual
+ * basis. Constant functions cannot be overridden in subclasses.
+ * <br/>
+ * Curly brackets are also used in declaring use of an
+ * <code>${Annotations}</code> and flexible expressions.
  */
 public class LeftCurlyBracketCrystal extends AtonementCrystal {
+
     public LeftCurlyBracketCrystal() {
-        super(DefaultIdentifierMapping.LEFT_CURLY_BRACKET.getIdentifier());
+        super(TokenType.LEFT_CURLY_BRACKET.getIdentifier());
     }
+
 }

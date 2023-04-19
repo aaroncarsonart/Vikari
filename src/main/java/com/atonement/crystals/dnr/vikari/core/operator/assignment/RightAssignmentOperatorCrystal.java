@@ -1,14 +1,16 @@
 package com.atonement.crystals.dnr.vikari.core.operator.assignment;
 
 import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.DefaultIdentifierMapping;
+import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
 
 /**
- * The right assignment operator `>>` assigns the value of the left-hand
- * operand into the identifier of the right-hand operand.
+ * The right assignment operator >> assigns the value of the left
+ * operand to the right operand.
  */
 public class RightAssignmentOperatorCrystal extends AtonementCrystal {
+
     public RightAssignmentOperatorCrystal() {
-        super(DefaultIdentifierMapping.RIGHT_ASSIGNMENT.getIdentifier());
+        super(TokenType.RIGHT_ASSIGNMENT.getIdentifier());
     }
+
 }

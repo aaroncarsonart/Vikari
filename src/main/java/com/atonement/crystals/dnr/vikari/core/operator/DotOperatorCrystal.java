@@ -1,16 +1,16 @@
 package com.atonement.crystals.dnr.vikari.core.operator;
 
 import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.DefaultIdentifierMapping;
+import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
 
 /**
- * The dot operator dereferences values from a crystal's Atonement Field
- * in order to give you direct access to that field's namespace.
+ * The dot operator . de-references type members from a crystal's field.
  */
 public class DotOperatorCrystal extends AtonementCrystal {
 
     public DotOperatorCrystal() {
-        super(DefaultIdentifierMapping.DOT_OPERATOR.getIdentifier());
+        super(TokenType.DOT.getIdentifier());
     }
+
 }
 

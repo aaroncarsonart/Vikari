@@ -1,13 +1,15 @@
 package com.atonement.crystals.dnr.vikari.core.operator.math;
 
 import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.DefaultIdentifierMapping;
+import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
 
 /**
- * The left divide operator `/` divides the right operand by the left.
+ * The left divide operator / divides the left operand by the right operand.
  */
 public class LeftDivideOperatorCrystal extends AtonementCrystal {
+
     public LeftDivideOperatorCrystal() {
-        super(DefaultIdentifierMapping.LEFT_DIVIDE.getIdentifier());
+        super(TokenType.LEFT_DIVIDE.getIdentifier());
     }
+
 }

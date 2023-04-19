@@ -5,4 +5,5 @@ public class Vikari_LexerException extends Vikari_Error {
     public Vikari_LexerException(String message) {
         super("Lexer Error", message);
     }
+
 }

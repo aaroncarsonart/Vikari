@@ -2,15 +2,15 @@ package com.atonement.crystals.dnr.vikari.core.separator.list;
 
 
 import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.DefaultIdentifierMapping;
+import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
 
 /**
- * The pipe character `|` denotes separations between crystals
- * within a list constructor literal syntax.
+ * A pipe | denotes separations between elements of a list literal.
  */
 public class ListElementSeparatorCrystal extends AtonementCrystal {
 
     public ListElementSeparatorCrystal() {
-        super(DefaultIdentifierMapping.LIST_ELEMENT_SEPARATOR.getIdentifier());
+        super(TokenType.LIST_ELEMENT_SEPARATOR.getIdentifier());
     }
+
 }

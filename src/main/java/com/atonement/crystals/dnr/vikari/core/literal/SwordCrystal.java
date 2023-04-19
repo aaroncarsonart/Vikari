@@ -2,6 +2,9 @@ package com.atonement.crystals.dnr.vikari.core.literal;
 
 import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
 
+/**
+ * Swords are identifiers consisting of only underscores.
+ */
 public class SwordCrystal extends AtonementCrystal {
 
     private int length;

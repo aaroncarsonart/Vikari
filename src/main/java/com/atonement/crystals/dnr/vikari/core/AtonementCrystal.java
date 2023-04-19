@@ -1,11 +1,16 @@
 package com.atonement.crystals.dnr.vikari.core;
 
-public class AtonementCrystal {
+import com.atonement.crystals.dnr.vikari.util.CoordinatePair;
 
+/**
+ * AtonementCrystals are the base type for all components of a
+ * Vikari source code file. Each crystal has an associated field,
+ * which holds all state of that crystal's instance in the program.
+ */
+public class AtonementCrystal {
     private String identifier;
-    private String definition;
     private AtonementField field = new AtonementField();
-    private TypeCrystal type;
+    private CoordinatePair coordinates;
 
     public AtonementCrystal(String identifier) {
         this.identifier = identifier;
@@ -19,14 +24,6 @@ public class AtonementCrystal {
         this.identifier = identifier;
     }
 
-    public String getDefinition() {
-        return definition;
-    }
-
-    public void setDefinition(String definition) {
-        this.definition = definition;
-    }
-
     public AtonementField getField() {
         return field;
     }
@@ -35,11 +32,15 @@ public class AtonementCrystal {
         this.field = field;
     }
 
-    public TypeCrystal getType() {
-        return type;
+    public CoordinatePair getCoordinates() {
+        return coordinates;
     }
 
-    public void setType(TypeCrystal type) {
-        this.type = type;
+    public void setCoordinates(CoordinatePair coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public void setCoordinates(int row, int column) {
+        this.coordinates = new CoordinatePair(row, column);
     }
 }

@@ -8,7 +8,17 @@ import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
  */
 public class CommentCrystal extends AtonementCrystal {
 
-    public CommentCrystal(String contents) {
-        super(contents);
+    String contents;
+
+    public CommentCrystal(String identifier) {
+        super(identifier);
+    }
+
+    public String getContents() {
+        return contents;
+    }
+
+    public void setComment(String contents) {
+        this.contents = contents;
     }
 }
