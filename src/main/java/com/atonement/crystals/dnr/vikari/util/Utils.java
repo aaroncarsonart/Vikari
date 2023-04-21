@@ -70,7 +70,7 @@ public class Utils {
      * @param length The number of times to repeat printing the character.
      */
     public static void printLineOfChars(char c, int length) {
-        for (int i = 0; i < length + 8; i++) {
+        for (int i = 0; i < length; i++) {
             System.out.print(c);
         }
         System.out.println();

@@ -24,6 +24,8 @@ import com.atonement.crystals.dnr.vikari.error.Vikari_IOException;
 import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
 import com.atonement.crystals.dnr.vikari.util.CoordinatePair;
 import com.atonement.crystals.dnr.vikari.util.Utils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,6 +46,7 @@ import java.util.Map;
  * as the final output of the Lexer.
  */
 public class Lexer {
+    private static final Logger log = LogManager.getLogger(Lexer.class);
 
     /**
      * Lexes a Vikari source file into a sequence of AtonementCrystals.
@@ -52,6 +55,7 @@ public class Lexer {
      * @return The sequence of AtonementCrystals defined by the Vikari source file.
      */
     public List<List<AtonementCrystal>> lexVikariSourceFile(File sourceFile) {
+        log.trace("lexVikariSourceFile()");
         List<List<String>> statementsOfStringTokens = lexToStringTokens(sourceFile);
         statementsOfStringTokens = collapseTokens(statementsOfStringTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = convertTokensToCrystals(statementsOfStringTokens);
@@ -65,6 +69,7 @@ public class Lexer {
      * @return The sequence of AtonementCrystals defined by the string of Vikari source code.
      */
     public List<List<AtonementCrystal>> lexVikariSourceCode(String sourceCode) {
+        log.trace("lexVikariSourceCode()");
         List<List<String>> statementsOfStringTokens = lexToStringTokens(sourceCode);
         statementsOfStringTokens = collapseTokens(statementsOfStringTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = convertTokensToCrystals(statementsOfStringTokens);
@@ -78,6 +83,7 @@ public class Lexer {
      * @return  A sequence of string tokens.
      */
     public List<List<String>> lexToStringTokens(File sourceFile) {
+        log.trace("lexToStringTokens(sourceFile)");
         try (BufferedReader reader = new BufferedReader(new FileReader(sourceFile))) {
             return readFromBufferAsStringTokens(reader);
         } catch (IOException e) {
@@ -94,6 +100,7 @@ public class Lexer {
      * @return  A sequence of string tokens.
      */
     public List<List<String>> lexToStringTokens(String sourceString) {
+        log.trace("lexToStringTokens(sourceString)");
         try (BufferedReader reader = new BufferedReader(new StringReader(sourceString))) {
             return readFromBufferAsStringTokens(reader);
         } catch (IOException e) {
@@ -141,6 +148,7 @@ public class Lexer {
      * @return A new list of collapsed statements.
      */
     public List<List<String>> collapseTokens(List<List<String>> statementsOfStringTokens) {
+        log.trace("collapseTokens()");
         int numberOfLines = statementsOfStringTokens.size();
 
         String commentPrefix = TokenType.COMMENT_PREFIX_CRYSTAL.getIdentifier();
@@ -380,6 +388,7 @@ public class Lexer {
      * @return The crystals representing each string token.
      */
     public List<List<AtonementCrystal>> convertTokensToCrystals(List<List<String>> statementsOfStringTokens) {
+        log.trace("convertTokensToCrystals()");
         List<List<AtonementCrystal>> statementsOfCrystals = new ArrayList<>();
 
         Map<String, TokenType> defaultIdentifiersMap = new LinkedHashMap<>();

@@ -14,6 +14,12 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +30,7 @@ import java.util.Properties;
  * Lex, parse, and interpret Vikari programs based on input of command-line arguments.
  */
 public class Main {
+    private static final Logger log = LogManager.getLogger(Main.class);
 
     /**
      * Entry point of the program.
@@ -31,6 +38,7 @@ public class Main {
      */
     public static void main(String[] args) {
         runVikariProgram(args);
+        log.debug("End of program.\n");
     }
 
     /**
@@ -43,7 +51,30 @@ public class Main {
 
         try {
             CommandLine cmd = commandLineParser.parse(options, args);
-            boolean verbose = false;
+
+            //-----------------------------
+            // 0. Set log level of project.
+            //-----------------------------
+            if (cmd.hasOption("log-level")) {
+                String logLevelName = cmd.getOptionValue("log-level");
+                Level logLevel = Level.getLevel(logLevelName);
+                if (logLevel != null) {
+                    setLogLevel(logLevel);
+                    log.debug("runVikariProgram()");
+                    log.debug("set log level to: {}.", logLevel);
+                } else {
+                    log.debug("runVikariProgram()");
+                    String msg = "Unrecognized log level: ``" + logLevelName + "``";
+                    log.debug(msg);
+                    System.err.println(msg);
+                    System.err.println("Supported values: ALL, TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF.");
+                    return;
+                }
+            } else {
+                setLogLevel(Level.TRACE);
+                log.debug("runVikariProgram()");
+            }
+
             Phase phase = Phase.DEFAULT;
             LexerOptions lexerOptions = parseLexerOptions("lit");
             List<String> argsList = cmd.getArgList();
@@ -52,14 +83,14 @@ public class Main {
             // 1. Run default behavior of interpreter with no optional arguments.
             // ------------------------------------------------------------------
             if (cmd.getOptions().length == 0) {
-                System.out.println("No options provided.");
+                log.debug("No options provided.");
 
                 // Run the only argument as a file.
                 if (argsList.size() == 1) {
-//                    System.out.println("One argument. Default behavior.");
-//                    System.out.println("Use default phase.");
-//                    System.out.println("Use default config:\n    " + lexerOptions);
-//                    System.out.println("Use file OR type source option.");
+                    log.debug("One argument. Default behavior.");
+                    log.debug("Use default phase.");
+                    log.debug("Use default config:\n    " + lexerOptions);
+                    log.debug("Use file OR type source option.");
 
                     String pathToSourceFile = argsList.get(0);
 
@@ -70,33 +101,32 @@ public class Main {
 
                     VikariSourceFileLoader sourceFileLoader = new VikariSourceFileLoader();
                     File sourceFile = sourceFileLoader.loadSourceFile(pathToSourceFile);
-                    runSourceFile(sourceFile, phase, lexerOptions, verbose);
+                    runSourceFile(sourceFile, phase, lexerOptions);
                     return;
                 }
 
                 // Run repl mode.
                 else if (argsList.size() == 0) {
-//                    System.out.println("Zero arguments. Default behavior.");
-//                    System.out.println("Use default phase.");
-//                    System.out.println("Use default config:\n    " + lexerOptions);
-//                    System.out.println("Use repl source option.");
+                    log.debug("Zero arguments. Default behavior.");
+                    log.debug("Use default phase.");
+                    log.debug("Use default config:\n    " + lexerOptions);
 
-                    runReplMode(phase, lexerOptions, verbose);
+                    runReplMode(phase, lexerOptions);
                     return;
                 }
             }
 
-            // -----------------------------------------------------
-            // If too many arguments, print help message. Then exit.
-            // -----------------------------------------------------
+            // --------------------------------------------------------
+            // 2. If too many arguments, print help message. Then exit.
+            // --------------------------------------------------------
             if (argsList.size() > 1) {
-                System.out.println("Too many arguments.");
+                System.err.println("Too many arguments.");
                 printHelp(options);
                 return;
             }
 
             // -----------------------------------------------------
-            // 2. Exit early if version or help option is requested.
+            // 3. Exit early if version or help option is requested.
             // -----------------------------------------------------
             if (cmd.hasOption("version")) {
                 printVersion();
@@ -108,67 +138,57 @@ public class Main {
                 return;
             }
 
-            // -------------------------
-            // 3. Enable verbose output.
-            // -------------------------
-            if (cmd.hasOption("debug")) {
-                verbose = true;
-            }
-
             // -----------------------------------------
             // 4. Determine phase of interpreter to run.
             // -----------------------------------------
             // Lexer phase.
             if (cmd.hasOption("lex")) {
-                if (verbose) System.out.println("Lexer phase selected.");
-                if (verbose) System.out.println("Use default config:\n    " + lexerOptions);
+                log.debug("Lexer phase selected.");
+                log.debug("Use default config:\n    " + lexerOptions);
                 phase = Phase.LEX;
             } else if (cmd.hasOption("Lex")) {
-                if (verbose) System.out.println("Lexer phase selected.");
+                log.debug("Lexer phase selected.");
                 phase = Phase.LEX;
 
                 String configArgument = cmd.getOptionValue("Lex");
                 lexerOptions = parseLexerOptions(configArgument);
-                if (verbose) System.out.println("Use config:\n    " + lexerOptions);
+                log.debug("Use config:\n    " + lexerOptions);
             }
 
             // Parser phase.
             else if (cmd.hasOption("parse")) {
-                if (verbose) System.out.println("Parser phase selected.");
-                if (verbose) System.out.println("Use default config:\n    " + lexerOptions);
+                log.debug("Parser phase selected.");
+                log.debug("Use default config:\n    " + lexerOptions);
                 phase = Phase.PARSE;
             } else if (cmd.hasOption("Parse")) {
-                if (verbose) System.out.println("Parser phase selected.");
+                log.debug("Parser phase selected.");
                 phase = Phase.PARSE;
 
                 String configArgument = cmd.getOptionValue("Parse");
                 lexerOptions = parseLexerOptions(configArgument);
-                if (verbose) System.out.println("Use config:\n    " + lexerOptions);
+                log.debug("Use config:\n    " + lexerOptions);
             }
 
             // Execute phase.
             else if (cmd.hasOption("execute")) {
-                if (verbose) {
-                    System.out.println("Execute phase selected.");
-                    System.out.println("Use default config:\n    " + lexerOptions);
-                }
+                log.debug("Execute phase selected.");
+                log.debug("Use default config:\n    " + lexerOptions);
+
                 phase = Phase.EXECUTE;
             } else if (cmd.hasOption("Execute")) {
-                if (verbose) System.out.println("Execute phase selected.");
+                log.debug("Execute phase selected.");
                 phase = Phase.EXECUTE;
 
                 String configArgument = cmd.getOptionValue("Execute");
                 lexerOptions = parseLexerOptions(configArgument);
-                if (verbose) System.out.println("Use config:\n    " + lexerOptions);
+                log.debug("Use config:\n    " + lexerOptions);
             }
 
             // No phase requested. Use default behavior.
             else {
-                if (verbose) {
-                    System.out.println("No phase selected.");
-                    System.out.println("Use default phase.");
-                    System.out.println("Use default config:\n    " + lexerOptions);
-                }
+                log.debug("No phase selected.");
+                log.debug("Use default phase.");
+                log.debug("Use default config:\n    " + lexerOptions);
             }
 
             // ----------------------------------------------
@@ -181,20 +201,20 @@ public class Main {
 
             // Get path to file from option argument.
             if (cmd.hasOption("file")) {
-                if (verbose) System.out.println("File source option selected.");
+                log.debug("File source option selected.");
                 pathToFile = cmd.getOptionValue("file");
-                if (verbose) System.out.println("File: ``" + pathToFile +"``");
+                log.debug("File: ``" + pathToFile +"``");
                 expectedAdditionalArguments = 0;
             }
 
             // Get path to file from type or script name in option argument.
             else if (cmd.hasOption("type")) {
-                if (verbose) System.out.println("Type source option selected.");
+                log.debug("Type source option selected.");
                 String fullyQualifiedTypeName = cmd.getOptionValue("type");
                 boolean isValid = Utils.validateFullyQualifiedTypeName(fullyQualifiedTypeName);
                 if (isValid) {
                     pathToFile = Utils.filePathForTypeName(fullyQualifiedTypeName);
-                    if (verbose) System.out.println("File: ``" + pathToFile + "``");
+                    log.debug("File: ``" + pathToFile + "``");
                 } else {
                     String message = "Type name not resolvable. Use the following formats:\n" +
                             "``path::to::Type``\n" +
@@ -206,15 +226,15 @@ public class Main {
 
             // Get code statements from option argument.
             else if (cmd.hasOption("code")) {
-                if (verbose) System.out.println("Code source option selected.");
+                log.debug("Code source option selected.");
                 sourceString = cmd.getOptionValue("code");
-                if (verbose) System.out.println("Source code string: " + sourceString);
+                log.debug("Source code string: " + sourceString);
                 expectedAdditionalArguments = 0;
             }
 
             // Run the repl mode for the interpreter.
             else if (cmd.hasOption("repl")) {
-                if (verbose) System.out.println("Repl source option selected.");
+                log.debug("Repl source option selected.");
                 replMode = true;
                 expectedAdditionalArguments = 0;
             }
@@ -222,19 +242,19 @@ public class Main {
             // If no source option selected, use the final argument as a file OR type name.
             // (If present.)
             else {
-                if (verbose) System.out.println("No source option selected.");
+                log.debug("No source option selected.");
                 if (argsList.size() == 0) {
-                    if (verbose) System.out.println("Using repl mode.");
+                    log.debug("Using repl mode.");
                     replMode = true;
                 } else if (argsList.size() == 1) {
-                    if (verbose) System.out.println("Using file OR type mode.");
+                    log.debug("Using file OR type mode.");
                     pathToFile = argsList.get(0);
                 }
             }
 
             // If too many arguments, print help message. Then exit.
             if (argsList.size() > expectedAdditionalArguments) {
-                System.out.println("Too many arguments.");
+                System.err.println("Too many arguments.");
                 printHelp(options);
                 return;
             }
@@ -243,25 +263,21 @@ public class Main {
             // 6. Lex, parse, or execute the program.
             // --------------------------------------
             if (pathToFile != null) {
-                if (verbose) System.out.println("Run source file.");
                 VikariSourceFileLoader sourceFileLoader = new VikariSourceFileLoader();
                 File sourceFile = sourceFileLoader.loadSourceFile(pathToFile);
-                runSourceFile(sourceFile, phase, lexerOptions, verbose);
+                runSourceFile(sourceFile, phase, lexerOptions);
             } else if (sourceString != null) {
-                if (verbose) System.out.println("Run source string.");
-                runSourceString(sourceString, phase, lexerOptions, verbose);
+                runSourceString(sourceString, phase, lexerOptions);
             } else if (replMode) {
-                runReplMode(phase, lexerOptions, verbose);
+                runReplMode(phase, lexerOptions);
             }else {
-//                runReplMode(phase, lexerOptions);
                 throw new IllegalStateException("Unreachable code.");
             }
 
-        } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            printHelp(options);
-        } catch (Vikari_TypeError e) {
-            System.out.println(e.getMessage());
+        } catch (ParseException | Vikari_TypeError e) {
+            String message = e.getMessage();
+            log.debug(message);
+            System.err.println(message);
         }
     }
 
@@ -350,20 +366,23 @@ public class Main {
                 .desc("print version number")
                 .build();
 
-        Option debugOption = Option.builder("d").longOpt("debug")
-                .desc("print verbose output")
-                .build();
-
         Option helpOption = Option.builder("h").longOpt("help")
                 .desc("show help dialog")
+                .build();
+
+        Option logLevelOption = Option.builder("g").longOpt("log-level")
+                .desc("set log level")
+                .argName("log_level")
+                .hasArg()
+                .required(false)
                 .build();
 
         Options options = new Options();
         options.addOptionGroup(interpreterPhaseOptions);
         options.addOptionGroup(sourceLocationOptions);
         options.addOption(versionNumberOption);
-        options.addOption(debugOption);
         options.addOption(helpOption);
+        options.addOption(logLevelOption);
 
         return options;
     }
@@ -374,6 +393,9 @@ public class Main {
      * @return The LexerOptions represented by the optional argument.
      */
     public static LexerOptions parseLexerOptions(String optionsArgument) {
+        log.trace("parseLexerOptions()");
+        log.trace("optionsArgument: {}", optionsArgument);
+
         boolean printLineNumbers = optionsArgument.contains("l");
         boolean showInvisibles = optionsArgument.contains("i");
         boolean separateTokens = optionsArgument.contains("t");
@@ -394,14 +416,11 @@ public class Main {
      * @param sourceFile The source file to interpret.
      * @param phase The phase of the interpreter to run the source file through.
      * @param lexerOptions An optional set of options for configuring output of the Lexer.
-     * @param verbose If true, then each phase of the interpreter prints a more verbose
-     *                output of information regarding the processing of that phase.
      */
-    public static void runSourceFile(File sourceFile, Phase phase, LexerOptions lexerOptions,
-                                     boolean verbose) {
+    public static void runSourceFile(File sourceFile, Phase phase, LexerOptions lexerOptions) {
+        log.debug("Run source file.");
         VikariProgram program = new VikariProgram();
         program.setLexerOptions(lexerOptions);
-        program.setPrintVerboseOutput(verbose);
 
         switch (phase) {
             case LEX:
@@ -413,7 +432,7 @@ public class Main {
             case EXECUTE:
             case DEFAULT:
                 program.lexAndParse(sourceFile);
-                program.execute();
+                program.execute(sourceFile);
                 break;
             default:
                 throw new IllegalStateException("Unreachable code.");
@@ -427,11 +446,10 @@ public class Main {
      * @param phase The phase of the interpreter to run the source file through.
      * @param lexerOptions An optional set of options for configuring output of the Lexer.
      */
-    public static void runSourceString(String sourceString, Phase phase, LexerOptions lexerOptions,
-                                       boolean verbose) {
+    public static void runSourceString(String sourceString, Phase phase, LexerOptions lexerOptions) {
+        log.debug("Run source string.");
         VikariProgram program = new VikariProgram();
         program.setLexerOptions(lexerOptions);
-        program.setPrintVerboseOutput(verbose);
 
         switch (phase) {
             case LEX:
@@ -454,34 +472,48 @@ public class Main {
      * Run the interpreter in repl mode.
      * @param phase The phase of the interpreter to process code statements though.
      * @param lexerOptions Options to pass to the lexer.
-     * @param verbose Show verbose output of the lexer, parser, and interpreter.
      */
-    public static void runReplMode(Phase phase, LexerOptions lexerOptions, boolean verbose) {
-        System.out.println("Run repl mode.");
-        System.out.println("Not yet implemented.");
+    public static void runReplMode(Phase phase, LexerOptions lexerOptions) {
+        log.debug("Run repl mode.");
+        log.debug("Not yet implemented.");
         // TODO: implement.
     }
 
     public static void printHelp(Options options) {
+        log.trace("printHelp()");
         HelpFormatter helpFormatter = new HelpFormatter();
         String header = "\nInterpret the Vikari programming language.\n";
         String footer = "\n<config_options>: [litv] for each line of code in output:\n" +
          " l: [lines] Print line numbers before each line.\n" +
          " i: [invisibles] Show SPACE, TAB, and NEWLINE as `·`, `→`, and `¶`.\n" +
          " t: [tokens] Show each token as quoted strings separated by commas.\n" +
-         " v: [verbose] Print each token's type name.";
+         " v: [verbose] Print each token's type name.\n" +
+         "\n" +
+         "<log_level>: one of the following:\n" +
+         " ALL, TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF.";
         helpFormatter.printHelp("vikari", header, options, footer, true);
     }
 
     public static void printVersion() {
+        log.trace("printVersion()");
         try {
             final Properties properties = new Properties();
             properties.load(Main.class.getClassLoader().getResourceAsStream("vikari.properties"));
             String version = properties.getProperty("version");
             System.out.println(version);
         } catch (IOException e) {
+            log.error(e);
             System.err.println("Error fetching version number from ``vikari.properties`` file.");
             System.exit(-1);
         }
+    }
+
+    public static void setLogLevel(Level logLevel) {
+        LoggerContext loggerContext = (LoggerContext) LogManager.getContext(false);
+        Configuration configuration = loggerContext.getConfiguration();
+        String rootPackageName = Main.class.getPackage().getName();
+        LoggerConfig loggerConfig = configuration.getLoggerConfig(rootPackageName);
+        loggerConfig.setLevel(logLevel);
+        loggerContext.updateLoggers();
     }
 }

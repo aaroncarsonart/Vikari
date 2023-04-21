@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="ERROR">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d{yyyy-MM-dd}][%d{HH:mm:ss.SSS}][%level][%logger{36}] - %msg%n"/>
+        </Console>
+        <File name="LogFile" fileName="${sys:user.home}/vikari.log">
+            <PatternLayout pattern="[%d{yyyy-MM-dd}][%d{HH:mm:ss.SSS}][%level][%logger{36}] - %msg%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="ERROR">
+            <AppenderRef ref="Console" level="ERROR"/>
+        </Root>
+        <Logger name="com.atonement.crystals.dnr.vikari" level="TRACE">
+            <AppenderRef ref="LogFile" level="TRACE"/>
+        </Logger>
+    </Loggers>
+</Configuration>
+
