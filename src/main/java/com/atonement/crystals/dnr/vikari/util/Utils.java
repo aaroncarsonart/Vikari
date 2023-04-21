@@ -5,6 +5,7 @@ import com.atonement.crystals.dnr.vikari.core.identifier.Keyword;
 import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
 import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
 
+import java.nio.file.FileSystems;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -215,5 +216,82 @@ public class Utils {
         int end = name.indexOf("Crystal");
         name = name.substring(0, end);
         return name;
+    }
+
+    public static boolean validateFullyQualifiedTypeName(String fullyQualifiedTypeName) {
+        // Null and empty strings are invalid.
+        if (fullyQualifiedTypeName == null || fullyQualifiedTypeName.equals("")) {
+            return false;
+        }
+
+        String[] tokens = fullyQualifiedTypeName.split("::");
+
+        // Strings of only :: operators are invalid.
+        if (tokens.length == 0) {
+            return false;
+        }
+
+        Pattern packageNamePattern = Pattern.compile("^[a-z][a-z0-9_]*$");
+
+        // Validate the package names.
+        for (int i = 0; i < tokens.length - 1; i++) {
+            String packageToken = tokens[i];
+            Matcher matcher = packageNamePattern.matcher(packageToken);
+            if (!matcher.find()) {
+                return false;
+            }
+        }
+
+        // Validate the type name.
+        int typeTokenIndex = tokens.length == 1 ? 0 : tokens.length - 1;
+        String typeToken = tokens[typeTokenIndex];
+
+        // check if final token is a Type name.
+        Pattern typeNamePattern = Pattern.compile("^[A-Z]\\w*$");
+        Matcher matcher = typeNamePattern.matcher(typeToken);
+        if (matcher.find()) {
+            return true;
+        }
+
+        // check if final token is a script name.
+        String scriptToken = typeToken;
+        matcher = packageNamePattern.matcher(scriptToken);
+        return matcher.find();
+    }
+
+    /**
+     * Generates a file path for the following fully-qualified type name.
+     * Assumes it to be validated by validateFullyQualifiedTypeName().
+     * @param fullyQualifiedTypeName The type name to convert into a file path.
+     * @return The file path represented by this fully-qualified type name.
+     */
+    public static String filePathForTypeName(String fullyQualifiedTypeName) {
+        String[] tokens = fullyQualifiedTypeName.split("::");
+        String fileSeparator = FileSystems.getDefault().getSeparator();
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < tokens.length - 1; i++) {
+            String directoryToken = tokens[i];
+            sb.append(directoryToken);
+            sb.append(fileSeparator);
+        }
+
+        String fileToken = tokens[tokens.length - 1];
+        sb.append(fileToken);
+
+        char firstCharacter = fileToken.charAt(0);
+        boolean capitalized = Character.isUpperCase(firstCharacter);
+
+        // Is a type file.
+        if (capitalized) {
+            sb.append(".DNR");
+        }
+
+        // Is a script file.
+        else {
+            sb.append(".dnr");
+        }
+
+        return sb.toString();
     }
 }

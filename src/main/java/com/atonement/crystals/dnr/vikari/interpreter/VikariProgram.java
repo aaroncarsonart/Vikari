@@ -4,7 +4,10 @@ import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
 import com.atonement.crystals.dnr.vikari.util.Utils;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Holds all state for lexing, parsing, and interpreting a Vikari program.
@@ -14,34 +17,133 @@ public class VikariProgram {
     private Parser parser;
     private TreeWalkInterpreter interpreter;
 
+    private LexerOptions lexerOptions;
+    public boolean printVerboseOutput;
+
     public VikariProgram() {
         lexer = new Lexer();
         parser = new Parser();
         interpreter = new TreeWalkInterpreter();
     }
 
+    public void setLexerOptions(LexerOptions lexerOptions) {
+        this.lexerOptions = lexerOptions;
+    }
+
+    public void setPrintVerboseOutput(boolean printVerboseOutput) {
+        this.printVerboseOutput = printVerboseOutput;
+    }
+
+    /**
+     * Execute the LEX phase of the interpreter. For lexing the contents of a Vikari source file.
+     *
+     * @param sourceFile The source file to lex.
+     * @return The list of lexed statements.
+     */
     public List<List<AtonementCrystal>> lex(File sourceFile) {
-        return lexer.lexVikariSourceFile(sourceFile);
+        String filePath = sourceFile.getAbsolutePath();
+
+        if (printVerboseOutput) {
+            System.out.println("Lex source file: ``" + filePath + "``");
+        }
+
+        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceFile(sourceFile);
+
+        if (lexerOptions != null) {
+            printLexedStatements(lexedStatements,
+                    lexerOptions.printLineNumbers,
+                    lexerOptions.showInvisibles,
+                    lexerOptions.separateTokens,
+                    lexerOptions.verbose);
+        }
+
+        return lexedStatements;
     }
 
+    /**
+     * Execute the LEX phase of the interpreter. For lexing Vikari code statements directly.
+     * (Such as from -c or --code {@literal <code>})
+     *
+     * @param sourceCode The source code to lex.
+     * @return The list of lexed statements.
+     */
     public List<List<AtonementCrystal>> lex(String sourceCode) {
-        return lexer.lexVikariSourceCode(sourceCode);
+        if (printVerboseOutput) {
+            System.out.println("Lex source code: " + sourceCode );
+        }
+
+        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceCode);
+
+        if (lexerOptions != null) {
+            printLexedStatements(lexedStatements,
+                    lexerOptions.printLineNumbers,
+                    lexerOptions.showInvisibles,
+                    lexerOptions.separateTokens,
+                    lexerOptions.verbose);
+        }
+
+        return lexedStatements;
     }
 
+    /**
+     * For executing the PARSE phase of the interpreter.
+     * @param sourceFile The source file to lex and parse.
+     */
     public void lexAndParse(File sourceFile) {
+
+        // -----------------------
+        // 1. Lex the source file.
+        // -----------------------
         List<List<AtonementCrystal>> lexedStatements = lex(sourceFile);
 
-        boolean printLineNumbers = true;
-        boolean showInvisibles = true;
-        boolean separateTokens = true;
-        boolean verbose = true;
+        // -------------------------
+        // 2. Parse the source file.
+        // -------------------------
+        parse(lexedStatements);
+    }
 
-        printLexedStatements(lexedStatements, printLineNumbers, showInvisibles, separateTokens, verbose);
+    /**
+     * Parse the output of the lexer.
+     * @param lexedStatements The output of the lexer to parse.
+     */
+    public void parse(List<List<AtonementCrystal>> lexedStatements) {
+        if (printVerboseOutput) {
+            System.out.println("Parse.");
+            System.out.println("Parser phase is not implemented.");
+        }
 
         // TODO: Implement parser.
     }
 
+    /**
+     * For executing the PARSE phase of the interpreter.
+     * @param sourceString The Vikari source code string to lex and parse.
+     */
+    public void lexAndParse(String sourceString) {
+        // -----------------------
+        // 1. Lex the source code.
+        // -----------------------
+        if (printVerboseOutput) {
+            System.out.println("Lex source code: " + sourceString);
+        }
+
+        List<List<AtonementCrystal>> lexedStatements = lex(sourceString);
+
+        // -------------------------
+        // 2. Parse the source code.
+        // -------------------------
+        if (printVerboseOutput) {
+            System.out.println("Parse source code: " + sourceString);
+            System.out.println("Parser phase is not implemented.");
+        }
+
+        parse(lexedStatements);
+    }
+
     public void execute() {
+        // -----------------------------
+        // 2. Execute the resulting AST.
+        // -----------------------------
         // TODO: Implement interpreter.
     }
 
