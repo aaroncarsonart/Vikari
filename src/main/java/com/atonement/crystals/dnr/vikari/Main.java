@@ -3,6 +3,7 @@ package com.atonement.crystals.dnr.vikari;
 import com.atonement.crystals.dnr.vikari.error.Vikari_TypeError;
 import com.atonement.crystals.dnr.vikari.interpreter.LexerOptions;
 import com.atonement.crystals.dnr.vikari.interpreter.Phase;
+import com.atonement.crystals.dnr.vikari.interpreter.ProgramId;
 import com.atonement.crystals.dnr.vikari.interpreter.VikariProgram;
 import com.atonement.crystals.dnr.vikari.interpreter.VikariSourceFileLoader;
 import com.atonement.crystals.dnr.vikari.util.Utils;
@@ -46,6 +47,8 @@ public class Main {
      * @param args All command-line arguments to parse.
      */
     public static void runVikariProgram(String[] args) {
+        ProgramId.initialize();
+
         CommandLineParser commandLineParser = new DefaultParser();
         Options options = buildOptions();
 

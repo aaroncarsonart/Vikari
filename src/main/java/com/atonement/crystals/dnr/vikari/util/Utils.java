@@ -97,6 +97,15 @@ public class Utils {
         return string != null && (string.equals(trueLiteral) || string.equals(falseLiteral));
     }
 
+    public static boolean isIntegerNumber(String string) {
+        try {
+            Integer.valueOf(string);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+
     public static boolean isLongIntegerNumber(String string) {
         try {
             Long.valueOf(string);
