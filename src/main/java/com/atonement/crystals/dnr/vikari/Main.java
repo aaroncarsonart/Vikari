@@ -428,14 +428,20 @@ public class Main {
         switch (phase) {
             case LEX:
                 program.lex(sourceFile);
+                program.reportSyntaxErrors();
                 break;
             case PARSE:
                 program.lexAndParse(sourceFile);
+                program.reportSyntaxErrors();
                 break;
             case EXECUTE:
             case DEFAULT:
                 program.lexAndParse(sourceFile);
-                program.execute(sourceFile);
+                if (program.hasErrors()) {
+                    program.reportSyntaxErrors();
+                } else {
+                    program.execute(sourceFile);
+                }
                 break;
             default:
                 throw new IllegalStateException("Unreachable code.");
@@ -457,14 +463,20 @@ public class Main {
         switch (phase) {
             case LEX:
                 program.lex(sourceString);
+                program.reportSyntaxErrors();
                 break;
             case PARSE:
                 program.lexAndParse(sourceString);
+                program.reportSyntaxErrors();
                 break;
             case EXECUTE:
             case DEFAULT:
                 program.lexAndParse(sourceString);
-                program.execute();
+                if (program.hasErrors()) {
+                    program.reportSyntaxErrors();
+                } else {
+                    program.execute();
+                }
                 break;
             default:
                 throw new IllegalStateException("Unreachable code.");

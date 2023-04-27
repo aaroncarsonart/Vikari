@@ -1,6 +1,7 @@
 package com.atonement.crystals.dnr.vikari.interpreter;
 
 import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
+import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonement.crystals.dnr.vikari.util.Utils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +26,7 @@ public class VikariProgram {
     private LexerOptions lexerOptions;
 
     private Map<String, List<List<AtonementCrystal>>> lexerResults;
+    private SyntaxErrorReporter syntaxErrorReporter;
 
     public VikariProgram() {
         log.trace("VikariProgram constructor.");
@@ -32,6 +34,9 @@ public class VikariProgram {
         parser = new Parser();
         interpreter = new TreeWalkInterpreter();
         lexerResults = new LinkedHashMap<>();
+        syntaxErrorReporter = new SyntaxErrorReporter();
+
+        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
     }
 
     public void setLexerOptions(LexerOptions lexerOptions) {
@@ -249,5 +254,16 @@ public class VikariProgram {
         String result = sb.toString();
         log.trace("Lexed statements:\n{}", result);
         System.out.println(result);
+    }
+
+    public boolean hasErrors() {
+        return syntaxErrorReporter.hasErrors();
+    }
+
+    public void reportSyntaxErrors() {
+        if (syntaxErrorReporter.hasErrors()) {
+            syntaxErrorReporter.reportErrors();
+            syntaxErrorReporter.clear();
+        }
     }
 }

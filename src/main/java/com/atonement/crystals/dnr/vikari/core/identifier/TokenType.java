@@ -74,6 +74,7 @@ import com.atonement.crystals.dnr.vikari.core.separator.grouping.RightSquareBrac
 import com.atonement.crystals.dnr.vikari.core.separator.list.LeftParenthesisCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.list.ListElementSeparatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.list.RightParenthesisCrystal;
+import com.atonement.crystals.dnr.vikari.core.separator.quotation.BacktickQuotationCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.quotation.CaptureQuotationCrystal;
 
 import java.util.Arrays;
@@ -107,7 +108,7 @@ public enum TokenType {
     SWORD("_", SwordCrystal.class),
 
     // Separators
-    BACKTICK("`", null),
+    BACKTICK("`", BacktickQuotationCrystal.class),
     CAPTURE_QUOTATION("``", CaptureQuotationCrystal.class),
     LEFT_SQUARE_BRACKET("[", LeftSquareBracketCrystal.class),
     RIGHT_SQUARE_BRACKET("]", RightSquareBracketCrystal.class),

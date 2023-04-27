@@ -20,8 +20,10 @@ import com.atonement.crystals.dnr.vikari.core.operator.prefix.DeleteOperatorCrys
 import com.atonement.crystals.dnr.vikari.core.separator.BlankLineCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.WhitespaceCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.quotation.CaptureQuotationCrystal;
+import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonement.crystals.dnr.vikari.error.Vikari_IOException;
 import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
+import com.atonement.crystals.dnr.vikari.error.SyntaxError;
 import com.atonement.crystals.dnr.vikari.util.CoordinatePair;
 import com.atonement.crystals.dnr.vikari.util.Utils;
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +40,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Performs the lexical analysis step of scanning the contents of a
@@ -48,6 +51,13 @@ import java.util.Map;
 public class Lexer {
     private static final Logger log = LogManager.getLogger(Lexer.class);
 
+    private SyntaxErrorReporter syntaxErrorReporter;
+    private File currentFile;
+
+    public void setSyntaxErrorReporter(SyntaxErrorReporter syntaxErrorReporter) {
+        this.syntaxErrorReporter = syntaxErrorReporter;
+    }
+
     /**
      * Lexes a Vikari source file into a sequence of AtonementCrystals.
      *
@@ -56,9 +66,13 @@ public class Lexer {
      */
     public List<List<AtonementCrystal>> lexVikariSourceFile(File sourceFile) {
         log.trace("lexVikariSourceFile()");
+        currentFile = sourceFile;
+
         List<List<String>> statementsOfStringTokens = lexToStringTokens(sourceFile);
         statementsOfStringTokens = collapseTokens(statementsOfStringTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = convertTokensToCrystals(statementsOfStringTokens);
+
+        currentFile = null;
         return statementsOfCrystals;
     }
 
@@ -156,6 +170,7 @@ public class Lexer {
         String backtickQuotation = TokenType.BACKTICK.getIdentifier();
         String captureQuotation = TokenType.CAPTURE_QUOTATION.getIdentifier();
 
+        boolean stop = false;
         List<List<String>> collapsedLines = new ArrayList<>();
         for (int lineNumber = 0; lineNumber <  numberOfLines; lineNumber++) {
             List<String> line = statementsOfStringTokens.get(lineNumber);
@@ -169,6 +184,8 @@ public class Lexer {
                 // 1: Collapse comments.
                 // ----------------------
                 if (token.equals(commentPrefix)) {
+                    int startLine = lineNumber;
+                    int startTokenNumber = tokenNumber;
                     CollapseEnclosureResult result = collapseEnclosure(commentPrefix, commentSuffix, tokenNumber, line);
                     tokenNumber = result.columnIndex;
                     nextToken = result.collapsedString;
@@ -176,23 +193,25 @@ public class Lexer {
                     while (!finished) {
                         collapsedLine.add(nextToken);
                         collapsedLines.add(collapsedLine);
-                        collapsedLine = new ArrayList<>();
-                        tokenNumber = 0;
                         lineNumber++;
 
-                        // Throw an error if missing comment suffix `:~` token.
-                        try {
+                        if (lineNumber < numberOfLines) {
+                            collapsedLine = new ArrayList<>();
+                            tokenNumber = 0;
                             line = statementsOfStringTokens.get(lineNumber);
-                        } catch (IndexOutOfBoundsException e) {
-                            // TODO: Edit error reporting to prevent halting of entire program.
-                            // TODO: Collect a list of errors, and report at the end of lexing.
-                            throw new Vikari_LexerException("Missing comment suffix token `:~` at end of comment after: ``" + nextToken + "``.");
+                            result = collapseEnclosure(null, commentSuffix, tokenNumber, line);
+                            tokenNumber = result.columnIndex;
+                            nextToken = result.collapsedString;
+                            finished = result.finished;
+                        } else {
+                            // Report syntax error if missing comment suffix `:~` token.
+                            stop = true;
+                            String errorMessage = "Missing comment suffix token `:~`.";
+                            int errorLineNumber = startLine;
+                            int errorTokenNumber = startTokenNumber;
+                            reportError(errorMessage, errorLineNumber, errorTokenNumber, statementsOfStringTokens);
+                            break;
                         }
-
-                        result = collapseEnclosure(null, commentSuffix, tokenNumber, line);
-                        tokenNumber = result.columnIndex;
-                        nextToken = result.collapsedString;
-                        finished = result.finished;
                     }
                 }
 
@@ -200,6 +219,8 @@ public class Lexer {
                 // 2: Collapse capture quotations.
                 // --------------------------------
                 else if (token.equals(captureQuotation)) {
+                    int startLine = lineNumber;
+                    int startTokenNumber = tokenNumber;
                     CollapseEnclosureResult result = collapseEnclosure(captureQuotation, captureQuotation, tokenNumber, line);
                     tokenNumber = result.columnIndex;
                     nextToken = result.collapsedString;
@@ -207,23 +228,26 @@ public class Lexer {
                     while (!finished) {
                         collapsedLine.add(nextToken);
                         collapsedLines.add(collapsedLine);
-                        collapsedLine = new ArrayList<>();
-                        tokenNumber = 0;
                         lineNumber++;
 
-                        // Throw an error if missing ending capture quotation `` token.
-                        try {
+
+                        if (lineNumber < numberOfLines) {
+                            collapsedLine = new ArrayList<>();
+                            tokenNumber = 0;
                             line = statementsOfStringTokens.get(lineNumber);
-                        } catch (IndexOutOfBoundsException e) {
-                            // TODO: Edit error reporting to prevent halting of entire program.
-                            // TODO: Collect a list of errors, and report at the end of lexing.
-                            throw new Vikari_LexerException("Error: Missing closing capture" +
-                                    "quotation `` at end of string after: ``" + nextToken + "``.");
+                            result = collapseEnclosure(null, captureQuotation, tokenNumber, line);
+                            tokenNumber = result.columnIndex;
+                            nextToken = result.collapsedString;
+                            finished = result.finished;
+                        } else {
+                            // Report an error if missing ending capture quotation `` token.
+                            stop = true;
+                            String errorMessage = "Missing closing capture quotation ``.";
+                            int errorLineNumber = startLine;
+                            int errorTokenNumber = startTokenNumber;
+                            reportError(errorMessage, errorLineNumber, errorTokenNumber, statementsOfStringTokens);
+                            break;
                         }
-                        result = collapseEnclosure(null, captureQuotation, tokenNumber, line);
-                        tokenNumber = result.columnIndex;
-                        nextToken = result.collapsedString;
-                        finished = result.finished;
                     }
                 }
 
@@ -231,24 +255,34 @@ public class Lexer {
                 // 3: Collapse backtick quotations.
                 // ---------------------------------
                 else if (token.equals(backtickQuotation)) {
+                    int backtickTokenNumber = tokenNumber;
                     CollapseEnclosureResult result = collapseEnclosure(backtickQuotation, backtickQuotation, tokenNumber, line);
                     tokenNumber = result.columnIndex;
                     nextToken = result.collapsedString;
                     boolean finished = result.finished;
-                    // TODO: Edit error reporting to prevent halting of entire program.
-                    // TODO: Collect a list of errors, and report at the end of lexing.
+
                     if (!finished) {
-                        throw new Vikari_LexerException("Single-backtick-quotation of an identifier is missing " +
-                                "a closing quote: " + nextToken);
-                    }
-                    String unquotedNextToken = Utils.stripEnclosure(nextToken, backtickQuotation, backtickQuotation);
-                    if (Utils.isWhitespace(unquotedNextToken)) {
-                        throw new Vikari_LexerException("Single-backtick-quoted identifiers cannot contain only " +
-                                "whitespace: " + nextToken);
-                    }
-                    if (nextToken.contains("\t")) {
-                        throw new Vikari_LexerException("Single-backtick-quoted identifiers cannot contain tab " +
-                                "characters: " + nextToken);
+                        // Report an error if missing ending backtick quotation ` token.
+                        String errorMessage = "Missing closing backtick quotation `.";
+                        int errorLineNumber = lineNumber;
+                        int errorTokenNumber = backtickTokenNumber;
+                        reportError(errorMessage, errorLineNumber, errorTokenNumber, statementsOfStringTokens);
+                    } else {
+                        String unquotedNextToken = Utils.stripEnclosure(nextToken, backtickQuotation, backtickQuotation);
+                        boolean isSpaceCharLiteral = unquotedNextToken.equals(" ");
+                        if (!isSpaceCharLiteral && Utils.isWhitespace(unquotedNextToken)) {
+                            // Report an error if identifier contains only whitespace.
+                            String errorMessage = "Backtick-quoted identifiers cannot contain only whitespace.";
+                            int errorLineNumber = lineNumber;
+                            int errorTokenNumber = backtickTokenNumber + 1;
+                            reportError(errorMessage, errorLineNumber, errorTokenNumber, statementsOfStringTokens);
+                        } else if (unquotedNextToken.contains("\t")) {
+                            // Report an error if identifier contains a tab character.
+                            String errorMessage = "Backtick-quoted identifiers cannot contain tabs.";
+                            int errorLineNumber = lineNumber;
+                            int errorTokenNumber = backtickTokenNumber + 1;
+                            reportError(errorMessage, errorLineNumber, errorTokenNumber, statementsOfStringTokens);
+                        }
                     }
                 }
 
@@ -303,7 +337,18 @@ public class Lexer {
                 else {
                     nextToken = token;
                 }
+
+                // Short-circuit for when end of file has already been reached.
+                if (stop) {
+                    break;
+                }
+
                 collapsedLine.add(nextToken);
+            }
+
+            // Short-circuit for when end of file has already been reached.
+            if (stop) {
+                break;
             }
 
             // ------------------------------------------------------------
@@ -331,6 +376,20 @@ public class Lexer {
         }
 
         return collapsedLines;
+    }
+
+    private void reportError(String message, int lineNumber, int tokenNumber, List<List<String>> statementsOfStringTokens) {
+        List<String> errorStatement = statementsOfStringTokens.get(lineNumber);
+        String lineForError = errorStatement.stream().collect(Collectors.joining());
+        int row = lineNumber;
+        int column = 0;
+        for (int i = 0; i < tokenNumber; i++) {
+            String tmpToken = errorStatement.get(i);
+            column += tmpToken.length();
+        }
+        CoordinatePair location = new CoordinatePair(row, column);
+        SyntaxError syntaxError = new SyntaxError(currentFile, location, lineForError, message);
+        syntaxErrorReporter.add(syntaxError);
     }
 
     /**
@@ -652,8 +711,6 @@ public class Lexer {
                     statementOfCrystals.add(crystal);
                 } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
                          IllegalAccessException e) {
-                    // TODO: Edit error reporting to prevent halting of entire program.
-                    // TODO: Collect a list of errors, and report at the end of lexing.
                     throw new Vikari_LexerException("Internal error. Description: \"" + e.getMessage() + "\"");
                 }
             }

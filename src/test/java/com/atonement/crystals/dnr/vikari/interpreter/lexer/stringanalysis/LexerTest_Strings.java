@@ -1,16 +1,18 @@
 package com.atonement.crystals.dnr.vikari.interpreter.lexer.stringanalysis;
 
-import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
+import com.atonement.crystals.dnr.vikari.error.SyntaxError;
+import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonement.crystals.dnr.vikari.interpreter.Lexer;
+import com.atonement.crystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.io.File;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test that String literal identifiers (i.e. ``foo``) are properly
@@ -18,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_Strings {
+    private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test
     @Order(1)
@@ -279,14 +282,37 @@ public class LexerTest_Strings {
     @Order(8)
     public void testLexer_StringAnalysis_CaptureQuotations_ErrorHandlingForUnclosedString_SingleLine() {
         String sourceString = "``This is a malformed string literal.";
+
         Lexer lexer = new Lexer();
+        SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        try {
-            lexer.collapseTokens(listOfStatementTokens);
-            fail("Missing exception for malformed string literal missing a capture quotation `` at the end.");
-        } catch (Vikari_LexerException e) {
-            // success
-        }
+        lexer.collapseTokens(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing capture quotation.");
+
+        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        int expectedSize = 1;
+        int actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        SyntaxError syntaxError = syntaxErrors.get(0);
+        File expectedFile = null;
+        File actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        String expectedLine = sourceString;
+        String actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        String errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("capture quotation"), "Unexpected syntax error message.");
     }
 
     @Test
@@ -294,13 +320,36 @@ public class LexerTest_Strings {
     public void testLexer_StringAnalysis_CaptureQuotations_ErrorHandlingForUnclosedString_MultiLine() {
         String sourceString = "``This is a malformed string literal \n" +
                 "because it has no ending capture quotation!";
+
         Lexer lexer = new Lexer();
+        SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        try {
-            lexer.collapseTokens(listOfStatementTokens);
-            fail("Missing exception for malformed string literal missing a capture quotation `` at the end.");
-        } catch (Vikari_LexerException e) {
-            // success
-        }
+        lexer.collapseTokens(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing capture quotation.");
+
+        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        int expectedSize = 1;
+        int actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        SyntaxError syntaxError = syntaxErrors.get(0);
+        File expectedFile = null;
+        File actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        String expectedLine = "``This is a malformed string literal ";
+        String actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        String errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("capture quotation"), "Unexpected syntax error message.");
     }
 }

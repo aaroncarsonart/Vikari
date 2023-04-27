@@ -18,7 +18,8 @@ import com.atonement.crystals.dnr.vikari.core.operator.math.SubtractCrystal;
 import com.atonement.crystals.dnr.vikari.core.operator.prefix.DeleteOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.WhitespaceCrystal;
 import com.atonement.crystals.dnr.vikari.core.separator.list.LeftParenthesisCrystal;
-import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
+import com.atonement.crystals.dnr.vikari.error.SyntaxError;
+import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonement.crystals.dnr.vikari.interpreter.Lexer;
 import com.atonement.crystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -166,17 +168,39 @@ public class LexerTest_ConvertToCrystals {
     @Test
     @Order(3)
     public void lexerTest_Crystals_CommentPrefix() {
-        try {
-            String sourceString = "~:";
-            Lexer lexer = new Lexer();
-            List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-            listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
-            lexer.convertTokensToCrystals(listOfStatementTokens);
-            fail("Expected error for missing a comment suffix token.");
-        } catch (Vikari_LexerException e) {
-            assertTrue(e.getErrorMessage().contains("Missing comment suffix token"),
-                    "Unexpected error. Expected error for missing a comment suffix token.");
-        }
+        String sourceString = "~:";
+
+        Lexer lexer = new Lexer();
+        SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
+        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
+        lexer.convertTokensToCrystals(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing comment prefix.");
+
+        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        int expectedSize = 1;
+        int actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        SyntaxError syntaxError = syntaxErrors.get(0);
+        File expectedFile = null;
+        File actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        String expectedLine = sourceString;
+        String actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        String errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("comment suffix"), "Unexpected syntax error message.");
     }
 
     @Test
@@ -1398,17 +1422,39 @@ public class LexerTest_ConvertToCrystals {
     @Test
     @Order(15)
     public void lexerTest_Crystals_ErrorCase_SingularBacktick() {
-        try {
-            String sourceString = "`";
-            Lexer lexer = new Lexer();
-            List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-            listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
-            lexer.convertTokensToCrystals(listOfStatementTokens);
-            fail("Expected error for missing a backtick.");
-        } catch (Vikari_LexerException e) {
-            assertTrue(e.getErrorMessage().contains("Single-backtick-quotation of an identifier is missing " +
-                    "a closing quote"), "Unexpected error. Expected error for missing a backtick quote.");
-        }
+        String sourceString = "`";
+
+        Lexer lexer = new Lexer();
+        SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
+        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
+        lexer.convertTokensToCrystals(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing backtick.");
+
+        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        int expectedSize = 1;
+        int actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        SyntaxError syntaxError = syntaxErrors.get(0);
+        File expectedFile = null;
+        File actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        String expectedLine = sourceString;
+        String actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        String errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("backtick"), "Unexpected syntax error message.");
     }
 
     @Test

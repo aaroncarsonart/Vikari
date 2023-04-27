@@ -467,7 +467,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     public void testUtils_getSimpleClassName() {
         // positive tests
         AtonementCrystal className = new ReferenceCrystal("referenceIdentifier");
@@ -485,5 +485,48 @@ class UtilsTest {
         actual = Utils.getSimpleClassName(className);
         assertEquals(expected, actual, "The AtonementCrystal class should not have its name altered when passed to " +
                 "Utils::getSimpleClassName.");
+    }
+
+    @Test
+    @Order(13)
+    public void testUtils_countOccurrences() {
+        // Expect no matches.
+        String sourceString = "foo";
+        String searchString = "bar";
+        int regionEnd = sourceString.length();
+        int expected = 0;
+        int actual = Utils.countOccurrences(sourceString, searchString, regionEnd);
+        assertEquals(expected, actual, "Unexpected result for countOccurrences().");
+
+        // Expect one match.
+        sourceString = "foo bar";
+        searchString = "foo";
+        regionEnd = sourceString.length();
+        expected = 1;
+        actual = Utils.countOccurrences(sourceString, searchString, regionEnd);
+        assertEquals(expected, actual, "Unexpected result for countOccurrences().");
+
+        sourceString = "foo bar";
+        searchString = "bar";
+        regionEnd = sourceString.length();
+        expected = 1;
+        actual = Utils.countOccurrences(sourceString, searchString, regionEnd);
+        assertEquals(expected, actual, "Unexpected result for countOccurrences().");
+
+        // Expect no match because of regionEnd.
+        sourceString = "foo bar";
+        searchString = "bar";
+        regionEnd = "foo".length();
+        expected = 0;
+        actual = Utils.countOccurrences(sourceString, searchString, regionEnd);
+        assertEquals(expected, actual, "Unexpected result for countOccurrences().");
+
+        // Expect multiple matches.
+        sourceString = "foo bar foo baz";
+        searchString = "foo";
+        regionEnd = sourceString.length();
+        expected = 2;
+        actual = Utils.countOccurrences(sourceString, searchString, regionEnd);
+        assertEquals(expected, actual, "Unexpected result for countOccurrences().");
     }
 }

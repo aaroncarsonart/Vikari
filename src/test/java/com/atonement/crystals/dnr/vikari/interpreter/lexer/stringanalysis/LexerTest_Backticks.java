@@ -1,12 +1,15 @@
 package com.atonement.crystals.dnr.vikari.interpreter.lexer.stringanalysis;
 
-import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
+import com.atonement.crystals.dnr.vikari.error.SyntaxError;
+import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonement.crystals.dnr.vikari.interpreter.Lexer;
+import com.atonement.crystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.io.File;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_Backticks {
+    private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test
     @Order(1)
@@ -120,28 +124,89 @@ public class LexerTest_Backticks {
         String sourceString = "`foo\n`:Integer << *";
 
         Lexer lexer = new Lexer();
+        SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        try {
-            lexer.collapseTokens(listOfStatementTokens);
-            fail("Single-backtick-quoted identifiers containing a newline should fail.");
-        } catch (Vikari_LexerException e) {
-            // success
-        }
+        lexer.collapseTokens(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for backtick quoted identifier across 2 lines.");
+
+        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        int expectedSize = 2;
+        int actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        SyntaxError syntaxError = syntaxErrors.get(0);
+        File expectedFile = null;
+        File actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        String expectedLine = "`foo";
+        String actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        String errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("backtick"), "Unexpected syntax error message.");
+
+        // Syntax Error 2
+        syntaxError = syntaxErrors.get(1);
+        expectedFile = null;
+        actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        expectedLocation = new CoordinatePair(1, 0);
+        actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        expectedLine = "`:Integer << *";
+        actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("backtick"), "Unexpected syntax error message.");
     }
 
     @Test
     @Order(6)
     public void testLexer_StringAnalysis_SingleBacktickQuotation_IdentifierMissingClosingBacktickQuote() {
-        String sourceString = "`foo:Integer << *";
+        String sourceString = "foo:Integer << `bar";
 
         Lexer lexer = new Lexer();
+        SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        try {
-            lexer.collapseTokens(listOfStatementTokens);
-            fail("Single-backtick quotations missing a closing backtick should fail.");
-        } catch (Vikari_LexerException e) {
-            // success
-        }
+        lexer.collapseTokens(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing backtick.");
+
+        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        int expectedSize = 1;
+        int actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        SyntaxError syntaxError = syntaxErrors.get(0);
+        File expectedFile = null;
+        File actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        CoordinatePair expectedLocation = new CoordinatePair(0, 15);
+        CoordinatePair actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        String expectedLine = "foo:Integer << `bar";
+        String actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        String errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("backtick"), "Unexpected syntax error message.");
     }
 
     @Test
@@ -227,68 +292,203 @@ public class LexerTest_Backticks {
     @Order(10)
     public void testLexer_StringAnalysis_SingleBacktickQuotation_ContainingTabsShouldFail() {
         String sourceString = "`foo\tbar`:Integer << 2";
+
         Lexer lexer = new Lexer();
+        SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        try {
-            lexer.collapseTokens(listOfStatementTokens);
-            fail("Expected Vikari_LexerException for backticks containing a tab character.");
-        } catch (Vikari_LexerException e) {
-            assertTrue(e.getErrorMessage().contains("tab"), "Unexpected error message: " + e.getErrorMessage());
-        }
+        lexer.collapseTokens(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for a backtick-quoted identifier containing a " +
+                "tab.");
+
+        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        int expectedSize = 1;
+        int actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        SyntaxError syntaxError = syntaxErrors.get(0);
+        File expectedFile = null;
+        File actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        CoordinatePair expectedLocation = new CoordinatePair(0, 1);
+        CoordinatePair actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        String expectedLine = sourceString;
+        String actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        String errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("tab"), "Unexpected syntax error message.");
     }
 
     @Test
     @Order(11)
     public void testLexer_StringAnalysis_SingleBacktickQuotation_OnlyWhitespaceCharactersShouldFail() {
+        // ------------
         // single space
-        String sourceString = "` ` << 2";
+        // ------------
+        String sourceString = "space:Character << ` `";
+
         Lexer lexer = new Lexer();
+        SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        try {
-            lexer.collapseTokens(listOfStatementTokens);
-            fail("Expected Vikari_LexerException for backticks containing only whitespace characters.");
-        } catch (Vikari_LexerException e) {
-            assertTrue(e.getErrorMessage().contains("whitespace"), "Unexpected error message: " + e.getErrorMessage());
-        }
+        lexer.collapseTokens(listOfStatementTokens);
 
+        assertFalse(errorReporter.hasErrors(), "A space character literal should not cause a syntax error");
+
+        // ---------------
         // multiple spaces
+        // ---------------
         sourceString = "`   ` << *";
-        listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        try {
-            lexer.collapseTokens(listOfStatementTokens);
-            fail("Expected Vikari_LexerException for backticks containing only whitespace characters.");
-        } catch (Vikari_LexerException e) {
-            assertTrue(e.getErrorMessage().contains("whitespace"), "Unexpected error message: " + e.getErrorMessage());
-        }
 
+        lexer = new Lexer();
+        errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
+        listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        lexer.collapseTokens(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for a backtick-quoted identifier containing " +
+                "only whitespace.");
+
+        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        int expectedSize = 1;
+        int actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        SyntaxError syntaxError = syntaxErrors.get(0);
+        File expectedFile = null;
+        File actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        CoordinatePair expectedLocation = new CoordinatePair(0, 1);
+        CoordinatePair actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        String expectedLine = sourceString;
+        String actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        String errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("whitespace"), "Unexpected syntax error message.");
+
+        // ----------
         // single tab
+        // ----------
         sourceString = "`\t` << *";
-        listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        try {
-            lexer.collapseTokens(listOfStatementTokens);
-            fail("Expected Vikari_LexerException for backticks containing only whitespace characters.");
-        } catch (Vikari_LexerException e) {
-            assertTrue(e.getErrorMessage().contains("whitespace"), "Unexpected error message: " + e.getErrorMessage());
-        }
 
+        lexer = new Lexer();
+        errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
+        listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        lexer.collapseTokens(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for a backtick-quoted identifier containing a " +
+                "tab.");
+
+        syntaxErrors = errorReporter.getSyntaxErrors();
+        expectedSize = 1;
+        actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        syntaxError = syntaxErrors.get(0);
+        expectedFile = null;
+        actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        expectedLocation = new CoordinatePair(0, 1);
+        actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        expectedLine = sourceString;
+        actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("whitespace"), "Unexpected syntax error message.");
+
+        // -------------
         // multiple tabs
+        // -------------
         sourceString = "`\t\t` << *";
-        listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        try {
-            lexer.collapseTokens(listOfStatementTokens);
-            fail("Expected Vikari_LexerException for backticks containing only whitespace characters.");
-        } catch (Vikari_LexerException e) {
-            assertTrue(e.getErrorMessage().contains("whitespace"), "Unexpected error message: " + e.getErrorMessage());
-        }
 
-        // mix of spaces and tabs
-        sourceString = "` \t  \t\t   ` << *";
+        lexer = new Lexer();
+        errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
         listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        try {
-            lexer.collapseTokens(listOfStatementTokens);
-            fail("Expected Vikari_LexerException for backticks containing only whitespace characters.");
-        } catch (Vikari_LexerException e) {
-            assertTrue(e.getErrorMessage().contains("whitespace"), "Unexpected error message: " + e.getErrorMessage());
-        }
+        lexer.collapseTokens(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for a backtick-quoted identifier containing " +
+                "tabs.");
+
+        syntaxErrors = errorReporter.getSyntaxErrors();
+        expectedSize = 1;
+        actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        syntaxError = syntaxErrors.get(0);
+        expectedFile = null;
+        actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        expectedLocation = new CoordinatePair(0, 1);
+        actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        expectedLine = sourceString;
+        actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("whitespace"), "Unexpected syntax error message.");
+
+        // ----------------------
+        // mix of spaces and tabs
+        // ----------------------
+        sourceString = "` \t  \t\t   ` << *";
+
+        lexer = new Lexer();
+        errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
+        listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        lexer.collapseTokens(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for a backtick-quoted identifier containing a " +
+                "tab.");
+
+        syntaxErrors = errorReporter.getSyntaxErrors();
+        expectedSize = 1;
+        actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        syntaxError = syntaxErrors.get(0);
+        expectedFile = null;
+        actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        expectedLocation = new CoordinatePair(0, 1);
+        actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        expectedLine = sourceString;
+        actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("whitespace"), "Unexpected syntax error message.");
     }
 }

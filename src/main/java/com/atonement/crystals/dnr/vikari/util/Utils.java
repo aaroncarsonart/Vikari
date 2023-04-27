@@ -5,6 +5,8 @@ import com.atonement.crystals.dnr.vikari.core.identifier.Keyword;
 import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
 import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,6 +21,7 @@ import java.util.regex.Pattern;
  * </ul>
  */
 public class Utils {
+    private static String userDir = System.getProperty("user.dir");
 
     /**
      * Do not instantiate the Utils class.
@@ -128,7 +131,7 @@ public class Utils {
         if (string == null) {
             return false;
         }
-        String regex = String.format("^\\Q%s\\E.*\\Q%s\\E$", leftEnclosure, rightEnclosure);
+        String regex = java.lang.String.format("^\\Q%s\\E.*\\Q%s\\E$", leftEnclosure, rightEnclosure);
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(string);
         return matcher.find();
@@ -190,6 +193,21 @@ public class Utils {
     }
 
     /**
+     * Count the number of occurrences of the searchString in the sourceString.
+     * @param sourceString The string to count the number of occurrences in.
+     * @param searchString The string the count the number of occurrences for.
+     * @param regionEnd The end of the region to search in sourceString.
+     * @return The number of occurrences.
+     */
+    public static int countOccurrences(String sourceString, String searchString, int regionEnd) {
+        Pattern pattern = Pattern.compile(Pattern.quote(searchString));
+        Matcher matcher = pattern.matcher(sourceString);
+        matcher.region(0, regionEnd);
+        int matchCount = (int) matcher.results().count();
+        return matchCount;
+    }
+
+    /**
      * Replaces spaces, tabs, and newlines with "·", "→", and "¶".
      * @param text The string to modify.
      * @return A string with spaces, tabs, and newlines replaced.
@@ -222,8 +240,11 @@ public class Utils {
         if (name.equals(AtonementCrystal.class.getSimpleName())) {
             return name;
         }
-        int end = name.indexOf("Crystal");
-        name = name.substring(0, end);
+        if (name.endsWith("Crystal")) {
+            int end = name.indexOf("Crystal");
+            name = name.substring(0, end);
+            return name;
+        }
         return name;
     }
 
@@ -302,5 +323,25 @@ public class Utils {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * Shorten the filename by truncating it via removing the prefix of the
+     * current directory where Vikari is running.
+     * @param file The File to shorten the filename for.
+     * @return The shortened filename.
+     */
+    public static String getShortenedFilename(File file) {
+        String filename;
+        try {
+            filename = file.getCanonicalPath();
+        } catch (IOException e) {
+            filename = file.getAbsolutePath();
+        }
+
+        if (filename.startsWith(userDir)) {
+            return filename.substring(userDir.length() + 1);
+        }
+        return filename;
     }
 }

@@ -38,9 +38,6 @@ public class VikariSourceFileLoader {
 
             // Otherwise, it must be a type name.
             else {
-                // TODO: Resolve fully-qualified type names ``package_1::package_2::TypeName`` into
-                // TODO: directories as a part of a path string to allow executing a Vikari source
-                // TODO: file in a subdirectory.
                 sourceFile = resolveFileFromTypeOrScriptName(sourceFilePathOrTypeName);
             }
 

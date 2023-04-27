@@ -1,17 +1,18 @@
 package com.atonement.crystals.dnr.vikari.interpreter.lexer.stringanalysis;
 
-import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
+import com.atonement.crystals.dnr.vikari.error.SyntaxError;
+import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonement.crystals.dnr.vikari.interpreter.Lexer;
+import com.atonement.crystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.io.File;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test that comment crystal enclosed text (i.e. ~:foo:~) are properly
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_Comments {
+    public static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test
     @Order(1)
@@ -233,14 +235,37 @@ public class LexerTest_Comments {
     @Order(7)
     public void testLexer_StringAnalysis_CommentEnclosure_ErrorHandlingForUnclosedComment_SingleLine() {
         String sourceString = "~:`a` is approximately: [pi * 100].";
+
         Lexer lexer = new Lexer();
+        SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        try {
-            lexer.collapseTokens(listOfStatementTokens);
-            fail("Missing exception for malformed comment missing a suffix token `:~` at end of comment.");
-        } catch (Vikari_LexerException e) {
-            // success
-        }
+        lexer.collapseTokens(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing comment suffix.");
+
+        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        int expectedSize = 1;
+        int actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        SyntaxError syntaxError = syntaxErrors.get(0);
+        File expectedFile = null;
+        File actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        String expectedLine = sourceString;
+        String actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        String errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("comment suffix"), "Unexpected syntax error message.");
     }
 
     @Test
@@ -248,13 +273,36 @@ public class LexerTest_Comments {
     public void testLexer_StringAnalysis_CommentEnclosure_ErrorHandlingForUnclosedComment_MultiLine() {
         String sourceString = "~:`a` is approximately: [pi * 100].\n" +
                 "However, I forgot to close this comment!";
+
         Lexer lexer = new Lexer();
+        SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(errorReporter);
+
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        try {
-            lexer.collapseTokens(listOfStatementTokens);
-            fail("Missing exception for malformed comment missing a suffix token `:~` at end of comment.");
-        } catch (Vikari_LexerException e) {
-            // success
-        }
+        lexer.collapseTokens(listOfStatementTokens);
+
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing comment suffix.");
+
+        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        int expectedSize = 1;
+        int actualSize = syntaxErrors.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        SyntaxError syntaxError = syntaxErrors.get(0);
+        File expectedFile = null;
+        File actualFile = syntaxError.getFile();
+        assertEquals(expectedFile, actualFile, "Expected file to be null.");
+
+        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair actualLocation = syntaxError.getLocation();
+        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
+
+        String expectedLine = "~:`a` is approximately: [pi * 100].";
+        String actualLine = syntaxError.getLine();
+        assertEquals(expectedLine, actualLine, "Unexpected line.");
+
+        String errorMessage = syntaxError.getMessage();
+        assertTrue(errorMessage.contains("comment suffix"), "Unexpected syntax error message.");
     }
 }

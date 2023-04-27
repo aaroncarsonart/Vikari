@@ -4,7 +4,7 @@ package com.atonement.crystals.dnr.vikari.util;
  * Represents a row and column coordinate pair. Used for locating the
  * exact position of a crystal's identifier within a Vikari source file.
  */
-public class CoordinatePair {
+public class CoordinatePair implements Comparable<CoordinatePair> {
 
     private final int row;
     private final int column;
@@ -46,5 +46,14 @@ public class CoordinatePair {
     @Override
     public String toString() {
         return "CoordinatePair(row=" + row + ",column=" + column + ")";
+    }
+
+    @Override
+    public int compareTo(CoordinatePair that) {
+        int rowResult = Integer.compare(this.row, that.row);
+        if (rowResult == 0) {
+            return Integer.compare(this.column, that.column);
+        }
+        return rowResult;
     }
 }

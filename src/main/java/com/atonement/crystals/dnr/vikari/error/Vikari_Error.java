@@ -1,6 +1,5 @@
 package com.atonement.crystals.dnr.vikari.error;
 
-// TODO: Completely overhaul the strategy for error reporting in Vikari.
 public class Vikari_Error extends RuntimeException {
 
     private String errorName;
