@@ -32,7 +32,7 @@ public class SyntaxErrorReporter {
         return !syntaxErrors.isEmpty();
     }
 
-    public void reportErrors() {
+    public String getErrorReport() {
         syntaxErrors.sort(Comparator.comparing(SyntaxError::getLocation));
 
         StringBuilder sb = new StringBuilder();
@@ -85,6 +85,11 @@ public class SyntaxErrorReporter {
         }
 
         String syntaxErrorReport = sb.toString();
+        return syntaxErrorReport;
+    }
+
+    public void reportErrors() {
+        String syntaxErrorReport = getErrorReport();
         System.out.println(syntaxErrorReport);
         log.debug(syntaxErrorReport);
     }

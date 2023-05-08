@@ -1,25 +1,25 @@
 package com.atonement.crystals.dnr.vikari.interpreter;
 
-import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.comment.CommentCrystal;
-import com.atonement.crystals.dnr.vikari.core.comment.MultiLineCommentCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.ReferenceCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
-import com.atonement.crystals.dnr.vikari.core.literal.BooleanLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.literal.MultiLineStringLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.literal.StringLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.literal.SwordCrystal;
-import com.atonement.crystals.dnr.vikari.core.literal.number.DoubleLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.literal.number.LongLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.control.flow.ContinueOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.math.AddOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.math.ModulusOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.math.MultiplyOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.math.SubtractCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.prefix.DeleteOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.BlankLineCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.WhitespaceCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.quotation.CaptureQuotationCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.comment.CommentCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.comment.MultiLineCommentCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.identifier.TokenType;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.BooleanLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.StringLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.SwordCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.number.DoubleLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.number.LongLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.control.flow.ContinueOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.ModulusOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.separator.BlankLineCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.separator.WhitespaceCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.separator.quotation.CaptureQuotationCrystal;
 import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonement.crystals.dnr.vikari.error.Vikari_IOException;
 import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
@@ -650,7 +650,7 @@ public class Lexer {
 
                 if (TokenType.SUBTRACT.getIdentifier().equals(stringToken)) {
                     // handle all as SUBTRACT at first.
-                    SubtractCrystal subtractCrystal = new SubtractCrystal();
+                    SubtractOperatorCrystal subtractCrystal = new SubtractOperatorCrystal();
                     subtractCrystal.setCoordinates(tokenCoordinates);
                     statementOfCrystals.add(subtractCrystal);
                     continue;

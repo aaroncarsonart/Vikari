@@ -1,7 +1,9 @@
 package com.atonement.crystals.dnr.vikari;
 
+import com.atonement.crystals.dnr.vikari.core.statement.Statement;
 import com.atonement.crystals.dnr.vikari.error.Vikari_TypeError;
 import com.atonement.crystals.dnr.vikari.interpreter.LexerOptions;
+import com.atonement.crystals.dnr.vikari.interpreter.ParserOptions;
 import com.atonement.crystals.dnr.vikari.interpreter.Phase;
 import com.atonement.crystals.dnr.vikari.interpreter.ProgramId;
 import com.atonement.crystals.dnr.vikari.interpreter.VikariProgram;
@@ -79,7 +81,9 @@ public class Main {
             }
 
             Phase phase = Phase.DEFAULT;
-            LexerOptions lexerOptions = parseLexerOptions("lit");
+            String defaultConfigOptions = "litp";
+            LexerOptions lexerOptions = parseLexerOptions(defaultConfigOptions);
+            ParserOptions parserOptions = parseParserOptions(defaultConfigOptions);
             List<String> argsList = cmd.getArgList();
 
             // ------------------------------------------------------------------
@@ -104,7 +108,7 @@ public class Main {
 
                     VikariSourceFileLoader sourceFileLoader = new VikariSourceFileLoader();
                     File sourceFile = sourceFileLoader.loadSourceFile(pathToSourceFile);
-                    runSourceFile(sourceFile, phase, lexerOptions);
+                    runSourceFile(sourceFile, phase, lexerOptions, parserOptions);
                     return;
                 }
 
@@ -155,7 +159,7 @@ public class Main {
 
                 String configArgument = cmd.getOptionValue("Lex");
                 lexerOptions = parseLexerOptions(configArgument);
-                log.debug("Use config:\n    " + lexerOptions);
+                log.debug("Use config:\n    {}\n", lexerOptions);
             }
 
             // Parser phase.
@@ -169,7 +173,8 @@ public class Main {
 
                 String configArgument = cmd.getOptionValue("Parse");
                 lexerOptions = parseLexerOptions(configArgument);
-                log.debug("Use config:\n    " + lexerOptions);
+                parserOptions = parseParserOptions(configArgument);
+                log.debug("Use config:\n    {}\n    {}\n", lexerOptions, parserOptions);
             }
 
             // Execute phase.
@@ -184,7 +189,8 @@ public class Main {
 
                 String configArgument = cmd.getOptionValue("Execute");
                 lexerOptions = parseLexerOptions(configArgument);
-                log.debug("Use config:\n    " + lexerOptions);
+                parserOptions = parseParserOptions(configArgument);
+                log.debug("Use config:\n    {}\n    {}\n", lexerOptions, parserOptions);
             }
 
             // No phase requested. Use default behavior.
@@ -268,9 +274,9 @@ public class Main {
             if (pathToFile != null) {
                 VikariSourceFileLoader sourceFileLoader = new VikariSourceFileLoader();
                 File sourceFile = sourceFileLoader.loadSourceFile(pathToFile);
-                runSourceFile(sourceFile, phase, lexerOptions);
+                runSourceFile(sourceFile, phase, lexerOptions, parserOptions);
             } else if (sourceString != null) {
-                runSourceString(sourceString, phase, lexerOptions);
+                runSourceString(sourceString, phase, lexerOptions, parserOptions);
             } else if (replMode) {
                 runReplMode(phase, lexerOptions);
             }else {
@@ -414,16 +420,33 @@ public class Main {
     }
 
     /**
+     * Parse the ParserOptions from the {@literal <config_options>} argument.
+     * @param optionsArgument The optional argument to parse.
+     * @return The ParserOptions represented by the optional argument.
+     */
+    public static ParserOptions parseParserOptions(String optionsArgument) {
+        log.trace("parseParserOptions()");
+        log.trace("optionsArgument: {}", optionsArgument);
+
+        boolean printAst = optionsArgument.contains("p");
+        boolean printLineNumbers = optionsArgument.contains("l");
+        boolean verbose = optionsArgument.contains("v");
+        ParserOptions parserOptions = new ParserOptions(printAst, printLineNumbers, verbose);
+        return parserOptions;
+    }
+
+    /**
      * Run the given Vikari source file through the given phase with the given options.
      *
      * @param sourceFile The source file to interpret.
      * @param phase The phase of the interpreter to run the source file through.
      * @param lexerOptions An optional set of options for configuring output of the Lexer.
      */
-    public static void runSourceFile(File sourceFile, Phase phase, LexerOptions lexerOptions) {
+    public static void runSourceFile(File sourceFile, Phase phase, LexerOptions lexerOptions, ParserOptions parserOptions) {
         log.debug("Run source file.");
         VikariProgram program = new VikariProgram();
         program.setLexerOptions(lexerOptions);
+        program.setParserOptions(parserOptions);
 
         switch (phase) {
             case LEX:
@@ -455,10 +478,12 @@ public class Main {
      * @param phase The phase of the interpreter to run the source file through.
      * @param lexerOptions An optional set of options for configuring output of the Lexer.
      */
-    public static void runSourceString(String sourceString, Phase phase, LexerOptions lexerOptions) {
+    public static void runSourceString(String sourceString, Phase phase, LexerOptions lexerOptions,
+                                       ParserOptions parserOptions) {
         log.debug("Run source string.");
         VikariProgram program = new VikariProgram();
         program.setLexerOptions(lexerOptions);
+        program.setParserOptions(parserOptions);
 
         switch (phase) {
             case LEX:
@@ -471,11 +496,11 @@ public class Main {
                 break;
             case EXECUTE:
             case DEFAULT:
-                program.lexAndParse(sourceString);
+                List<Statement> statements = program.lexAndParse(sourceString);
                 if (program.hasErrors()) {
                     program.reportSyntaxErrors();
                 } else {
-                    program.execute();
+                    program.execute(statements);
                 }
                 break;
             default:

@@ -1,6 +1,6 @@
 package com.atonement.crystals.dnr.vikari.interpreter;
 
-import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
+import com.atonement.crystals.dnr.vikari.core.crystal.identifier.TokenType;
 
 import java.util.ArrayList;
 import java.util.Comparator;

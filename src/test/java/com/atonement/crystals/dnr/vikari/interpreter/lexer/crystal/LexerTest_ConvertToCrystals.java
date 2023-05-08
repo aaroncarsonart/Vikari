@@ -1,23 +1,23 @@
 package com.atonement.crystals.dnr.vikari.interpreter.lexer.crystal;
 
-import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.comment.CommentCrystal;
-import com.atonement.crystals.dnr.vikari.core.comment.MultiLineCommentCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.ReferenceCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.TokenType;
-import com.atonement.crystals.dnr.vikari.core.literal.BooleanLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.literal.MultiLineStringLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.literal.StringLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.literal.SwordCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.FunctionCallOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.LeftAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.math.AddOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.math.ModulusOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.math.MultiplyOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.math.SubtractCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.prefix.DeleteOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.WhitespaceCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.list.LeftParenthesisCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.comment.CommentCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.comment.MultiLineCommentCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.identifier.TokenType;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.BooleanLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.StringLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.SwordCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.FunctionCallOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.assignment.LeftAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.ModulusOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.separator.WhitespaceCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
 import com.atonement.crystals.dnr.vikari.error.SyntaxError;
 import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonement.crystals.dnr.vikari.interpreter.Lexer;
@@ -1642,7 +1642,7 @@ public class LexerTest_ConvertToCrystals {
 
         int tokenNumber = 0;
         AtonementCrystal crystal = statement.get(tokenNumber);
-        assertEquals(SubtractCrystal.class, crystal.getClass(), "Unexpected crystal type for token number " +
+        assertEquals(SubtractOperatorCrystal.class, crystal.getClass(), "Unexpected crystal type for token number " +
                 tokenNumber + " with identifier \"" + crystal.getIdentifier() +  "\" in source string: \"" +
                 sourceString + "\".");
 

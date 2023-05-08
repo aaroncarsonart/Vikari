@@ -1,9 +1,9 @@
 package com.atonement.crystals.dnr.vikari.util;
 
-import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.Keyword;
-import com.atonement.crystals.dnr.vikari.core.identifier.ReferenceCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.FunctionCallOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.identifier.Keyword;
+import com.atonement.crystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.FunctionCallOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;

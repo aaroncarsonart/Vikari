@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LexerOptions {
-    public final boolean printLineNumbers;
-    public final boolean showInvisibles;
-    public final boolean separateTokens;
-    public final boolean verbose;
+    public final boolean printLineNumbers;   // l
+    public final boolean showInvisibles;     // i
+    public final boolean separateTokens;     // t
+    public final boolean verbose;            // v
 
     public LexerOptions() {
         printLineNumbers = true;

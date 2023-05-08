@@ -1,16 +1,16 @@
 package com.atonement.crystals.dnr.vikari.interpreter.lexer.crystal;
 
-import com.atonement.crystals.dnr.vikari.core.AtonementCrystal;
-import com.atonement.crystals.dnr.vikari.core.comment.MultiLineCommentCrystal;
-import com.atonement.crystals.dnr.vikari.core.identifier.ReferenceCrystal;
-import com.atonement.crystals.dnr.vikari.core.literal.MultiLineStringLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.literal.StringLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.literal.number.LongLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.TypeLabelOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.assignment.LeftAssignmentOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.operator.math.MultiplyOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.WhitespaceCrystal;
-import com.atonement.crystals.dnr.vikari.core.separator.quotation.BacktickQuotationCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.comment.MultiLineCommentCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.StringLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.literal.number.LongLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.assignment.LeftAssignmentOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.separator.WhitespaceCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.separator.quotation.BacktickQuotationCrystal;
 import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonement.crystals.dnr.vikari.interpreter.Lexer;
 import com.atonement.crystals.dnr.vikari.util.CoordinatePair;
