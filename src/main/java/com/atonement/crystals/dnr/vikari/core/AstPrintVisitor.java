@@ -1,6 +1,5 @@
 package com.atonement.crystals.dnr.vikari.core;
 
-import com.atonement.crystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonement.crystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonement.crystals.dnr.vikari.core.expression.Expression;
 import com.atonement.crystals.dnr.vikari.core.expression.GroupingExpression;
@@ -10,6 +9,7 @@ import com.atonement.crystals.dnr.vikari.core.expression.UnaryExpression;
 import com.atonement.crystals.dnr.vikari.core.statement.ExpressionStatement;
 import com.atonement.crystals.dnr.vikari.core.statement.PrintStatement;
 import com.atonement.crystals.dnr.vikari.core.statement.Statement;
+import com.atonement.crystals.dnr.vikari.core.statement.SyntaxErrorStatement;
 import com.atonement.crystals.dnr.vikari.util.Utils;
 
 /**
@@ -93,5 +93,11 @@ public class AstPrintVisitor implements Statement.Visitor<String>, Expression.Vi
     @Override
     public String visit(ExpressionStatement stmt) {
         return stmt.getExpression().accept(this);
+    }
+
+    @Override
+    public String visit(SyntaxErrorStatement stmt) {
+        String statement = stmt.getStatement();
+        return "Syntax Error: [" + statement + "]";
     }
 }

@@ -1,6 +1,5 @@
 package com.atonement.crystals.dnr.vikari.interpreter;
 
-import com.atonement.crystals.dnr.vikari.core.AstPrintVisitor;
 import com.atonement.crystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.identifier.TokenType;
@@ -18,6 +17,7 @@ import com.atonement.crystals.dnr.vikari.core.expression.UnaryExpression;
 import com.atonement.crystals.dnr.vikari.core.statement.ExpressionStatement;
 import com.atonement.crystals.dnr.vikari.core.statement.PrintStatement;
 import com.atonement.crystals.dnr.vikari.core.statement.Statement;
+import com.atonement.crystals.dnr.vikari.core.statement.SyntaxErrorStatement;
 import com.atonement.crystals.dnr.vikari.error.SyntaxError;
 import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonement.crystals.dnr.vikari.error.Vikari_ParserException;
@@ -45,6 +45,7 @@ public class Parser {
 
     private int lineCount;
     private int lastLineLength;
+    private int statementNumber;
 
     private List<AtonementCrystal> currentLine;
 
@@ -63,11 +64,13 @@ public class Parser {
         this.lexedStatements = lexedStatements;
         lineCount = lexedStatements.size();
         lastLineLength = lexedStatements.get(lexedStatements.size() - 1).size();
-        currentLine = lexedStatements.get(0);
 
         List<Statement> statements = new ArrayList<>();
         while (!isAtEnd()) {
+            // TODO: Fix statement number. Error case is stepping over the next line.
+            currentLine = lexedStatements.get(lineNumber);
             Statement statement = statement();
+            statementNumber = statement.getLocation().getRow();
             statements.add(statement);
             advanceToNextLine();
         }
@@ -82,7 +85,17 @@ public class Parser {
             return expressionStatement();
         } catch (Vikari_ParserException e) {
             synchronize();
-            return null;
+
+            // TODO: Fix statement number. Error case is stepping over the next line.
+            List<AtonementCrystal> lastVisitedLine = getLastVisitedLexedStatement();
+            String statementString = lastVisitedLine.stream()
+                    .map(AtonementCrystal::getIdentifier)
+                    .collect(Collectors.joining(""));
+
+            SyntaxErrorStatement syntaxErrorStatement = new SyntaxErrorStatement(statementString);
+            int errorLineNumber = statementNumber - 1;
+            syntaxErrorStatement.setLocation(new CoordinatePair(errorLineNumber, 0));
+            return syntaxErrorStatement;
         }
     }
 
@@ -189,8 +202,14 @@ public class Parser {
             groupingExpression.setLocation(location);
             return groupingExpression;
         }
+        AtonementCrystal errorCrystal;
+        if (isAtEndOfStatement() || isAtEnd()) {
+            errorCrystal = previous();
+        } else {
+            errorCrystal = peek();
+        }
 
-        throw error(peek(), "Expected expression.");
+        throw error(errorCrystal, "Expected expression.");
     }
 
     public boolean isAtEndOfStatement() {
@@ -244,13 +263,19 @@ public class Parser {
         return previous;
     }
 
+    public void advanceToEndOfLine() {
+        tokenNumber = currentLine.size();
+    }
+
     public void advanceToNextLine() {
         ++lineNumber;
         tokenNumber = 0;
         if (isAtEnd()) {
             currentLine = null;
+            statementNumber = lexedStatements.size() - 1;
         } else {
             currentLine = lexedStatements.get(lineNumber);
+            statementNumber++;
         }
     }
 
@@ -318,8 +343,12 @@ public class Parser {
             return advance();
         }
         AtonementCrystal errorCrystal;
-        if (isAtEnd()) {
-            errorCrystal = previous();
+        if (isAtEndOfStatement() || isAtEnd()) {
+            CoordinatePair location = previous().getCoordinates();
+            errorCrystal = new AtonementCrystal("");
+            int row = location.getRow();
+            int nextCol = location.getColumn() + 1;
+            errorCrystal.setCoordinates(new CoordinatePair(row, nextCol));
         } else {
             errorCrystal = peek();
         }
@@ -328,14 +357,25 @@ public class Parser {
 
     private Vikari_ParserException error(AtonementCrystal crystal, String errorMessage) {
         CoordinatePair location = crystal.getCoordinates();
-        String line = currentLine.stream().map(AtonementCrystal::getIdentifier).collect(Collectors.joining());
-        SyntaxError syntaxError = new SyntaxError(file, location, line, errorMessage);
+
+        List<AtonementCrystal> lastVisitedLine = getLastVisitedLexedStatement();
+        String lineString = lastVisitedLine.stream().map(AtonementCrystal::getIdentifier).collect(Collectors.joining());
+        SyntaxError syntaxError = new SyntaxError(file, location, lineString, errorMessage);
         syntaxErrorReporter.add(syntaxError);
         return new Vikari_ParserException(errorMessage);
     }
 
     private void synchronize() {
         // TODO: Will need special handling for the LINE_CONTINUATION operator ~.
-        advanceToNextLine();
+
+        advanceToEndOfLine();
+    }
+
+    private List<AtonementCrystal> getLastVisitedLexedStatement() {
+        List<AtonementCrystal> lastLine = currentLine;
+        if (currentLine == null) {
+            lastLine = lexedStatements.get(lexedStatements.size() - 1);
+        }
+        return lastLine;
     }
 }

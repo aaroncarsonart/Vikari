@@ -4,7 +4,6 @@ import com.atonement.crystals.dnr.vikari.core.AstPrintVisitor;
 import com.atonement.crystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonement.crystals.dnr.vikari.core.statement.Statement;
 import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
-import com.atonement.crystals.dnr.vikari.util.CoordinatePair;
 import com.atonement.crystals.dnr.vikari.util.Utils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -273,9 +272,7 @@ public class VikariProgram {
                 }
 
             }
-            if (lineNumber < lexedStatements.size() - 1) {
-                sb.append('\n');
-            }
+            sb.append('\n');
         }
 
         String result = sb.toString();
@@ -292,18 +289,16 @@ public class VikariProgram {
             StringBuilder sb = new StringBuilder();
             Formatter formatter = new Formatter(sb);
 
-            Statement lastParsedStatement = parsedStatements.get(parsedStatements.size() - 1);
-            int maxLineNumber = lastParsedStatement.getLocation().getRow();
+            int maxLineNumber = parsedStatements.size() - 1;
             int maxLineNumberCharWidth = String.valueOf(maxLineNumber).length();
             String lineNumberFormat = "[line:%0"+ maxLineNumberCharWidth + "d] ";
 
+            int lineNumber = 0;
             for (Statement statement : parsedStatements) {
                 if (printLineNumbers) {
 
                     if (printLineNumbers) {
-                        CoordinatePair location = statement.getLocation();
-                        int lineNumber = location.getRow();
-                        formatter.format(lineNumberFormat, lineNumber);
+                        formatter.format(lineNumberFormat, lineNumber++);
                     }
                 }
                 String result = statement.accept(astPrintVisitor);

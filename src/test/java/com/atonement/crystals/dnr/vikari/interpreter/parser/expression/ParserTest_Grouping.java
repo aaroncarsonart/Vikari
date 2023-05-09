@@ -161,7 +161,7 @@ public class ParserTest_Grouping {
 
     @Test
     @Order(4)
-    public void testGrouping_MissingClosingSquareBracket() {
+    public void testGrouping_MissingClosingSquareBracket_Factor() {
         String sourceString = "[22 / 7";
 
         Lexer lexer = new Lexer();
@@ -183,6 +183,153 @@ public class ParserTest_Grouping {
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1
+        testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 7), sourceString, "Expected `]` after expression.");
+    }
+
+    @Test
+    @Order(5)
+    public void testGrouping_MissingClosingSquareBracket_Term() {
+        String sourceString = "[3 - 2";
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+
+        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
+        parser.setSyntaxErrorReporter(syntaxErrorReporter);
+
+        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
+
+        int expectedSize = 1;
+        int actualSize = parsedStatements.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
         testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 6), sourceString, "Expected `]` after expression.");
+    }
+
+    @Test
+    @Order(6)
+    public void testGrouping_EmptyGrouping() {
+        String sourceString = "[]";
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+
+        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
+        parser.setSyntaxErrorReporter(syntaxErrorReporter);
+
+        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
+
+        int expectedSize = 1;
+        int actualSize = parsedStatements.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 1), sourceString, "Expected expression.");
+    }
+
+    @Test
+    @Order(7)
+    public void testGrouping_BareSingleBrackets() {
+        List<String> sourceStrings = List.of("[", "]");
+        for (String sourceString : sourceStrings) {
+
+            Lexer lexer = new Lexer();
+            Parser parser = new Parser();
+
+            SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
+            lexer.setSyntaxErrorReporter(syntaxErrorReporter);
+            parser.setSyntaxErrorReporter(syntaxErrorReporter);
+
+            List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+            List<Statement> parsedStatements = parser.parse(null, lexedStatements);
+
+            int expectedSize = 1;
+            int actualSize = parsedStatements.size();
+            assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+            assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+            List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+            assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
+
+            // Syntax Error 1
+            testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 0), sourceString, "Expected expression.");
+        }
+    }
+
+    @Test
+    @Order(8)
+    public void testGrouping_MissingOpeningSquareBracket_twoLines() {
+        String sourceString = "3 - 2]\n" +
+                              "3 - 2]";
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+
+        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
+        parser.setSyntaxErrorReporter(syntaxErrorReporter);
+
+        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
+
+        int expectedSize = 2;
+        int actualSize = parsedStatements.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        assertEquals(2, syntaxErrors.size(), "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 5), "3 - 2]", "Expected expression.");
+
+        // Syntax Error 2
+        testSyntaxError(syntaxErrors.get(1), new CoordinatePair(1, 5), "3 - 2]", "Expected expression.");
+    }
+
+    @Test
+    @Order(9)
+    public void testGrouping_MissingClosingSquareBracket_twoLines() {
+        String sourceString = "[3 - 2\n" +
+                              "[3 - 2";
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+
+        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
+        parser.setSyntaxErrorReporter(syntaxErrorReporter);
+
+        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
+
+        syntaxErrorReporter.reportErrors();
+
+        int expectedSize = 2;
+        int actualSize = parsedStatements.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        assertEquals(2, syntaxErrors.size(), "Unexpected number of syntax errors.");
+
+        // Syntax Error 1
+        testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 6), "[3 - 2", "Expected `]` after expression.");
+
+        // Syntax Error 2
+        testSyntaxError(syntaxErrors.get(1), new CoordinatePair(1, 6), "[3 - 2", "Expected `]` after expression.");
     }
 }

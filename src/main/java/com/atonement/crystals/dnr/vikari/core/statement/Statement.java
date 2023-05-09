@@ -16,6 +16,7 @@ public abstract class Statement {
     public interface Visitor<S> {
         S visit(PrintStatement stmt);
         S visit(ExpressionStatement stmt);
+        S visit(SyntaxErrorStatement stmt);
     }
 
     public abstract <S> S accept(Visitor<S> visitor);
