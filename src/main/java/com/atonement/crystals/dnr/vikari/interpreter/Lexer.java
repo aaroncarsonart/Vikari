@@ -9,8 +9,12 @@ import com.atonement.crystals.dnr.vikari.core.crystal.literal.BooleanLiteralCrys
 import com.atonement.crystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.literal.StringLiteralCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.literal.SwordCrystal;
-import com.atonement.crystals.dnr.vikari.core.crystal.literal.number.DoubleLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.crystal.literal.number.LongLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.BigDecimalCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.BigIntegerCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.DoubleCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.FloatCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.IntegerCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.LongCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.operator.control.flow.ContinueOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.ModulusOperatorCrystal;
@@ -36,6 +40,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -84,6 +89,7 @@ public class Lexer {
      */
     public List<List<AtonementCrystal>> lexVikariSourceCode(String sourceCode) {
         log.trace("lexVikariSourceCode()");
+        currentFile = null;
         List<List<String>> statementsOfStringTokens = lexToStringTokens(sourceCode);
         statementsOfStringTokens = collapseTokens(statementsOfStringTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = convertTokensToCrystals(statementsOfStringTokens);
@@ -289,11 +295,11 @@ public class Lexer {
                 // -------------------------------------------
                 // 4: Collapse decimal number literal values.
                 // -------------------------------------------
-                else if (Utils.isLongIntegerNumber(token)) {
+                else if (Utils.isBigIntegerNumber(token)) {
                     if (tokenNumber + 2 < line.size()) {
                         String maybeDot = line.get(tokenNumber + 1);
                         String maybeInteger = line.get(tokenNumber + 2);
-                        if (maybeDot.equals(".") && Utils.isLongIntegerNumber(maybeInteger)) {
+                        if (maybeDot.equals(".") && Utils.isValidDecimalFractionalPart(maybeInteger)) {
                             String newDecimalToken = token + maybeDot + maybeInteger;
                             nextToken = newDecimalToken;
                             tokenNumber += 2;
@@ -363,7 +369,7 @@ public class Lexer {
                 if (token.equals(TokenType.NEGATE.getIdentifier())) {
                     if (tokenNumber < collapsedLine.size() - 1) {
                         String followingToken = collapsedLine.get(tokenNumber + 1);
-                        if (Utils.isDecimalNumber(followingToken) || Utils.isLongIntegerNumber(followingToken)) {
+                        if (Utils.isBigDecimalNumber(followingToken) || Utils.isBigIntegerNumber(followingToken)) {
                             nextToken = token + followingToken;
                             tokenNumber++;
                         }
@@ -490,25 +496,55 @@ public class Lexer {
                     continue;
                 }
 
-                // TODO: Diversify type handling to allow for int, long, and BigInteger types.
+                // TODO: Impose maximum limits on length of Vikari number literals.
 
                 // handle integer number literals
-                if (Utils.isLongIntegerNumber(stringToken)) {
-                    // TODO: Impose maximum limits on length of Vikari number literals.
-                    LongLiteralCrystal numberCrystal = new LongLiteralCrystal(stringToken);
-                    numberCrystal.setValue(Long.valueOf(stringToken));
+                if (Utils.isIntegerNumber(stringToken)) {
+                    IntegerCrystal numberCrystal = new IntegerCrystal(stringToken, stringToken);
+                    numberCrystal.setCoordinates(tokenCoordinates);
+                    statementOfCrystals.add(numberCrystal);
+                    continue;
+                } else if (Utils.isLongIntegerNumber(stringToken)) {
+                    String numericValue = stringToken;
+                    if (Utils.hasLongSuffix(numericValue)) {
+                        numericValue = Utils.trimLastCharacter(numericValue);
+                    }
+                    LongCrystal numberCrystal = new LongCrystal(stringToken, numericValue);
+                    numberCrystal.setCoordinates(tokenCoordinates);
+                    statementOfCrystals.add(numberCrystal);
+                    continue;
+                } else if (Utils.isBigIntegerNumber(stringToken)) {
+                    String numericValue = stringToken;
+                    if (Utils.hasBigSuffix(numericValue)) {
+                        numericValue = Utils.trimLastCharacter(numericValue);
+                    }
+                    BigIntegerCrystal numberCrystal = new BigIntegerCrystal(stringToken, numericValue);
                     numberCrystal.setCoordinates(tokenCoordinates);
                     statementOfCrystals.add(numberCrystal);
                     continue;
                 }
 
-                // TODO: Diversify type handling to allow for float, double, and BigDecimal types.
+                // TODO: Impose maximum limits on length of Vikari number literals.
 
                 // handle decimal number literals
-                if (Utils.isDecimalNumber(stringToken)) {
-                    // TODO: Impose maximum limits on length of Vikari number literals.
-                    DoubleLiteralCrystal numberCrystal = new DoubleLiteralCrystal(stringToken);
-                    numberCrystal.setValue(Double.valueOf(stringToken));
+                if (Utils.isDoubleNumber(stringToken)) {
+                    // Double is checked first so unspecified decimal literals, aka 1.2, default to a Double type.
+                    DoubleCrystal numberCrystal = new DoubleCrystal(stringToken, stringToken);
+                    numberCrystal.setCoordinates(tokenCoordinates);
+                    statementOfCrystals.add(numberCrystal);
+                    continue;
+                } else if (Utils.isFloatNumber(stringToken)) {
+                    FloatCrystal numberCrystal = new FloatCrystal(stringToken, stringToken);
+                    numberCrystal.setCoordinates(tokenCoordinates);
+                    statementOfCrystals.add(numberCrystal);
+                    continue;
+                } else if (Utils.isBigDecimalNumber(stringToken)) {
+                    String numericValue = stringToken;
+                    if (Utils.hasBigSuffix(numericValue)) {
+                        numericValue = Utils.trimLastCharacter(numericValue);
+                    }
+                    BigDecimal bigDecimal = new BigDecimal(numericValue, Arithmetic.getMathContext());
+                    BigDecimalCrystal numberCrystal = new BigDecimalCrystal(stringToken, bigDecimal);
                     numberCrystal.setCoordinates(tokenCoordinates);
                     statementOfCrystals.add(numberCrystal);
                     continue;

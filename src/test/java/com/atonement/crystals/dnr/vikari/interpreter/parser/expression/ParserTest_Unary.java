@@ -17,7 +17,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 
-import static com.atonement.crystals.dnr.vikari.interpreter.parser.ParserTest_Utils.assertNoSyntaxErrors;
+import static com.atonement.crystals.dnr.vikari.interpreter.TestUtils.assertNoSyntaxErrors;
 import static com.atonement.crystals.dnr.vikari.interpreter.parser.ParserTest_Utils.testBinaryExpression;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -65,6 +65,6 @@ public class ParserTest_Unary {
 
         // 3. inner expression (subtract: "5 - 3")
         Expression innerExpression = groupingExpression.getExpression();
-        testBinaryExpression(innerExpression, SubtractOperatorCrystal.class, 5L, 3L);
+        testBinaryExpression(innerExpression, SubtractOperatorCrystal.class, 5, 3);
     }
 }

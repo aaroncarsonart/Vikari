@@ -2,6 +2,7 @@ package com.atonement.crystals.dnr.vikari.interpreter;
 
 import com.atonement.crystals.dnr.vikari.core.AstPrintVisitor;
 import com.atonement.crystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.Type;
 import com.atonement.crystals.dnr.vikari.core.statement.Statement;
 import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonement.crystals.dnr.vikari.util.Utils;
@@ -35,6 +36,7 @@ public class VikariProgram {
 
     private List<List<List<AtonementCrystal>>> replLexerResults;
     private List<List<Statement>> replParserResults;
+    private Map<String, Type> loadedTypes;
 
     public VikariProgram() {
         log.trace("VikariProgram constructor.");
@@ -51,6 +53,25 @@ public class VikariProgram {
 
         replLexerResults = new ArrayList<>();
         replParserResults = new ArrayList<>();
+        loadedTypes = new LinkedHashMap<>();
+
+        loadTypes();
+    }
+
+    private void loadTypes() {
+        List<Type> types = new ArrayList<>();
+
+        String langPackage = "dnr::vikari::lang";
+        types.add(new Type(langPackage, "Integer"));
+        types.add(new Type(langPackage, "Decimal"));
+        types.add(new Type(langPackage, "Boolean"));
+        types.add(new Type(langPackage, "Character"));
+        types.add(new Type(langPackage, "String"));
+        types.add(new Type(langPackage, "Null"));
+
+        for (Type type : types) {
+            loadedTypes.put(type.getFullyQualifiedTypeName(), type);
+        }
     }
 
     public void setLexerOptions(LexerOptions lexerOptions) {
@@ -204,9 +225,10 @@ public class VikariProgram {
         // -----------------------------
         // 3. Execute the resulting AST.
         // -----------------------------
+        List<List<AtonementCrystal>> lexedStatements = lexerResults.get(filePath);
+        interpreter.setLexedStatements(lexedStatements);
         List<Statement> parsedStatements = parserResults.get(filePath);
-
-        // TODO: Implement interpreter.
+        interpreter.interpret(sourceFile, parsedStatements);
     }
 
     /**
@@ -218,8 +240,9 @@ public class VikariProgram {
         // -----------------------------
         // 3. Execute the resulting AST.
         // -----------------------------
-
-        // TODO: Implement interpreter.
+        List<List<AtonementCrystal>> lastReplLexerResults = replLexerResults.get(replLexerResults.size() - 1);
+        interpreter.setLexedStatements(lastReplLexerResults);
+        interpreter.interpret(null, parsedStatements);
     }
 
     /**
@@ -235,7 +258,7 @@ public class VikariProgram {
      * @param separateTokens Prints each token in quotes, separated by commas.
      * @param verbose Prints each token with quotes enclosed by its type name.
      */
-    public void printLexedStatements(List<List<AtonementCrystal>> lexedStatements, boolean printLineNumbers,
+    public static void printLexedStatements(List<List<AtonementCrystal>> lexedStatements, boolean printLineNumbers,
                                      boolean showInvisibles, boolean separateTokens, boolean verbose) {
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb);

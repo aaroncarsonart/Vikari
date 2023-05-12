@@ -11,12 +11,40 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UtilsTest {
 
     @Test
     @Order(1)
+    public void testUtils_isIntegerNumber() {
+        // positive tests
+        String integer = "2";
+        assertTrue(Utils.isIntegerNumber(integer), "Expected integer number to return true for Utils::isIntegerNumber.");
+        integer = "-32";
+        assertTrue(Utils.isIntegerNumber(integer), "Expected integer number to return true for Utils::isIntegerNumber.");
+        integer = "98209380";
+        assertTrue(Utils.isIntegerNumber(integer), "Expected integer number to return true for Utils::isIntegerNumber.");
+
+        // negative tests
+        String longInteger = "22L";
+        assertTrue(Utils.isLongIntegerNumber(longInteger), "Expected long literal to return false for Utils::isIntegerNumber.");
+        longInteger = "913l";
+        assertTrue(Utils.isLongIntegerNumber(longInteger), "Expected long literal to return false for Utils::isIntegerNumber.");
+        longInteger = "4000000000";
+        assertTrue(Utils.isLongIntegerNumber(longInteger), "Expected long literal to return false for Utils::isIntegerNumber.");
+
+        String notInteger = "3.14";
+        assertFalse(Utils.isLongIntegerNumber(notInteger), "Expected decimal number to return false for Utils::isIntegerNumber.");
+        notInteger = "-6.28";
+        assertFalse(Utils.isLongIntegerNumber(notInteger), "Expected decimal number to return false for Utils::isIntegerNumber.");
+        notInteger = "foo";
+        assertFalse(Utils.isLongIntegerNumber(notInteger), "Expected non-number to return false for Utils::isIntegerNumber.");
+    }
+
+    @Test
+    @Order(2)
     public void testUtils_isLongNumber() {
         // positive tests
         String integer = "2";
@@ -25,9 +53,16 @@ class UtilsTest {
         assertTrue(Utils.isLongIntegerNumber(integer), "Expected integer number to return true for Utils::isLongNumber.");
         integer = "98209380";
         assertTrue(Utils.isLongIntegerNumber(integer), "Expected integer number to return true for Utils::isLongNumber.");
-        String notInteger = "3.14";
+        integer = "22L";
+        assertTrue(Utils.isLongIntegerNumber(integer), "Expected long literal to return true for Utils::isLongNumber.");
+        integer = "913l";
+        assertTrue(Utils.isLongIntegerNumber(integer), "Expected long literal to return true for Utils::isLongNumber.");
+        integer = "4000000000";
+        assertTrue(Utils.isLongIntegerNumber(integer), "Expected long literal to return true for Utils::isLongNumber.");
+
 
         // negative tests
+        String notInteger = "3.14";
         assertFalse(Utils.isLongIntegerNumber(notInteger), "Expected decimal number to return false for Utils::isLongNumber.");
         notInteger = "-6.28";
         assertFalse(Utils.isLongIntegerNumber(notInteger), "Expected decimal number to return false for Utils::isLongNumber.");
@@ -36,27 +71,67 @@ class UtilsTest {
     }
 
     @Test
-    @Order(2)
-    public void testUtils_isDecimalNumber() {
-        // negative tests
-        String notDecimal = "2";
-        assertFalse(Utils.isDecimalNumber(notDecimal), "Expected integer number to return false for Utils::isDecimalNumber.");
-        notDecimal = "-32";
-        assertFalse(Utils.isDecimalNumber(notDecimal), "Expected integer number to return false for Utils::isDecimalNumber.");
-        notDecimal = "98209380";
-        assertFalse(Utils.isDecimalNumber(notDecimal), "Expected integer number to return false for Utils::isDecimalNumber.");
-
+    @Order(3)
+    public void testUtils_isFloatNumber() {
         // positive tests
+        String notDecimal = "2";
+        assertTrue(Utils.isFloatNumber(notDecimal), "Expected integer number to return true for Utils::isFloatNumber.");
+        notDecimal = "-32";
+        assertTrue(Utils.isFloatNumber(notDecimal), "Expected integer number to return true for Utils::isFloatNumber.");
+        notDecimal = "98209380";
+        assertTrue(Utils.isFloatNumber(notDecimal), "Expected integer number to return true for Utils::isFloatNumber.");
+
         String decimal = "3.14";
-        assertTrue(Utils.isDecimalNumber(decimal), "Expected decimal number to return true for Utils::isDecimalNumber.");
+        assertTrue(Utils.isFloatNumber(decimal), "Expected decimal number to return true for Utils::isFloatNumber.");
         decimal = "-6.28";
-        assertTrue(Utils.isDecimalNumber(decimal), "Expected decimal number to return true for Utils::isDecimalNumber.");
-        decimal = "foo";
-        assertFalse(Utils.isDecimalNumber(decimal), "Expected non-number to return false for Utils::isDecimalNumber.");
+        assertTrue(Utils.isFloatNumber(decimal), "Expected decimal number to return true for Utils::isFloatNumber.");
+
+        String floatLiteral = "2.0F";
+        assertTrue(Utils.isFloatNumber(floatLiteral), "Expected float literal to return true for Utils::isFloatNumber.");
+        floatLiteral = "22.7f";
+        assertTrue(Utils.isFloatNumber(floatLiteral), "Expected float literal to return true for Utils::isFloatNumber.");
+
+        // negative tests
+        String doubleLiteral = "2.0D";
+        assertFalse(Utils.isFloatNumber(doubleLiteral), "Expected double literal to return false for Utils::isFloatNumber.");
+        doubleLiteral = "22.7d";
+        assertFalse(Utils.isFloatNumber(doubleLiteral), "Expected double literal to return false for Utils::isFloatNumber.");
+        String nonNumber = "foo";
+        assertFalse(Utils.isFloatNumber(nonNumber), "Expected non-number to return false for Utils::isFloatNumber.");
     }
 
     @Test
-    @Order(3)
+    @Order(4)
+    public void testUtils_isDoubleNumber() {
+        // positive tests
+        String notDecimal = "2";
+        assertTrue(Utils.isDoubleNumber(notDecimal), "Expected integer number to return true for Utils::isDoubleNumber.");
+        notDecimal = "-32";
+        assertTrue(Utils.isDoubleNumber(notDecimal), "Expected integer number to return true for Utils::isDoubleNumber.");
+        notDecimal = "98209380";
+        assertTrue(Utils.isDoubleNumber(notDecimal), "Expected integer number to return true for Utils::isDoubleNumber.");
+
+        String decimal = "3.14";
+        assertTrue(Utils.isDoubleNumber(decimal), "Expected decimal number to return true for Utils::isDoubleNumber.");
+        decimal = "-6.28";
+        assertTrue(Utils.isDoubleNumber(decimal), "Expected decimal number to return true for Utils::isDoubleNumber.");
+
+        String doubleLiteral = "2.0D";
+        assertTrue(Utils.isDoubleNumber(doubleLiteral), "Expected double literal to return true for Utils::isDoubleNumber.");
+        doubleLiteral = "22.7d";
+        assertTrue(Utils.isDoubleNumber(doubleLiteral), "Expected double literal to return true for Utils::isDoubleNumber.");
+
+        // negative tests
+        String floatLiteral = "2.0F";
+        assertFalse(Utils.isDoubleNumber(floatLiteral), "Expected float literal to return false for Utils::isDoubleNumber.");
+        floatLiteral = "22.7f";
+        assertFalse(Utils.isDoubleNumber(floatLiteral), "Expected float literal to return false for Utils::isDoubleNumber.");
+        decimal = "foo";
+        assertFalse(Utils.isDoubleNumber(decimal), "Expected non-number to return false for Utils::isDoubleNumber.");
+    }
+
+    @Test
+    @Order(5)
     public void testUtils_stripEnclosure() {
         String enclosure = "`foo`";
         String inner = Utils.stripEnclosure(enclosure, "`", "`");
@@ -90,7 +165,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(4)
+    @Order(6)
     public void testUtils_isWhitespace() {
         // positive tests
         assertTrue(Utils.isWhitespace(" "), "Single-space string should return true for" +
@@ -112,7 +187,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(5)
+    @Order(7)
     public void testUtils_isBacktickQuotedIdentifier() {
         // positive tests
         assertTrue(Utils.isBacktickQuotedIdentifier("`:`"), "A character literal is a quoted identifier.");
@@ -128,7 +203,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(6)
+    @Order(8)
     public void testUtils_isSword() {
         // positive tests
         String sword = "_";
@@ -168,7 +243,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(6)
+    @Order(9)
     public void testUtils_isBooleanLiteral() {
         // positive tests
         String booleanLiteral = Keyword.TRUE.getIdentifier();
@@ -200,7 +275,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(7)
+    @Order(10)
     public void testUtils_isEnclosedString() {
         // positive tests
         String enclosedString = "``foo``";
@@ -254,7 +329,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(8)
+    @Order(11)
     public void testUtils_isStringLiteral() {
         // positive tests
         String stringLiteral = "``foo``";
@@ -283,7 +358,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(9)
+    @Order(12)
     public void testUtils_isStartOfStringLiteral() {
         // positive tests
         String stringLiteral = "``foo``";
@@ -312,7 +387,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(9)
+    @Order(13)
     public void testUtils_isEndOfStringLiteral() {
         // positive tests
         String stringLiteral = "``foo``";
@@ -341,7 +416,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(9)
+    @Order(14)
     public void testUtils_isSingleLineComment() {
         // positive tests
         String comment = "~:This is a comment.:~";
@@ -367,7 +442,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(10)
+    @Order(15)
     public void testUtils_isStartOfComment() {
         // positive tests
         String comment = "~:This is a comment.:~";
@@ -393,7 +468,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(11)
+    @Order(16)
     public void testUtils_isEndOfComment() {
         // positive tests
         String comment = "~:This is a comment.:~";
@@ -419,7 +494,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(11)
+    @Order(17)
     public void testUtils_showInvisibles() {
         // positive tests
         String containingInvisibles = "\t";
@@ -467,7 +542,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(12)
+    @Order(18)
     public void testUtils_getSimpleClassName() {
         // positive tests
         AtonementCrystal className = new ReferenceCrystal("referenceIdentifier");
@@ -488,7 +563,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(13)
+    @Order(19)
     public void testUtils_countOccurrences() {
         // Expect no matches.
         String sourceString = "foo";
@@ -528,5 +603,75 @@ class UtilsTest {
         expected = 2;
         actual = Utils.countOccurrences(sourceString, searchString, regionEnd);
         assertEquals(expected, actual, "Unexpected result for countOccurrences().");
+    }
+
+    @Test
+    @Order(20)
+    public void testHasLongSuffix() {
+        assertTrue(Utils.hasLongSuffix("22L"), "Expected literal to have a long suffix.");
+        assertTrue(Utils.hasLongSuffix("7l"), "Expected literal to have a long suffix.");
+        assertFalse(Utils.hasLongSuffix("512B"), "Expected big integer literal to have a long suffix.");
+        assertFalse(Utils.hasLongSuffix("3.14b"), "Expected big decimal literal to have a long suffix.");
+        assertFalse(Utils.hasLongSuffix("5"), "Expected an integer literal to not have a big suffix.");
+        assertFalse(Utils.hasLongSuffix("5f"), "Expected a float literal to not have a big suffix.");
+        assertFalse(Utils.hasLongSuffix("5d"), "Expected a double literal to not have a big suffix.");
+        assertFalse(Utils.hasLongSuffix("3.14"), "Expected an double literal to not have a big suffix.");
+    }
+
+    @Test
+    @Order(21)
+    public void testHasBigSuffix() {
+        assertTrue(Utils.hasBigSuffix("5B"), "Expected literal to have a big suffix.");
+        assertTrue(Utils.hasBigSuffix("5b"), "Expected literal to have a big suffix.");
+        assertTrue(Utils.hasBigSuffix("3.14B"), "Expected literal to have a big suffix.");
+        assertTrue(Utils.hasBigSuffix("3.14b"), "Expected literal to have a big suffix.");
+        assertFalse(Utils.hasBigSuffix("5"), "Expected an integer literal to not have a big suffix.");
+        assertFalse(Utils.hasBigSuffix("5f"), "Expected a float literal to not have a big suffix.");
+        assertFalse(Utils.hasBigSuffix("5d"), "Expected a double literal to not have a big suffix.");
+        assertFalse(Utils.hasBigSuffix("3.14"), "Expected an double literal to not have a big suffix.");
+    }
+
+    @Test
+    @Order(22)
+    public void testTrimLastCharacter() {
+        assertEquals("5", Utils.trimLastCharacter("5B"), "Unexpected trim result.");
+        assertEquals("5", Utils.trimLastCharacter("5b"), "Unexpected trim result.");
+        assertEquals("3.14", Utils.trimLastCharacter("3.14B"), "Unexpected trim result.");
+        assertEquals("3.14", Utils.trimLastCharacter("3.14b"), "Unexpected trim result.");
+        assertEquals("22", Utils.trimLastCharacter("22L"), "Unexpected trim result.");
+        assertEquals("7", Utils.trimLastCharacter("7l"), "Unexpected trim result.");
+    }
+
+    @Test
+    @Order(23)
+    public void testIsBigInteger() {
+        assertTrue(Utils.isBigIntegerNumber("5"), "Expected literal to be a big decimal number.");
+        assertTrue(Utils.isBigIntegerNumber("7B"), "Expected literal to be a big decimal number.");
+        assertTrue(Utils.isBigIntegerNumber("22b"), "Expected literal to be a big decimal number.");
+    }
+
+    @Test
+    @Order(24)
+    public void testIsBigDecimal() {
+        assertTrue(Utils.isBigDecimalNumber("5"), "Expected literal to be a big decimal number.");
+        assertTrue(Utils.isBigDecimalNumber("3.14"), "Expected literal to be a big decimal number.");
+        assertTrue(Utils.isBigDecimalNumber("7B"), "Expected literal to be a big decimal number.");
+        assertTrue(Utils.isBigDecimalNumber("7.0b"), "Expected literal to be a big decimal number.");
+    }
+
+    @Test
+    @Order(25)
+    public void testIsValidDecimalFractionalPart() {
+        assertTrue(Utils.isValidDecimalFractionalPart("5"), "Expected to be a valid decimal fractional part.");
+        assertTrue(Utils.isValidDecimalFractionalPart("5f"), "Expected to be a valid decimal fractional part.");
+        assertTrue(Utils.isValidDecimalFractionalPart("5F"), "Expected to be a valid decimal fractional part.");
+        assertTrue(Utils.isValidDecimalFractionalPart("5d"), "Expected to be a valid decimal fractional part.");
+        assertTrue(Utils.isValidDecimalFractionalPart("5D"), "Expected to be a valid decimal fractional part.");
+        assertTrue(Utils.isValidDecimalFractionalPart("5b"), "Expected to be a valid decimal fractional part.");
+        assertTrue(Utils.isValidDecimalFractionalPart("5B"), "Expected to be a valid decimal fractional part.");
+        assertFalse(Utils.isValidDecimalFractionalPart("5.0"), "Expected to not be a valid decimal fractional part.");
+        assertFalse(Utils.isValidDecimalFractionalPart("5.0B"), "Expected to not be a valid decimal fractional part.");
+        assertFalse(Utils.isValidDecimalFractionalPart("7Y"), "Expected to not be a valid decimal fractional part.");
+        assertFalse(Utils.isValidDecimalFractionalPart("22BB"), "Expected to not be a valid decimal fractional part.");
     }
 }

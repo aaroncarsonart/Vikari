@@ -42,41 +42,11 @@ public class SyntaxErrorReporter {
         sb.append("Syntax Errors:\n");
         sb.append("--------------\n");
 
-        String tab = "\t";
-        String tabReplacement = "    ";
-
         for (int i = 0; i < syntaxErrors.size(); i++) {
             SyntaxError syntaxError = syntaxErrors.get(i);
-            File file = syntaxError.getFile();
-
-            String filename;
-            if (file == null) {
-                filename = "<repl>";
-            } else {
-                filename = Utils.getShortenedFilename(file);
-            }
-
-            CoordinatePair location = syntaxError.getLocation();
-            int row = location.getRow();
-            int column = location.getColumn();
-
-            String line = syntaxError.getLine();
-
-            // Need to sanitize code lines containing tab characters.
-            int tabCount = Utils.countOccurrences(line, tab, column);
-            line = line.replaceAll(tab, tabReplacement);
-
-            String message = syntaxError.getMessage();
-
-            formatter.format("%s:%d:%d:\n", filename, row, column);
-            formatter.format("    %s\n", line);
-
-            // Need to offset the caret placement based on the sanitized tabs.
-            int tabOffset = tabCount * (tabReplacement.length() - 1);
-            int caretOffset = column + 1 + tabOffset;
-
-            formatter.format("    %" + caretOffset + "s\n", "^");
-            formatter.format("    %s\n", message);
+            String errorReport = syntaxError.getErrorReport();
+            sb.append(errorReport);
+            sb.append('\n');
 
             // Separate entries by an additional newline.
             if (i < syntaxErrors.size() - 1) {

@@ -1,6 +1,6 @@
 package com.atonement.crystals.dnr.vikari.interpreter;
 
-import com.atonement.crystals.dnr.vikari.error.Vikari_Error;
+import com.atonement.crystals.dnr.vikari.error.Vikari_Exception;
 import com.atonement.crystals.dnr.vikari.error.Vikari_IOException;
 import org.apache.commons.io.FilenameUtils;
 
@@ -43,7 +43,7 @@ public class VikariSourceFileLoader {
 
             return sourceFile;
 
-        } catch (Vikari_Error e) {
+        } catch (Vikari_Exception e) {
             System.out.println(e.getErrorName() + ": " + e.getErrorMessage());
             System.exit(1);
         }

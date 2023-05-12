@@ -14,6 +14,7 @@ import com.atonement.crystals.dnr.vikari.core.statement.Statement;
 import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonement.crystals.dnr.vikari.interpreter.Lexer;
 import com.atonement.crystals.dnr.vikari.interpreter.Parser;
+import com.atonement.crystals.dnr.vikari.interpreter.TestUtils;
 import com.atonement.crystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -44,7 +45,7 @@ public class ParserTest_PrintStatement {
         List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        assertNoSyntaxErrors(syntaxErrorReporter);
+        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -84,7 +85,7 @@ public class ParserTest_PrintStatement {
         List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        assertNoSyntaxErrors(syntaxErrorReporter);
+        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -109,7 +110,7 @@ public class ParserTest_PrintStatement {
         Expression innerExpression = printExpression.getExpression();
         assertEquals(LiteralExpression.class, innerExpression.getClass(), "Unexpected expression type.");
 
-        testIntegerLiteralExpression(innerExpression, 2L);
+        testIntegerLiteralExpression(innerExpression, 2);
     }
 
     @Test
@@ -127,7 +128,7 @@ public class ParserTest_PrintStatement {
         List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        assertNoSyntaxErrors(syntaxErrorReporter);
+        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -152,7 +153,7 @@ public class ParserTest_PrintStatement {
         Expression innerExpression = printExpression.getExpression();
         assertEquals(LiteralExpression.class, innerExpression.getClass(), "Unexpected expression type.");
 
-        testIntegerLiteralExpression(innerExpression, 12L);
+        testIntegerLiteralExpression(innerExpression, 12);
 
         // print expression 2
         printExpression = printExpressions.get(1);
@@ -175,7 +176,7 @@ public class ParserTest_PrintStatement {
         List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        assertNoSyntaxErrors(syntaxErrorReporter);
+        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -221,7 +222,7 @@ public class ParserTest_PrintStatement {
         List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        assertNoSyntaxErrors(syntaxErrorReporter);
+        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -241,13 +242,13 @@ public class ParserTest_PrintStatement {
         actualSize = printExpressions.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of print statements.");
 
-        List<Long> expectedValues = List.of(1L, 2L, 3L);
+        List<Integer> expectedValues = List.of(1, 2, 3);
 
         // test expressions
         for (int i = 0; i < 3; i++) {
             PrintExpression printExpression = printExpressions.get(i);
             Expression innerExpression = printExpression.getExpression();
-            Long expectedValue = expectedValues.get(i);
+            Integer expectedValue = expectedValues.get(i);
             testIntegerLiteralExpression(innerExpression, expectedValue);
         }
     }
@@ -267,7 +268,7 @@ public class ParserTest_PrintStatement {
         List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        assertNoSyntaxErrors(syntaxErrorReporter);
+        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -294,7 +295,7 @@ public class ParserTest_PrintStatement {
 
         GroupingExpression groupingExpression = (GroupingExpression) innerExpression;
         innerExpression = groupingExpression.getExpression();
-        testBinaryExpression(innerExpression, MultiplyOperatorCrystal.class, 3L, 2L);
+        testBinaryExpression(innerExpression, MultiplyOperatorCrystal.class, 3, 2);
     }
 
     @Test
@@ -315,7 +316,7 @@ public class ParserTest_PrintStatement {
         List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        assertNoSyntaxErrors(syntaxErrorReporter);
+        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 4;
         int actualSize = parsedStatements.size();
@@ -340,12 +341,12 @@ public class ParserTest_PrintStatement {
         // expression 1 (literal: 1)
         PrintExpression printExpression = printExpressions.get(0);
         Expression innerExpression = printExpression.getExpression();
-        testIntegerLiteralExpression(innerExpression, 1L);
+        testIntegerLiteralExpression(innerExpression, 1);
 
         // expression 2 (binary: 2 - 3)
         printExpression = printExpressions.get(1);
         innerExpression = printExpression.getExpression();
-        testBinaryExpression(innerExpression, SubtractOperatorCrystal.class, 2L, 3L);
+        testBinaryExpression(innerExpression, SubtractOperatorCrystal.class, 2, 3);
 
         // expression 3 (empty print expression)
         printExpression = printExpressions.get(2);
@@ -375,7 +376,7 @@ public class ParserTest_PrintStatement {
 
         GroupingExpression groupingExpression = (GroupingExpression) innerExpression;
         innerExpression = groupingExpression.getExpression();
-        testBinaryExpression(innerExpression, LeftDivideOperatorCrystal.class, 12L, 7L);
+        testBinaryExpression(innerExpression, LeftDivideOperatorCrystal.class, 12, 7);
 
         // expression 2 (null)
         printExpression = printExpressions.get(1);
@@ -401,17 +402,17 @@ public class ParserTest_PrintStatement {
         // expression 1 (literal: 4)
         printExpression = printExpressions.get(0);
         innerExpression = printExpression.getExpression();
-        testIntegerLiteralExpression(innerExpression, 4L);
+        testIntegerLiteralExpression(innerExpression, 4);
 
         // expression 1 (literal: 5)
         printExpression = printExpressions.get(1);
         innerExpression = printExpression.getExpression();
-        testIntegerLiteralExpression(innerExpression, 5L);
+        testIntegerLiteralExpression(innerExpression, 5);
 
         // expression 1 (literal: 6)
         printExpression = printExpressions.get(2);
         innerExpression = printExpression.getExpression();
-        testIntegerLiteralExpression(innerExpression, 6L);
+        testIntegerLiteralExpression(innerExpression, 6);
 
         // -----------
         // statement 4

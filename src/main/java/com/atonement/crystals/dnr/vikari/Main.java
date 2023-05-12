@@ -1,7 +1,7 @@
 package com.atonement.crystals.dnr.vikari;
 
 import com.atonement.crystals.dnr.vikari.core.statement.Statement;
-import com.atonement.crystals.dnr.vikari.error.Vikari_TypeError;
+import com.atonement.crystals.dnr.vikari.error.Vikari_TypeException;
 import com.atonement.crystals.dnr.vikari.interpreter.LexerOptions;
 import com.atonement.crystals.dnr.vikari.interpreter.ParserOptions;
 import com.atonement.crystals.dnr.vikari.interpreter.Phase;
@@ -81,7 +81,7 @@ public class Main {
             }
 
             Phase phase = Phase.DEFAULT;
-            String defaultConfigOptions = "litp";
+            String defaultConfigOptions = "";
             LexerOptions lexerOptions = parseLexerOptions(defaultConfigOptions);
             ParserOptions parserOptions = parseParserOptions(defaultConfigOptions);
             List<String> argsList = cmd.getArgList();
@@ -228,7 +228,7 @@ public class Main {
                     String message = "Type name not resolvable. Use the following formats:\n" +
                             "``path::to::Type``\n" +
                             "``path::to::script``";
-                    throw new Vikari_TypeError(message);
+                    throw new Vikari_TypeException(message);
                 }
                 expectedAdditionalArguments = 0;
             }
@@ -283,7 +283,7 @@ public class Main {
                 throw new IllegalStateException("Unreachable code.");
             }
 
-        } catch (ParseException | Vikari_TypeError e) {
+        } catch (ParseException | Vikari_TypeException e) {
             String message = e.getMessage();
             log.debug(message);
             System.err.println(message);
@@ -405,6 +405,10 @@ public class Main {
         log.trace("parseLexerOptions()");
         log.trace("optionsArgument: {}", optionsArgument);
 
+        if (optionsArgument == null || optionsArgument.isBlank()) {
+            return null;
+        }
+
         boolean printLineNumbers = optionsArgument.contains("l");
         boolean showInvisibles = optionsArgument.contains("i");
         boolean separateTokens = optionsArgument.contains("t");
@@ -428,10 +432,19 @@ public class Main {
         log.trace("parseParserOptions()");
         log.trace("optionsArgument: {}", optionsArgument);
 
+        if (optionsArgument == null || optionsArgument.isBlank()) {
+            return null;
+        }
+
         boolean printAst = optionsArgument.contains("p");
         boolean printLineNumbers = optionsArgument.contains("l");
         boolean verbose = optionsArgument.contains("v");
-        ParserOptions parserOptions = new ParserOptions(printAst, printLineNumbers, verbose);
+
+        ParserOptions parserOptions = new ParserOptions(
+                printAst,
+                printLineNumbers,
+                verbose);
+
         return parserOptions;
     }
 

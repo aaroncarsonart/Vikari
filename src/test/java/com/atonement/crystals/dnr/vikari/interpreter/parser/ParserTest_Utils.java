@@ -2,15 +2,16 @@ package com.atonement.crystals.dnr.vikari.interpreter.parser;
 
 import com.atonement.crystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.crystal.literal.number.LongLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.BigDecimalCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.BigIntegerCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.DoubleCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.FloatCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.IntegerCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.LongCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonement.crystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonement.crystals.dnr.vikari.core.expression.Expression;
 import com.atonement.crystals.dnr.vikari.core.expression.LiteralExpression;
-import com.atonement.crystals.dnr.vikari.error.SyntaxError;
-import com.atonement.crystals.dnr.vikari.error.SyntaxErrorReporter;
-import com.atonement.crystals.dnr.vikari.util.CoordinatePair;
-
-import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,20 +19,45 @@ import static org.junit.jupiter.api.Assertions.*;
  * Helper methods for Parser tests.
  */
 public class ParserTest_Utils {
-    public static void testIntegerLiteralExpression(Expression expr, Object expectedValue) {
+    private static void testNumberCrystalLiteralExpression(Expression expr, Object expectedValue,
+                                                            Class<? extends NumberCrystal> clazz) {
         assertEquals(LiteralExpression.class, expr.getClass(), "Unexpected expression type.");
 
         LiteralExpression literalExpression = (LiteralExpression) expr;
         AtonementCrystal value = literalExpression.getValue();
-        assertEquals(LongLiteralCrystal.class, value.getClass(), "Unexpected literal type.");
+        assertEquals(clazz, value.getClass(), "Unexpected literal type.");
 
-        LongLiteralCrystal number = (LongLiteralCrystal) value;
+        NumberCrystal number = clazz.cast(value);
         assertEquals(expectedValue, number.getValue(), "Unexpected literal value.");
+    }
+
+    public static void testIntegerLiteralExpression(Expression expr, Object expectedValue) {
+        testNumberCrystalLiteralExpression(expr, expectedValue, IntegerCrystal.class);
+    }
+
+    public static void testLongLiteralExpression(Expression expr, Object expectedValue) {
+        testNumberCrystalLiteralExpression(expr, expectedValue, LongCrystal.class);
+    }
+
+    public static void testBigIntegerLiteralExpression(Expression expr, Object expectedValue) {
+        testNumberCrystalLiteralExpression(expr, expectedValue, BigIntegerCrystal.class);
+    }
+
+    public static void testFloatLiteralExpression(Expression expr, Object expectedValue) {
+        testNumberCrystalLiteralExpression(expr, expectedValue, FloatCrystal.class);
+    }
+
+    public static void testDoubleLiteralExpression(Expression expr, Object expectedValue) {
+        testNumberCrystalLiteralExpression(expr, expectedValue, DoubleCrystal.class);
+    }
+
+    public static void testBigDecimalLiteralExpression(Expression expr, Object expectedValue) {
+        testNumberCrystalLiteralExpression(expr, expectedValue, BigDecimalCrystal.class);
     }
 
     public static void testBinaryExpression(Expression expr,
                                             Class<? extends BinaryOperatorCrystal> expectedOperatorClass,
-                                            long expectedLeft, long expectedRight) {
+                                            int expectedLeft, int expectedRight) {
         assertEquals(BinaryExpression.class, expr.getClass(), "Unexpected expression type.");
         BinaryExpression binaryExpression = (BinaryExpression) expr;
 
@@ -42,28 +68,5 @@ public class ParserTest_Utils {
         assertEquals(expectedOperatorClass, operator.getClass(), "Unexpected operator type.");
         testIntegerLiteralExpression(left, expectedLeft);
         testIntegerLiteralExpression(right, expectedRight);
-    }
-
-    public static void testSyntaxError(SyntaxError syntaxError, CoordinatePair expectedLocation, String expectedLine,
-                                       String partialErrorMessage) {
-        File expectedFile = null;
-        File actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        CoordinatePair actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        String actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        String errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains(partialErrorMessage), "Unexpected syntax error message.");
-    }
-
-    public static void assertNoSyntaxErrors(SyntaxErrorReporter syntaxErrorReporter) {
-        if(syntaxErrorReporter.hasErrors()) {
-            syntaxErrorReporter.reportErrors();
-            fail("Expected no syntax errors for test case.");
-        }
     }
 }

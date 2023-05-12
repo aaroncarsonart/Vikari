@@ -2,7 +2,7 @@ package com.atonement.crystals.dnr.vikari.interpreter.parser.expression;
 
 import com.atonement.crystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
-import com.atonement.crystals.dnr.vikari.core.crystal.literal.number.LongLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonement.crystals.dnr.vikari.core.expression.Expression;
@@ -22,8 +22,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 
-import static com.atonement.crystals.dnr.vikari.interpreter.parser.ParserTest_Utils.assertNoSyntaxErrors;
-import static com.atonement.crystals.dnr.vikari.interpreter.parser.ParserTest_Utils.testSyntaxError;
+import static com.atonement.crystals.dnr.vikari.interpreter.TestUtils.assertNoSyntaxErrors;
+import static com.atonement.crystals.dnr.vikari.interpreter.TestUtils.testSyntaxError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -67,9 +67,9 @@ public class ParserTest_Grouping {
         LiteralExpression literalExpression = (LiteralExpression) innerExpression;
 
         AtonementCrystal value = literalExpression.getValue();
-        assertEquals(LongLiteralCrystal.class, value.getClass(), "Unexpected literal type.");
+        assertEquals(IntegerCrystal.class, value.getClass(), "Unexpected literal type.");
 
-        LongLiteralCrystal number = (LongLiteralCrystal) value;
+        IntegerCrystal number = (IntegerCrystal) value;
         assertEquals(5, number.getValue(), "Unexpected literal value.");
     }
 
@@ -119,16 +119,16 @@ public class ParserTest_Grouping {
 
         // 3. left operand (literal: "22")
         AtonementCrystal leftOperand = ((LiteralExpression) left).getValue();
-        assertEquals(LongLiteralCrystal.class, leftOperand.getClass(), "Unexpected literal type.");
+        assertEquals(IntegerCrystal.class, leftOperand.getClass(), "Unexpected literal type.");
 
-        LongLiteralCrystal leftNumber = (LongLiteralCrystal) leftOperand;
+        IntegerCrystal leftNumber = (IntegerCrystal) leftOperand;
         assertEquals(22, leftNumber.getValue(), "Unexpected literal value.");
 
         // 4. right operand (literal: 7)
         AtonementCrystal rightOperand = ((LiteralExpression) right).getValue();
-        assertEquals(LongLiteralCrystal.class, rightOperand.getClass(), "Unexpected literal type.");
+        assertEquals(IntegerCrystal.class, rightOperand.getClass(), "Unexpected literal type.");
 
-        LongLiteralCrystal rightNumber = (LongLiteralCrystal) rightOperand;
+        IntegerCrystal rightNumber = (IntegerCrystal) rightOperand;
         assertEquals(7, rightNumber.getValue(), "Unexpected literal value.");
     }
 

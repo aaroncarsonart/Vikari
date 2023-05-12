@@ -5,7 +5,7 @@ import com.atonement.crystals.dnr.vikari.core.crystal.comment.MultiLineCommentCr
 import com.atonement.crystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.literal.StringLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.crystal.literal.number.LongLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.operator.assignment.LeftAssignmentOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
@@ -393,7 +393,7 @@ public class LexerTest_ConvertToCrystals_SyntaxErrors {
 
         // seventh crystal
         crystal = statement.get(6);
-        assertEquals(LongLiteralCrystal.class, crystal.getClass(), "Integer literal has incorrect type.");
+        assertEquals(IntegerCrystal.class, crystal.getClass(), "Integer literal has incorrect type.");
 
         expectedIdentifier = "2";
         lexedIdentifier = crystal.getIdentifier();
@@ -1339,7 +1339,7 @@ public class LexerTest_ConvertToCrystals_SyntaxErrors {
 
         // ninth crystal
         crystal = statement.get(8);
-        assertEquals(LongLiteralCrystal.class, crystal.getClass(), "Integer literal has incorrect type.");
+        assertEquals(IntegerCrystal.class, crystal.getClass(), "Integer literal has incorrect type.");
 
         expectedIdentifier = "2";
         lexedIdentifier = crystal.getIdentifier();

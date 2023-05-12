@@ -4,9 +4,12 @@ import com.atonement.crystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.identifier.Keyword;
 import com.atonement.crystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonement.crystals.dnr.vikari.error.Vikari_LexerException;
+import com.atonement.crystals.dnr.vikari.interpreter.Arithmetic;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.file.FileSystems;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -111,20 +114,129 @@ public class Utils {
 
     public static boolean isLongIntegerNumber(String string) {
         try {
-            Long.valueOf(string);
+            String value = string;
+            if (Utils.hasLongSuffix(value)) {
+                value = Utils.trimLastCharacter(value);
+            }
+            Long.valueOf(value);
         } catch (NumberFormatException e) {
             return false;
         }
         return true;
     }
 
-    public static boolean isDecimalNumber(String string) {
+    /**
+     * Test if an identifier ends with "l" or "L".
+     * @param string The identifier to test.
+     * @return True if the identifier has a Long suffix.
+     */
+    public static boolean hasLongSuffix(String string) {
+        if (string.endsWith("l") || string.endsWith("L")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Test if an identifier ends with "b" or "B".
+     * @param string The identifier to test.
+     * @return True if the identifier has a Big suffix.
+     */
+    public static boolean hasBigSuffix(String string) {
+        if (string.endsWith("b") || string.endsWith("B")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Trims the last character in the string. Assumes a previous check to hasLongSuffix()
+     * or hasBigSuffix() has returned true for the input string.
+     * @param string The string to trim.
+     * @return A string with the last character trimmed.
+     */
+    public static String trimLastCharacter(String string) {
+        return string.substring(0, string.length() - 1);
+    }
+
+    public static boolean isBigIntegerNumber(String string) {
         try {
-            Double.valueOf(string);
+            String value = string;
+            if (Utils.hasBigSuffix(value)) {
+                value = Utils.trimLastCharacter(value);
+            }
+            new BigInteger(value);
+            return true;
         } catch (NumberFormatException e) {
             return false;
         }
-        return string != null && string.contains(".");
+    }
+
+    public static boolean isFloatNumber(String string) {
+        try {
+            // Don't allow explicit Double literals.
+            if (string.endsWith("d") || string.endsWith("D")) {
+                return false;
+            }
+            Float.valueOf(string);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isDoubleNumber(String string) {
+        try {
+            // Don't allow explicit Float literals.
+            if (string.endsWith("f") || string.endsWith("F")) {
+                return false;
+            }
+            Double.valueOf(string);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isBigDecimalNumber(String string) {
+        try {
+            String value = string;
+            if (Utils.hasBigSuffix(value)) {
+                value = Utils.trimLastCharacter(value);
+            }
+            new BigDecimal(value, Arithmetic.getMathContext());
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Checks if the string is an integer number followed by f, F, d, D, b, or B.
+     * @param string The identifier to check.
+     * @return True if the string is a valid fractional part of a decimal number; else false.
+     */
+    public static boolean isValidDecimalFractionalPart(String string) {
+        // 1. Check suffix.
+        String suffix = string.substring(string.length() - 1);
+        String allowedSuffixes = "fFdDbB";
+        boolean hasSuffix = allowedSuffixes.contains(suffix);
+
+        // 2. Get number part.
+        String number;
+        if (hasSuffix) {
+            number = string.substring(0, string.length() - 1);
+        } else {
+            number = string;
+        }
+
+        // 3. Check number.
+        try {
+            new BigInteger(number);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     public static boolean isEnclosedString(String string, String leftEnclosure, String rightEnclosure) {

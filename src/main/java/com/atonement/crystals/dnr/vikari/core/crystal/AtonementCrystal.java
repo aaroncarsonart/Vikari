@@ -11,6 +11,7 @@ public class AtonementCrystal {
     private String identifier;
     private AtonementField field = new AtonementField();
     private CoordinatePair coordinates;
+    private Type type;
 
     public AtonementCrystal(String identifier) {
         this.identifier = identifier;
@@ -42,5 +43,9 @@ public class AtonementCrystal {
 
     public void setCoordinates(int row, int column) {
         this.coordinates = new CoordinatePair(row, column);
+    }
+
+    public String getStringRepresentation() {
+        return identifier;
     }
 }

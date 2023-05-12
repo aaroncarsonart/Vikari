@@ -3,8 +3,7 @@ package com.atonement.crystals.dnr.vikari.interpreter;
 import com.atonement.crystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.identifier.TokenType;
-import com.atonement.crystals.dnr.vikari.core.crystal.literal.number.DoubleLiteralCrystal;
-import com.atonement.crystals.dnr.vikari.core.crystal.literal.number.LongLiteralCrystal;
+import com.atonement.crystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.operator.PrintStatementOperatorCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.operator.math.NegateCrystal;
 import com.atonement.crystals.dnr.vikari.core.crystal.separator.WhitespaceCrystal;
@@ -185,7 +184,7 @@ public class Parser {
     }
 
     private Expression primary() {
-        if (match(LongLiteralCrystal.class, DoubleLiteralCrystal.class)) {
+        if (match(NumberCrystal.class)) {
             AtonementCrystal previous = previous();
             LiteralExpression literalExpression = new LiteralExpression(previous);
             literalExpression.setLocation(previous.getCoordinates());
