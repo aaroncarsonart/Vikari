@@ -4,6 +4,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.PrintExpression;
+import com.atonementcrystals.dnr.vikari.core.statement.BlankStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.PrintStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.core.statement.SyntaxErrorStatement;
@@ -167,6 +168,14 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         // This is always an internal error. And so it never should occur!
         CoordinatePair location = stmt.getLocation();
         String errorMessage = "Statement containing a Syntax Error should not be evaluated.";
+        throw internalRuntimeError(location, errorMessage);
+    }
+
+    @Override
+    public AtonementCrystal visit(BlankStatement stmt) {
+        // This is always an internal error. And so it never should occur!
+        CoordinatePair location = stmt.getLocation();
+        String errorMessage = "Blank statements should not be evaluated.";
         throw internalRuntimeError(location, errorMessage);
     }
 

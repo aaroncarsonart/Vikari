@@ -17,6 +17,7 @@ public abstract class Statement {
         S visit(PrintStatement stmt);
         S visit(ExpressionStatement stmt);
         S visit(SyntaxErrorStatement stmt);
+        S visit(BlankStatement stmt);
     }
 
     public abstract <S> S accept(Visitor<S> visitor);

@@ -1,9 +1,11 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.BlankLineCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.PrintExpression;
+import com.atonementcrystals.dnr.vikari.core.statement.BlankStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.PrintStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.core.statement.SyntaxErrorStatement;
@@ -62,15 +64,20 @@ public class Parser {
         this.file = file;
         this.lexedStatements = lexedStatements;
         lineCount = lexedStatements.size();
-        lastLineLength = lexedStatements.get(lexedStatements.size() - 1).size();
 
         List<Statement> statements = new ArrayList<>();
+        if (lexedStatements.isEmpty()) {
+            return statements;
+        }
+        lastLineLength = lexedStatements.get(lexedStatements.size() - 1).size();
+
         while (!isAtEnd()) {
-            // TODO: Fix statement number. Error case is stepping over the next line.
             currentLine = lexedStatements.get(lineNumber);
             Statement statement = statement();
-            statementNumber = statement.getLocation().getRow();
-            statements.add(statement);
+            if (!(statement instanceof BlankStatement)) {
+                statementNumber = statement.getLocation().getRow();
+                statements.add(statement);
+            }
             advanceToNextLine();
         }
         return statements;
@@ -80,6 +87,9 @@ public class Parser {
         try {
             if (check(TokenType.TYPE_LABEL)) {
                 return printStatement();
+            }
+            if (blank()) {
+                return blankStatement();
             }
             return expressionStatement();
         } catch (Vikari_ParserException e) {
@@ -209,6 +219,31 @@ public class Parser {
         }
 
         throw error(errorCrystal, "Expected expression.");
+    }
+
+    /**
+     * Check if the current line is blank, meaning it is empty or only contains whitespace.
+     * Blank lines are elided entirely in the output of the Parser.
+     * @return True if the current line is blank, else false.
+     */
+    public boolean blank() {
+        if (currentLine.isEmpty()) {
+            return true;
+        }
+        if (currentLine.size() == 1 && currentLine.get(0) instanceof BlankLineCrystal) {
+            return true;
+        }
+        for (AtonementCrystal crystal : currentLine) {
+            if (!(crystal instanceof WhitespaceCrystal)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public Statement blankStatement() {
+        CoordinatePair location = new CoordinatePair(lineNumber, 0);
+        return new BlankStatement(location);
     }
 
     public boolean isAtEndOfStatement() {

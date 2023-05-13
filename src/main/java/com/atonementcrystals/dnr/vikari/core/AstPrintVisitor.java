@@ -6,6 +6,7 @@ import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.PrintExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.UnaryExpression;
+import com.atonementcrystals.dnr.vikari.core.statement.BlankStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.PrintStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
@@ -99,5 +100,11 @@ public class AstPrintVisitor implements Statement.Visitor<String>, Expression.Vi
     public String visit(SyntaxErrorStatement stmt) {
         String statement = stmt.getStatement();
         return "Syntax Error: [" + statement + "]";
+    }
+
+    @Override
+    public String visit(BlankStatement stmt) {
+        // Will never be visited. So throw an internal error!
+        throw new IllegalStateException("Unreachable code.");
     }
 }
