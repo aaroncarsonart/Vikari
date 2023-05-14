@@ -33,7 +33,6 @@ public class SyntaxErrorReporter {
         syntaxErrors.sort(Comparator.comparing(SyntaxError::getLocation));
 
         StringBuilder sb = new StringBuilder();
-        Formatter formatter = new Formatter(sb);
 
         sb.append("--------------\n");
         sb.append("Syntax Errors:\n");

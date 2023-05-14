@@ -204,4 +204,9 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         String errorMessage = "Invalid operands for operator ``" + operator.getIdentifier() + "``.";
         return internalRuntimeError(location, errorMessage);
     }
+
+    public void clear() {
+        currentFile = null;
+        lexedStatements = null;
+    }
 }

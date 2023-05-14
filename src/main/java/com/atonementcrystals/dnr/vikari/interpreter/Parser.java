@@ -80,6 +80,7 @@ public class Parser {
             }
             advanceToNextLine();
         }
+        this.file = null;
         return statements;
     }
 
@@ -411,5 +412,16 @@ public class Parser {
             lastLine = lexedStatements.get(lexedStatements.size() - 1);
         }
         return lastLine;
+    }
+
+    public void clear() {
+        file = null;
+        lexedStatements = null;
+        lineNumber = 0;
+        tokenNumber = 0;
+        lineCount = 0;
+        lastLineLength = 0;
+        statementNumber = 0;
+        currentLine = null;
     }
 }

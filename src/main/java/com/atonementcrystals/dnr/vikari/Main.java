@@ -4,6 +4,7 @@ import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.error.Vikari_TypeException;
 import com.atonementcrystals.dnr.vikari.interpreter.LexerOptions;
 import com.atonementcrystals.dnr.vikari.interpreter.Phase;
+import com.atonementcrystals.dnr.vikari.interpreter.VikariREPL;
 import com.atonementcrystals.dnr.vikari.util.Utils;
 import com.atonementcrystals.dnr.vikari.interpreter.ParserOptions;
 import com.atonementcrystals.dnr.vikari.interpreter.ProgramId;
@@ -112,13 +113,13 @@ public class Main {
                     return;
                 }
 
-                // Run repl mode.
+                // Run REPL mode.
                 else if (argsList.size() == 0) {
                     log.debug("Zero arguments. Default behavior.");
                     log.debug("Use default phase.");
                     log.debug("Use default config:\n    " + lexerOptions);
 
-                    runReplMode(phase, lexerOptions);
+                    runReplMode();
                     return;
                 }
             }
@@ -243,7 +244,7 @@ public class Main {
 
             // Run the repl mode for the interpreter.
             else if (cmd.hasOption("repl")) {
-                log.debug("Repl source option selected.");
+                log.debug("REPL source option selected.");
                 replMode = true;
                 expectedAdditionalArguments = 0;
             }
@@ -253,7 +254,7 @@ public class Main {
             else {
                 log.debug("No source option selected.");
                 if (argsList.size() == 0) {
-                    log.debug("Using repl mode.");
+                    log.debug("Using REPL mode.");
                     replMode = true;
                 } else if (argsList.size() == 1) {
                     log.debug("Using file OR type mode.");
@@ -278,7 +279,7 @@ public class Main {
             } else if (sourceString != null) {
                 runSourceString(sourceString, phase, lexerOptions, parserOptions);
             } else if (replMode) {
-                runReplMode(phase, lexerOptions);
+                runReplMode();
             }else {
                 throw new IllegalStateException("Unreachable code.");
             }
@@ -362,7 +363,7 @@ public class Main {
 
         Option replOption = Option.builder("r").longOpt("repl")
                 .required(false)
-                .desc("Run repl mode.")
+                .desc("Run REPL mode.")
                 .build();
 
         OptionGroup sourceLocationOptions = new OptionGroup();
@@ -522,14 +523,13 @@ public class Main {
     }
 
     /**
-     * Run the interpreter in repl mode.
-     * @param phase The phase of the interpreter to process code statements though.
-     * @param lexerOptions Options to pass to the lexer.
+     * Run the interpreter in REPL mode.
      */
-    public static void runReplMode(Phase phase, LexerOptions lexerOptions) {
-        log.debug("Run repl mode.");
-        log.debug("Not yet implemented.");
-        // TODO: implement.
+    public static void runReplMode() {
+        log.debug("Run REPL mode.");
+
+        VikariREPL repl = new VikariREPL();
+        repl.start();
     }
 
     public static void printHelp(Options options) {
