@@ -4,7 +4,7 @@ public class Vikari_RuntimeException extends Vikari_Exception {
     private final RuntimeError runtimeError;
 
     public Vikari_RuntimeException(String name, RuntimeError runtimeError) {
-        super("Runtime Error", runtimeError.getMessage());
+        super(name, runtimeError.getMessage());
         this.runtimeError = runtimeError;
     }
 

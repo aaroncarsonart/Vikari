@@ -8,16 +8,23 @@ import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.error.Vikari_RuntimeException;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
 
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Handle all processing of the Vikari REPL mode.
  */
 public class VikariREPL {
+    private static final Logger log = LogManager.getLogger(VikariREPL.class);
+
     private static final String REPL_PROMPT = "vikari> ";
     private static final String REPL_COMMAND_PREFIX = "!";
     private static final String NEWLINE = "\n";
@@ -35,6 +42,7 @@ public class VikariREPL {
     private List<AtonementCrystal> interpretedResults;
 
     private boolean exit;
+    private LineReader userInput;
 
     /**
      * Instantiate a new VikariRepl instance.
@@ -52,6 +60,8 @@ public class VikariREPL {
         lexedStatements = new ArrayList<>();
         parsedStatements = new ArrayList<>();
         interpretedResults = new ArrayList();
+
+        userInput = LineReaderBuilder.builder().build();
     }
 
     /**
@@ -76,7 +86,7 @@ public class VikariREPL {
      * Begin the Vikari interpreter in REPL mode.
      */
     public void start() {
-        Scanner userInput = new Scanner(System.in);
+        log.trace("start()");
         exit = false;
 
         // Begin REPL loop.
@@ -85,63 +95,74 @@ public class VikariREPL {
             parser.clear();
             interpreter.clear();
 
-            // Get next line of user input.
-            System.out.print(REPL_PROMPT);
-            String nextLineOfUserInput = userInput.nextLine();
-
-            if (nextLineOfUserInput.isBlank()) {
-                continue;
-            }
-
-            // Parse REPL commands.
-            ReplCommand replCommand = getReplCommand(nextLineOfUserInput);
-            if (replCommand == ReplCommand.NONE) {
-                System.out.println("Unrecognized Vikari REPL command.");
-                continue;
-            } else if (replCommand != null) {
-                executeReplCommand(replCommand);
-                continue;
-            }
-
-            // Lex and parse as Vikari code statement(s).
-            List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(nextLineOfUserInput);
-            List<Statement> parsedStatements = parser.parse(null, lexedStatements);
-
-            lineHistory.add(nextLineOfUserInput);
-
-            // Report syntax errors, if any.
-            if (syntaxErrorReporter.hasErrors()) {
-                reportSyntaxErrors(nextLineOfUserInput);
-                syntaxErrorReporter.clear();
-                continue;
-            }
-
-            // Execute the Vikari code statement(s).
             try {
-                List<AtonementCrystal> currentResults = new ArrayList<>();
-                for (Statement statement : parsedStatements) {
-                    AtonementCrystal result = interpreter.execute(statement);
-                    currentResults.add(result);
+                // Get next line of user input.
+                String nextLineOfUserInput = userInput.readLine(REPL_PROMPT);
+
+                if (nextLineOfUserInput.isBlank()) {
+                    continue;
                 }
 
-                // Cache the results if there were no runtime errors.
-                this.lexedStatements.addAll(lexedStatements);
-                this.parsedStatements.addAll(parsedStatements);
-                interpretedResults.addAll(currentResults);
+                // Parse REPL commands.
+                ReplCommand replCommand = getReplCommand(nextLineOfUserInput);
+                if (replCommand == ReplCommand.NONE) {
+                    System.out.println("Unrecognized Vikari REPL command.");
+                    continue;
+                } else if (replCommand != null) {
+                    executeReplCommand(replCommand);
+                    continue;
+                }
 
-                // Report the output of the last statement.
-                if (!currentResults.isEmpty()) {
-                    Statement lastStatement = parsedStatements.get(parsedStatements.size() - 1);
-                    if (!(lastStatement instanceof PrintStatement)) {
-                        AtonementCrystal lastResult = currentResults.get(currentResults.size() - 1);
-                        System.out.println(lastResult.getStringRepresentation());
+                // Lex and parse as Vikari code statement(s).
+                List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(nextLineOfUserInput);
+                List<Statement> parsedStatements = parser.parse(null, lexedStatements);
+
+                lineHistory.add(nextLineOfUserInput);
+
+                // Report syntax errors, if any.
+                if (syntaxErrorReporter.hasErrors()) {
+                    reportSyntaxErrors(nextLineOfUserInput);
+                    syntaxErrorReporter.clear();
+                    continue;
+                }
+
+                // Execute the Vikari code statement(s).
+                try {
+                    List<AtonementCrystal> currentResults = new ArrayList<>();
+                    for (Statement statement : parsedStatements) {
+                        AtonementCrystal result = interpreter.execute(statement);
+                        currentResults.add(result);
+                    }
+
+                    // Cache the results if there were no runtime errors.
+                    this.lexedStatements.addAll(lexedStatements);
+                    this.parsedStatements.addAll(parsedStatements);
+                    interpretedResults.addAll(currentResults);
+
+                    // Report the output of the last statement.
+                    if (!currentResults.isEmpty()) {
+                        Statement lastStatement = parsedStatements.get(parsedStatements.size() - 1);
+                        if (!(lastStatement instanceof PrintStatement)) {
+                            AtonementCrystal lastResult = currentResults.get(currentResults.size() - 1);
+                            System.out.println(lastResult.getStringRepresentation());
+                        }
                     }
                 }
+
+                // Report runtime errors.
+                catch (Vikari_RuntimeException e) {
+                    reportRuntimeError(e);
+                }
             }
 
-            // Report runtime errors.
-            catch (Vikari_RuntimeException e) {
-                reportRuntimeError(e);
+            // Handle signal for Ctrl+C.
+            catch (UserInterruptException e) {
+                // Do nothing. (Just interrupt the present typed command.)
+            }
+
+            // Handle signal for Ctrl+D.
+            catch (EndOfFileException e) {
+                System.exit(0);
             }
         }
     }
@@ -170,6 +191,8 @@ public class VikariREPL {
      * @param replCommand The REPL command to execute.
      */
     private void executeReplCommand(ReplCommand replCommand) {
+        log.trace("executeReplCommand({})", replCommand);
+
         switch (replCommand) {
             case HELP:
                 printHelp();
@@ -271,6 +294,9 @@ public class VikariREPL {
 
         String errorMessage = syntaxError.getMessage();
         System.out.println(errorMessage);
+
+        // Print equivalent output as REPL in logs.
+        log.debug("\n{}{}\n{}", REPL_PROMPT, line, errorMessage);
     }
 
     /**
@@ -291,6 +317,9 @@ public class VikariREPL {
 
         String fullErrorReport = sb.toString();
         System.out.println(fullErrorReport);
+
+        // Print equivalent output as REPL in logs.
+        log.debug("\n{}", fullErrorReport);
     }
 
     /**
@@ -301,5 +330,8 @@ public class VikariREPL {
         RuntimeError runtimeError = e.getRuntimeError();
         String errorReport = runtimeError.getErrorReport();
         System.out.println(errorReport);
+
+        // Print equivalent output as REPL in logs.
+        log.debug("\n{}", errorReport);
     }
 }

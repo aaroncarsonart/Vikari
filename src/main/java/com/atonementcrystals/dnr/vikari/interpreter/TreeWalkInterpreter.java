@@ -24,12 +24,15 @@ import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.UnaryExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>, Expression.Visitor<AtonementCrystal> {
+    private static final Logger log = LogManager.getLogger(TreeWalkInterpreter.class);
 
     private File currentFile;
     private List<List<AtonementCrystal>> lexedStatements;
@@ -54,6 +57,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         RuntimeError runtimeError = e.getRuntimeError();
         String errorReport = runtimeError.getErrorReport();
         System.out.println(errorReport);
+        log.debug("\n{}", errorReport);
     }
 
     public AtonementCrystal execute(Statement statement) {
