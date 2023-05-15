@@ -114,7 +114,7 @@ public class VikariREPL {
                 }
 
                 // Lex and parse as Vikari code statement(s).
-                List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(nextLineOfUserInput);
+                List<List<AtonementCrystal>> lexedStatements = lexer.lex(nextLineOfUserInput);
                 List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
                 lineHistory.add(nextLineOfUserInput);
@@ -128,6 +128,7 @@ public class VikariREPL {
 
                 // Execute the Vikari code statement(s).
                 try {
+                    log.trace("interpret()");
                     List<AtonementCrystal> currentResults = new ArrayList<>();
                     for (Statement statement : parsedStatements) {
                         AtonementCrystal result = interpreter.execute(statement);
@@ -162,7 +163,7 @@ public class VikariREPL {
 
             // Handle signal for Ctrl+D.
             catch (EndOfFileException e) {
-                System.exit(0);
+                exitReplMode();
             }
         }
     }

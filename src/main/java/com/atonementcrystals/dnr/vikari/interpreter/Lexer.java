@@ -69,8 +69,8 @@ public class Lexer {
      * @param sourceFile The Vikari source file to lex.
      * @return The sequence of AtonementCrystals defined by the Vikari source file.
      */
-    public List<List<AtonementCrystal>> lexVikariSourceFile(File sourceFile) {
-        log.trace("lexVikariSourceFile()");
+    public List<List<AtonementCrystal>> lex(File sourceFile) {
+        log.trace("lex({})", sourceFile == null ? "null" : "\"" + sourceFile + "\"");
         currentFile = sourceFile;
 
         List<List<String>> statementsOfStringTokens = lexToStringTokens(sourceFile);
@@ -87,8 +87,8 @@ public class Lexer {
      * @param sourceCode The string of Vikari source code to lex.
      * @return The sequence of AtonementCrystals defined by the string of Vikari source code.
      */
-    public List<List<AtonementCrystal>> lexVikariSourceCode(String sourceCode) {
-        log.trace("lexVikariSourceCode()");
+    public List<List<AtonementCrystal>> lex(String sourceCode) {
+        log.trace("lex()");
         currentFile = null;
         List<List<String>> statementsOfStringTokens = lexToStringTokens(sourceCode);
         statementsOfStringTokens = collapseTokens(statementsOfStringTokens);
@@ -103,7 +103,6 @@ public class Lexer {
      * @return  A sequence of string tokens.
      */
     public List<List<String>> lexToStringTokens(File sourceFile) {
-        log.trace("lexToStringTokens(sourceFile)");
         try (BufferedReader reader = new BufferedReader(new FileReader(sourceFile))) {
             return readFromBufferAsStringTokens(reader);
         } catch (IOException e) {
@@ -120,7 +119,6 @@ public class Lexer {
      * @return  A sequence of string tokens.
      */
     public List<List<String>> lexToStringTokens(String sourceString) {
-        log.trace("lexToStringTokens(sourceString)");
         try (BufferedReader reader = new BufferedReader(new StringReader(sourceString))) {
             return readFromBufferAsStringTokens(reader);
         } catch (IOException e) {
@@ -168,7 +166,6 @@ public class Lexer {
      * @return A new list of collapsed statements.
      */
     public List<List<String>> collapseTokens(List<List<String>> statementsOfStringTokens) {
-        log.trace("collapseTokens()");
         int numberOfLines = statementsOfStringTokens.size();
 
         String commentPrefix = TokenType.COMMENT_PREFIX_CRYSTAL.getIdentifier();
@@ -453,7 +450,6 @@ public class Lexer {
      * @return The crystals representing each string token.
      */
     public List<List<AtonementCrystal>> convertTokensToCrystals(List<List<String>> statementsOfStringTokens) {
-        log.trace("convertTokensToCrystals()");
         List<List<AtonementCrystal>> statementsOfCrystals = new ArrayList<>();
 
         Map<String, TokenType> defaultIdentifiersMap = new LinkedHashMap<>();

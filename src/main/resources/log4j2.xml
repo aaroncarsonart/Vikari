@@ -12,7 +12,7 @@
         <Root level="ERROR">
             <AppenderRef ref="Console" level="ERROR"/>
         </Root>
-        <Logger name="com.atonement.crystals.dnr.vikari" level="TRACE">
+        <Logger name="com.atonementcrystals.dnr.vikari" level="TRACE">
             <AppenderRef ref="LogFile" level="TRACE"/>
         </Logger>
     </Loggers>

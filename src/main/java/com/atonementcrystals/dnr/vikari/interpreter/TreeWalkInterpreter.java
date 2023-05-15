@@ -31,6 +31,9 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Interpret the output of the Parser using a simple tree-walking approach.
+ */
 public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>, Expression.Visitor<AtonementCrystal> {
     private static final Logger log = LogManager.getLogger(TreeWalkInterpreter.class);
 
@@ -42,6 +45,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     }
 
     public void interpret(File file, List<Statement> statements) {
+        log.trace("interpret({})", file == null ? "null" : "\"" + file + "\"");
         this.currentFile = file;
         try {
             for (Statement statement : statements) {

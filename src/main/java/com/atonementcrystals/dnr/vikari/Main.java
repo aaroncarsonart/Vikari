@@ -42,7 +42,7 @@ public class Main {
      */
     public static void main(String[] args) {
         runVikariProgram(args);
-        log.debug("End of program.\n");
+        log.debug("End of program.");
     }
 
     /**
@@ -83,8 +83,8 @@ public class Main {
 
             Phase phase = Phase.DEFAULT;
             String defaultConfigOptions = "";
-            LexerOptions lexerOptions = parseLexerOptions(defaultConfigOptions);
-            ParserOptions parserOptions = parseParserOptions(defaultConfigOptions);
+            LexerOptions lexerOptions = parseLexerOptions(defaultConfigOptions, false);
+            ParserOptions parserOptions = parseParserOptions(defaultConfigOptions, false);
             List<String> argsList = cmd.getArgList();
 
             // ------------------------------------------------------------------
@@ -116,9 +116,6 @@ public class Main {
                 // Run REPL mode.
                 else if (argsList.size() == 0) {
                     log.debug("Zero arguments. Default behavior.");
-                    log.debug("Use default phase.");
-                    log.debug("Use default config:\n    " + lexerOptions);
-
                     runReplMode();
                     return;
                 }
@@ -152,36 +149,36 @@ public class Main {
             // Lexer phase.
             if (cmd.hasOption("lex")) {
                 log.debug("Lexer phase selected.");
-                log.debug("Use default config:\n    " + lexerOptions);
+                log.debug("Use default config.");
                 phase = Phase.LEX;
             } else if (cmd.hasOption("Lex")) {
                 log.debug("Lexer phase selected.");
                 phase = Phase.LEX;
 
                 String configArgument = cmd.getOptionValue("Lex");
-                lexerOptions = parseLexerOptions(configArgument);
-                log.debug("Use config:\n    {}\n", lexerOptions);
+                lexerOptions = parseLexerOptions(configArgument, true);
+                log.debug("Use config:\n    {}", lexerOptions);
             }
 
             // Parser phase.
             else if (cmd.hasOption("parse")) {
                 log.debug("Parser phase selected.");
-                log.debug("Use default config:\n    " + lexerOptions);
+                log.debug("Use default config.");
                 phase = Phase.PARSE;
             } else if (cmd.hasOption("Parse")) {
                 log.debug("Parser phase selected.");
                 phase = Phase.PARSE;
 
                 String configArgument = cmd.getOptionValue("Parse");
-                lexerOptions = parseLexerOptions(configArgument);
-                parserOptions = parseParserOptions(configArgument);
-                log.debug("Use config:\n    {}\n    {}\n", lexerOptions, parserOptions);
+                lexerOptions = parseLexerOptions(configArgument, true);
+                parserOptions = parseParserOptions(configArgument, true);
+                log.debug("Use config:\n    {}\n    {}", lexerOptions, parserOptions);
             }
 
             // Execute phase.
             else if (cmd.hasOption("execute")) {
                 log.debug("Execute phase selected.");
-                log.debug("Use default config:\n    " + lexerOptions);
+                log.debug("Use default config.");
 
                 phase = Phase.EXECUTE;
             } else if (cmd.hasOption("Execute")) {
@@ -189,16 +186,16 @@ public class Main {
                 phase = Phase.EXECUTE;
 
                 String configArgument = cmd.getOptionValue("Execute");
-                lexerOptions = parseLexerOptions(configArgument);
-                parserOptions = parseParserOptions(configArgument);
-                log.debug("Use config:\n    {}\n    {}\n", lexerOptions, parserOptions);
+                lexerOptions = parseLexerOptions(configArgument, true);
+                parserOptions = parseParserOptions(configArgument, true);
+                log.debug("Use config:\n    {}\n    {}", lexerOptions, parserOptions);
             }
 
             // No phase requested. Use default behavior.
-            else {
+            else if (!cmd.hasOption("repl")) {
                 log.debug("No phase selected.");
                 log.debug("Use default phase.");
-                log.debug("Use default config:\n    " + lexerOptions);
+                log.debug("Use default config.");
             }
 
             // ----------------------------------------------
@@ -400,11 +397,13 @@ public class Main {
     /**
      * Parse the LexerOptions from the {@literal <config_options>} argument.
      * @param optionsArgument The optional argument to parse.
+     * @param doLog Enable logging of this method call.
      * @return The LexerOptions represented by the optional argument.
      */
-    public static LexerOptions parseLexerOptions(String optionsArgument) {
-        log.trace("parseLexerOptions()");
-        log.trace("optionsArgument: {}", optionsArgument);
+    public static LexerOptions parseLexerOptions(String optionsArgument, boolean doLog) {
+        if (doLog) {
+            log.trace("parseLexerOptions(\"{}\")", optionsArgument);
+        }
 
         if (optionsArgument == null || optionsArgument.isBlank()) {
             return null;
@@ -427,11 +426,13 @@ public class Main {
     /**
      * Parse the ParserOptions from the {@literal <config_options>} argument.
      * @param optionsArgument The optional argument to parse.
+     * @param doLog Enable logging of this method call.
      * @return The ParserOptions represented by the optional argument.
      */
-    public static ParserOptions parseParserOptions(String optionsArgument) {
-        log.trace("parseParserOptions()");
-        log.trace("optionsArgument: {}", optionsArgument);
+    public static ParserOptions parseParserOptions(String optionsArgument, boolean doLog) {
+        if (doLog) {
+            log.trace("parseParserOptions(\"{}\")", optionsArgument);
+        }
 
         if (optionsArgument == null || optionsArgument.isBlank()) {
             return null;
@@ -530,6 +531,9 @@ public class Main {
 
         VikariREPL repl = new VikariREPL();
         repl.start();
+
+        log.debug("Exit REPL mode.");
+        System.exit(0);
     }
 
     public static void printHelp(Options options) {

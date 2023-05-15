@@ -46,7 +46,7 @@ public class ParserTest_Arithmetic {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -98,7 +98,7 @@ public class ParserTest_Arithmetic {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -150,7 +150,7 @@ public class ParserTest_Arithmetic {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -202,7 +202,7 @@ public class ParserTest_Arithmetic {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -254,7 +254,7 @@ public class ParserTest_Arithmetic {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -306,7 +306,7 @@ public class ParserTest_Arithmetic {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -424,7 +424,7 @@ public class ParserTest_Arithmetic {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         parser.parse(null, lexedStatements);
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
@@ -448,7 +448,7 @@ public class ParserTest_Arithmetic {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         parser.parse(null, lexedStatements);
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
@@ -470,7 +470,7 @@ public class ParserTest_Arithmetic {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         parser.parse(null, lexedStatements);
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
@@ -492,7 +492,7 @@ public class ParserTest_Arithmetic {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         parser.parse(null, lexedStatements);
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
@@ -514,7 +514,7 @@ public class ParserTest_Arithmetic {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceString);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         parser.parse(null, lexedStatements);
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");

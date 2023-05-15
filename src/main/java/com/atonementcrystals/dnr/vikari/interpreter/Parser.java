@@ -60,7 +60,7 @@ public class Parser {
     }
 
     public List<Statement> parse(File file, List<List<AtonementCrystal>> lexedStatements) {
-        log.trace("parse()");
+        log.trace("parse({})", file == null ? "null" : "\"" + file + "\"");
         this.file = file;
         this.lexedStatements = lexedStatements;
         lineCount = lexedStatements.size();
@@ -96,7 +96,6 @@ public class Parser {
         } catch (Vikari_ParserException e) {
             synchronize();
 
-            // TODO: Fix statement number. Error case is stepping over the next line.
             List<AtonementCrystal> lastVisitedLine = getLastVisitedLexedStatement();
             String statementString = lastVisitedLine.stream()
                     .map(AtonementCrystal::getIdentifier)
@@ -402,7 +401,6 @@ public class Parser {
 
     private void synchronize() {
         // TODO: Will need special handling for the LINE_CONTINUATION operator ~.
-
         advanceToEndOfLine();
     }
 

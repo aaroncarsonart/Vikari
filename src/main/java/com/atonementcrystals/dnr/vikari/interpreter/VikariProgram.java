@@ -94,7 +94,7 @@ public class VikariProgram {
         String filePath = sourceFile.getAbsolutePath();
         log.info("lex(\"{}\")", filePath);
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceFile(sourceFile);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceFile);
         lexerResults.put(filePath, lexedStatements);
 
         if (shouldPrintLexerResults()) {
@@ -118,9 +118,9 @@ public class VikariProgram {
      */
     public List<List<AtonementCrystal>> lex(String sourceCode) {
         log.info("lex()");
-        log.info("Source code: {}", sourceCode );
+        log.info("Source code:\n{}", sourceCode );
 
-        List<List<AtonementCrystal>> lexedStatements = lexer.lexVikariSourceCode(sourceCode);
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceCode);
         replLexerResults.add(lexedStatements);
 
         if (shouldPrintLexerResults()) {
@@ -295,7 +295,9 @@ public class VikariProgram {
                 }
 
             }
-            sb.append('\n');
+            if (lineNumber < lexedStatements.size() - 1) {
+                sb.append('\n');
+            }
         }
 
         String result = sb.toString();
@@ -326,7 +328,10 @@ public class VikariProgram {
                 }
                 String result = statement.accept(astPrintVisitor);
                 sb.append(result);
-                sb.append('\n');
+                if (lineNumber < parsedStatements.size() - 1) {
+                    sb.append('\n');
+                }
+
             }
 
             String result = sb.toString();

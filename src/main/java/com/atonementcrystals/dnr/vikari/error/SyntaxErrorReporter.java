@@ -57,7 +57,7 @@ public class SyntaxErrorReporter {
     public void reportErrors() {
         String syntaxErrorReport = getErrorReport();
         System.out.println(syntaxErrorReport);
-        log.debug(syntaxErrorReport);
+        log.debug("Error report:\n{}", syntaxErrorReport);
     }
 
     public void clear() {

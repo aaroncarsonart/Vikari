@@ -3,6 +3,8 @@ package com.atonementcrystals.dnr.vikari.interpreter;
 import com.atonementcrystals.dnr.vikari.error.Vikari_Exception;
 import com.atonementcrystals.dnr.vikari.error.Vikari_IOException;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
@@ -10,6 +12,7 @@ import java.io.File;
  * Handles the loading of File objects for files containing Vikari source code.
  */
 public class VikariSourceFileLoader {
+    private static final Logger log = LogManager.getLogger(VikariSourceFileLoader.class);
 
     /**
      * Load a Vikari source file from the input path or type name.
@@ -44,7 +47,9 @@ public class VikariSourceFileLoader {
             return sourceFile;
 
         } catch (Vikari_Exception e) {
-            System.out.println(e.getErrorName() + ": " + e.getErrorMessage());
+            String errorMessage = e.getErrorName() + ": " + e.getErrorMessage();
+            System.out.println(errorMessage);
+            log.debug(errorMessage);
             System.exit(1);
         }
 
