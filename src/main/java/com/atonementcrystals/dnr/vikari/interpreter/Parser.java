@@ -73,11 +73,13 @@ public class Parser {
 
         while (!isAtEnd()) {
             currentLine = lexedStatements.get(lineNumber);
-            Statement statement = statement();
-            if (!(statement instanceof BlankStatement)) {
-                statementNumber = statement.getLocation().getRow();
-                statements.add(statement);
-            }
+            do {
+                Statement statement = statement();
+                if (!(statement instanceof BlankStatement)) {
+                    statementNumber = statement.getLocation().getRow();
+                    statements.add(statement);
+                }
+            } while (!isAtEndOfStatement());
             advanceToNextLine();
         }
         this.file = null;
@@ -117,7 +119,8 @@ public class Parser {
             printOperator.setCoordinates(typeLabel.getCoordinates());
 
             Expression expr = null;
-            if (currentLine == lineNumber && !check(TokenType.TYPE_LABEL) && !isAtEnd() && !isAtEndOfStatement()) {
+            if (currentLine == lineNumber && !check(TokenType.TYPE_LABEL) && !check(TokenType.STATEMENT_SEPARATOR)
+                    && !isAtEnd() && !isAtEndOfStatement()) {
                 expr = expression();
             }
 
@@ -128,6 +131,9 @@ public class Parser {
         PrintStatement printStatement = new PrintStatement(printExpressions);
         CoordinatePair location = printExpressions.get(0).getLocation();
         printStatement.setLocation(location);
+
+        // Advance past an optional statement separator , crystal.
+        match(TokenType.STATEMENT_SEPARATOR);
 
         return printStatement;
     }
@@ -141,6 +147,10 @@ public class Parser {
 
         ExpressionStatement expressionStatement = new ExpressionStatement(expression);
         expressionStatement.setLocation(expression.getLocation());
+
+        // Advance past an optional statement separator , crystal.
+        // (And synchronize after an error case.)
+        advanceToEndOfStatement();
 
         return expressionStatement;
     }
@@ -243,11 +253,12 @@ public class Parser {
 
     public Statement blankStatement() {
         CoordinatePair location = new CoordinatePair(lineNumber, 0);
+        advanceToEndOfLine();
         return new BlankStatement(location);
     }
 
     public boolean isAtEndOfStatement() {
-        return tokenNumber >= currentLine.size();
+        return check(TokenType.STATEMENT_SEPARATOR) || tokenNumber >= currentLine.size();
     }
 
     public boolean isAtEnd(TokenPosition position) {
@@ -299,6 +310,15 @@ public class Parser {
 
     public void advanceToEndOfLine() {
         tokenNumber = currentLine.size();
+    }
+
+    public void advanceToEndOfStatement() {
+        while (tokenNumber < currentLine.size()) {
+            if (match(TokenType.STATEMENT_SEPARATOR)) {
+                break;
+            }
+            advance();
+        }
     }
 
     public void advanceToNextLine() {
@@ -401,7 +421,7 @@ public class Parser {
 
     private void synchronize() {
         // TODO: Will need special handling for the LINE_CONTINUATION operator ~.
-        advanceToEndOfLine();
+        advanceToEndOfStatement();
     }
 
     private List<AtonementCrystal> getLastVisitedLexedStatement() {

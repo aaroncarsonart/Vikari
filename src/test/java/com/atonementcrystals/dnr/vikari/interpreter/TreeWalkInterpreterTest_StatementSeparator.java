@@ -1,7 +1,7 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
-import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,7 @@ import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TreeWalkInterpreterTest_PrintStatements {
+public class TreeWalkInterpreterTest_StatementSeparator {
 
     private final PrintStream originalOut = System.out;
     private final ByteArrayOutputStream testOut = new ByteArrayOutputStream();
@@ -59,75 +59,79 @@ public class TreeWalkInterpreterTest_PrintStatements {
         assertEquals(expectedOutput, actualOutput, "Unexpected output of print statement.");
     }
 
+    // The following 12 tests are all identical to TreeWalkInterpreterTest_PrintStatements,
+    // except that the statement separator , has been interpersed between their calls.
+    // Resulting behavior should be exactly equivalent in both cases.
+
     @Test
     @Order(1)
     public void testPrintExpression_Empty() {
-        testPrintStatement(":", "\n");
+        testPrintStatement(":,", "\n");
     }
 
     @Test
     @Order(2)
     public void testPrintExpression_Simple() {
-        testPrintStatement(":5", "5");
+        testPrintStatement(":5,", "5");
     }
 
     @Test
     @Order(3)
     public void testPrintExpression_Chained() {
-        testPrintStatement(":5:3:7", "537");
+        testPrintStatement(":5,:3,:7", "537");
     }
 
     @Test
     @Order(4)
     public void testPrintlnExpression_Simple() {
-        testPrintStatement(":5:", "5\n");
+        testPrintStatement(":5,:", "5\n");
     }
 
     @Test
     @Order(5)
     public void testPrintlnExpression_Chained() {
-        testPrintStatement(":5:3:7:", "537\n");
+        testPrintStatement(":5,:3,:7,:", "537\n");
     }
 
     @Test
     @Order(6)
     public void testPrintExpression_BinaryExpression() {
-        testPrintStatement(":5 + 3", "8");
+        testPrintStatement(":5 + 3,", "8");
     }
 
     @Test
     @Order(7)
     public void testPrintlnExpression_BinaryExpression() {
-        testPrintStatement(":5 + 3:", "8\n");
+        testPrintStatement(":5 + 3,:,", "8\n");
     }
 
     @Test
     @Order(8)
     public void testPrintlnExpression_BinaryExpression_Chained() {
-        testPrintStatement(":5 + 3:7 - 2:", "85\n");
+        testPrintStatement(":5 + 3:7 - 2:,", "85\n");
     }
 
     @Test
     @Order(9)
     public void testPrintExpression_MultiLine() {
-        testPrintStatement(":5 + 3\n:7 - 2", "85");
+        testPrintStatement(":5 + 3,\n:7 - 2,", "85");
     }
 
     @Test
     @Order(10)
     public void testPrintlnExpression_MultiLine() {
-        testPrintStatement(":5 + 3:\n:7 - 2:", "8\n5\n");
+        testPrintStatement(":5 + 3,:\n:7 - 2,:,", "8\n5\n");
     }
 
     @Test
     @Order(11)
     public void testPrintExpression_Chained_MultiLine() {
-        testPrintStatement(":5 + 3\n:7 - 2\n:\n:22:7", "85\n227");
+        testPrintStatement(":5 + 3,\n:7 - 2,\n:\n:22,:7,", "85\n227");
     }
 
     @Test
     @Order(12)
     public void testPrintlnExpression_Chained_MultiLine() {
-        testPrintStatement(":5 + 3:\n:7 - 2:\n:\n:22:7:", "8\n5\n\n227\n");
+        testPrintStatement(":5 + 3,:,\n:7 - 2,:,\n:,\n:22,:7,:,", "8\n5\n\n227\n");
     }
 }

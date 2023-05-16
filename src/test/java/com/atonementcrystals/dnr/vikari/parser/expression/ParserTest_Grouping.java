@@ -178,7 +178,7 @@ public class ParserTest_Grouping {
         int actualSize = parsedStatements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing closing square bracket.");
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
@@ -205,7 +205,7 @@ public class ParserTest_Grouping {
         int actualSize = parsedStatements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing closing square bracket.");
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
@@ -232,7 +232,7 @@ public class ParserTest_Grouping {
         int actualSize = parsedStatements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for an empty grouping expression.");
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
@@ -260,7 +260,7 @@ public class ParserTest_Grouping {
             int actualSize = parsedStatements.size();
             assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-            assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+            assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing a matching square bracket.");
             List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
             assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
@@ -289,7 +289,7 @@ public class ParserTest_Grouping {
         int actualSize = parsedStatements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected syntax errors for missing opening square brackets.");
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(2, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
@@ -322,7 +322,7 @@ public class ParserTest_Grouping {
         int actualSize = parsedStatements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing closing square brackets.");
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(2, syntaxErrors.size(), "Unexpected number of syntax errors.");
 

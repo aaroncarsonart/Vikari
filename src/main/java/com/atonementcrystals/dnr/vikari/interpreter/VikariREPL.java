@@ -135,6 +135,10 @@ public class VikariREPL {
                         currentResults.add(result);
                     }
 
+                    // TODO: Once the index operator is implemented, assign each bare
+                    // TODO: ExpressionStatement result to $0, $1, $2 etc and report
+                    // TODO: the resulting assignment as e.g. ``$0 << 7`` in the REPL.
+
                     // Cache the results if there were no runtime errors.
                     this.lexedStatements.addAll(lexedStatements);
                     this.parsedStatements.addAll(parsedStatements);

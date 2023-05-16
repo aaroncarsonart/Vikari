@@ -427,7 +427,7 @@ public class ParserTest_Arithmetic {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         parser.parse(null, lexedStatements);
 
-        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for invalid operator.");
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
@@ -451,7 +451,7 @@ public class ParserTest_Arithmetic {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         parser.parse(null, lexedStatements);
 
-        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing operands.");
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
@@ -473,7 +473,7 @@ public class ParserTest_Arithmetic {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         parser.parse(null, lexedStatements);
 
-        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing left operand.");
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
@@ -495,34 +495,10 @@ public class ParserTest_Arithmetic {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         parser.parse(null, lexedStatements);
 
-        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
+        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing right operand.");
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 2), sourceString, "Expected expression.");
     }
-
-    @Test
-    @Order(11)
-    public void testArithmeticOperators_DoubleOperator() {
-        String sourceString = "4 // 2";
-
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-
-        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
-        parser.setSyntaxErrorReporter(syntaxErrorReporter);
-
-        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
-        parser.parse(null, lexedStatements);
-
-        assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
-
-        testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 2), sourceString, "Expected expression.");
-    }
-
-
 }

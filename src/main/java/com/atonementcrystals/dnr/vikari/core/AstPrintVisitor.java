@@ -17,7 +17,18 @@ import com.atonementcrystals.dnr.vikari.util.Utils;
  * Walk the AST and print a string representation of each statement and expression.
  */
 public class AstPrintVisitor implements Statement.Visitor<String>, Expression.Visitor<String> {
-    boolean verbose;
+
+    /**
+     * A simple, shared AstPrintVisitor instance for debugging purposes.
+     */
+    public static final AstPrintVisitor INSTANCE = new AstPrintVisitor();
+
+    /**
+     * If true, then an additional string label describing the Expression's type
+     * is prepended before the additional [ ] grouping of which wraps most sub-
+     * Expressions in a Statement.
+     */
+    private boolean verbose;
 
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
@@ -104,7 +115,6 @@ public class AstPrintVisitor implements Statement.Visitor<String>, Expression.Vi
 
     @Override
     public String visit(BlankStatement stmt) {
-        // Will never be visited. So throw an internal error!
-        throw new IllegalStateException("Unreachable code.");
+        return "";
     }
 }

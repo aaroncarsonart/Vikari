@@ -1,5 +1,6 @@
 package com.atonementcrystals.dnr.vikari.core.statement;
 
+import com.atonementcrystals.dnr.vikari.core.AstPrintVisitor;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 
 public abstract class Statement {
@@ -21,4 +22,12 @@ public abstract class Statement {
     }
 
     public abstract <S> S accept(Visitor<S> visitor);
+
+    /**
+     * @return An AstPrintVisitor String representation for debugging purposes.
+     */
+    @Override
+    public String toString() {
+        return this.accept(AstPrintVisitor.INSTANCE);
+    }
 }
