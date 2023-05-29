@@ -233,15 +233,15 @@ public enum TokenType {
      * concrete Crystal class type.
      *
      * @param identifier The default string identifier.
-     * @param type The concrete Crystal class type.
+     * @param javaType The concrete Crystal class type.
      */
-    TokenType(String identifier, Class<? extends AtonementCrystal> type) {
+    TokenType(String identifier, Class<? extends AtonementCrystal> javaType) {
         this.identifier = identifier;
-        this.type = type;
+        this.javaType = javaType;
     }
 
     private final String identifier;
-    private final Class<? extends AtonementCrystal> type;
+    private final Class<? extends AtonementCrystal> javaType;
 
     /**
      * @return The token's default string representation in Vikari.
@@ -255,7 +255,7 @@ public enum TokenType {
      *         If null, this TokenType is not used directly by the parser,
      *         but rather is used to combine into a larger crystal.
      */
-    public Class<? extends AtonementCrystal> getType() {
-        return type;
+    public Class<? extends AtonementCrystal> getJavaType() {
+        return javaType;
     }
 }

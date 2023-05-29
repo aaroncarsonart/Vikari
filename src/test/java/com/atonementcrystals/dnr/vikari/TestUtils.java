@@ -11,7 +11,7 @@ import java.io.File;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Helper methods for Lexer, Parser, and Intepreter test cases.
+ * Helper methods for Lexer, Parser, and Interpreter test cases.
  */
 public class TestUtils {
     public static void testSyntaxError(SyntaxError syntaxError, CoordinatePair expectedLocation, String expectedLine,
@@ -35,6 +35,11 @@ public class TestUtils {
             syntaxErrorReporter.reportErrors();
             fail("Expected no syntax errors for test case.");
         }
+    }
+
+    public static void assertSyntaxErrors(SyntaxErrorReporter syntaxErrorReporter, int expectedErrorCount) {
+        int actualErrorCount = syntaxErrorReporter.getSyntaxErrors().size();
+        assertEquals(expectedErrorCount, actualErrorCount, "Unexpected number of syntax errors.");
     }
 
     public static void testNumberCrystal(AtonementCrystal crystal, Object expectedValue, Class<? extends NumberCrystal> expectedClass) {

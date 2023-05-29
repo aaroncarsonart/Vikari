@@ -27,6 +27,22 @@ public class Utils {
     private static String userDir = System.getProperty("user.dir");
 
     /**
+     * Regular expression pattern for type names.
+     */
+    private static final Pattern typeIdentifierRegex = Pattern.compile("[A-Z][A-Za-z0-9_]*");
+
+    /**
+     * Regular expression pattern for field region names.
+     */
+    private static final Pattern fieldRegionIdentifierRegex = Pattern.compile("[a-z_][a-z0-9_]*");
+
+    /**
+     * Regular expression pattern for crystal reference names. This pattern doesn't detect error
+     * cases for backtick quoted identifiers, like all whitespace or if it contains tabs.
+     */
+    private static final Pattern crystalIdentifierRegex = Pattern.compile("(?:[a-z_][A-Za-z0-9_]*|(?<!`.)`[^`\\n]{2,}`)");
+
+    /**
      * Do not instantiate the Utils class.
      */
     private Utils() {
@@ -348,8 +364,19 @@ public class Utils {
      * @return The simplified form of the crystal's class name.
      */
     public static String getSimpleClassName(AtonementCrystal crystal) {
-        String name = crystal.getClass().getSimpleName();
-        if (name.equals(AtonementCrystal.class.getSimpleName())) {
+        return getSimpleClassName(crystal.getClass());
+    }
+
+    /**
+     * Strips the word "Crystal" from the end of any AtonementCrystal
+     * class name. (Except for the AtonementCrystal class itself.)
+     *
+     * @param crystalType The AtonementCrystal to simplify the class name for.
+     * @return The simplified form of the crystal's class name.
+     */
+    public static String getSimpleClassName(Class<? extends AtonementCrystal> crystalType) {
+        String name = crystalType.getSimpleName();
+        if (crystalType == AtonementCrystal.class) {
             return name;
         }
         if (name.endsWith("Crystal")) {
@@ -455,5 +482,32 @@ public class Utils {
             return filename.substring(userDir.length() + 1);
         }
         return filename;
+    }
+
+    public static boolean isCrystalIdentifier(String identifier) {
+        Matcher matcher = crystalIdentifierRegex.matcher(identifier);
+        return matcher.matches();
+    }
+
+    public static boolean isFieldRegionIdentifier(String identifier) {
+        Matcher matcher = fieldRegionIdentifierRegex.matcher(identifier);
+        return matcher.matches();
+    }
+
+    public static boolean isTypeIdentifier(String identifier) {
+        Matcher matcher = typeIdentifierRegex.matcher(identifier);
+        return matcher.matches();
+    }
+
+    public static boolean isMissingBacktickQuotation(String identifier) {
+        if (identifier == null) {
+            return false;
+        }
+        String backtick = "`";
+
+        boolean startsWithBacktick = identifier.startsWith(backtick);
+        boolean endsWithBacktick = identifier.endsWith(backtick);
+
+        return (startsWithBacktick && !endsWithBacktick) || (!startsWithBacktick && endsWithBacktick);
     }
 }

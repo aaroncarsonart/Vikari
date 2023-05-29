@@ -1,17 +1,22 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
-import com.atonementcrystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
+import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.PrintExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.RightAssignmentExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.VariableExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.BlankStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.PrintStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.core.statement.SyntaxErrorStatement;
+import com.atonementcrystals.dnr.vikari.core.statement.VariableDeclarationStatement;
 import com.atonementcrystals.dnr.vikari.error.RuntimeError;
 import com.atonementcrystals.dnr.vikari.error.Vikari_RuntimeException;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.UnaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.UnaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
@@ -29,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -40,6 +46,14 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     private File currentFile;
     private List<List<AtonementCrystal>> lexedStatements;
 
+    /** Parent field of the rootEnvironment. */
+    private AtonementField globalAtonementField;
+
+    /** Root environments are unique per source file. */
+    private Map<String, AtonementField> rootEnvironments;
+    private AtonementField rootEnvironment;
+    private AtonementField currentEnvironment;
+
     public void setLexedStatements(List<List<AtonementCrystal>> lexedStatements) {
         this.lexedStatements = lexedStatements;
     }
@@ -47,6 +61,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     public void interpret(File file, List<Statement> statements) {
         log.trace("interpret({})", file == null ? "null" : "\"" + file + "\"");
         this.currentFile = file;
+        establishRootEnvironment();
         try {
             for (Statement statement : statements) {
                 execute(statement);
@@ -55,6 +70,31 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
             reportError(e);
         }
         this.currentFile = null;
+    }
+
+    public void setGlobalAtonementField(AtonementField globalAtonementField) {
+        this.globalAtonementField = globalAtonementField;
+    }
+
+    private void establishRootEnvironment() {
+        // File is for a type or a script.
+        // Cache the environment with the file path.
+        if (currentFile != null) {
+            String filePath = currentFile.getAbsolutePath();
+            if (rootEnvironments.containsKey(filePath)) {
+                rootEnvironment = rootEnvironments.get(filePath);
+            } else {
+                rootEnvironment = new AtonementField(globalAtonementField);
+                rootEnvironments.put(filePath, rootEnvironment);
+            }
+        }
+
+        // Code is executed with -c or the REPL.
+        // So only one environment is necessary.
+        else if (rootEnvironment == null) {
+            rootEnvironment = new AtonementField(globalAtonementField);
+        }
+        currentEnvironment = rootEnvironment;
     }
 
     private void reportError(Vikari_RuntimeException e) {
@@ -123,7 +163,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     @Override
     public AtonementCrystal visit(PrintExpression expr) {
         // TODO: Should return a StringCrystal.
-        // TODO: (Once StringCrystals are implmemented in Vikari.)
+        //       (Once StringCrystals are implemented in Vikari.)
         Expression innerExpression = expr.getExpression();
         if (innerExpression == null) {
             System.out.println();
@@ -134,6 +174,37 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
             System.out.print(output);
             return result;
         }
+    }
+
+    @Override
+    public AtonementCrystal visit(VariableExpression expr) {
+        AtonementCrystal reference = expr.getReference();
+        // TODO: Resolve reference in current environment.
+        return null;
+    }
+
+    @Override
+    public AtonementCrystal visit(VariableDeclarationStatement stmt) {
+        // TODO: Implement.
+        return null;
+    }
+
+    @Override
+    public AtonementCrystal visit(LeftAssignmentExpression expr) {
+        AtonementCrystal rvalue = evaluate(expr.getRvalue());
+        AtonementCrystal lvalue = evaluate(expr.getLvalue());
+        // TODO: Check types and promote/demote values before assignment.
+        //       Int << Long truncates value.
+        return null;
+    }
+
+    @Override
+    public AtonementCrystal visit(RightAssignmentExpression expr) {
+        AtonementCrystal rvalue = evaluate(expr.getRvalue());
+        AtonementCrystal lvalue = evaluate(expr.getLvalue());
+        // TODO: Check types and promote/demote values before assignment.
+        //       Int << Long truncates value.
+        return null;
     }
 
     @Override

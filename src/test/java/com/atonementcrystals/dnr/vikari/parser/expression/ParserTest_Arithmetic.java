@@ -1,6 +1,6 @@
 package com.atonementcrystals.dnr.vikari.parser.expression;
 
-import com.atonementcrystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
@@ -433,8 +433,6 @@ public class ParserTest_Arithmetic {
 
         testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 2), sourceString, "Expected expression.");
     }
-
-    // TODO: Add more error test cases.
 
     @Test
     @Order(8)

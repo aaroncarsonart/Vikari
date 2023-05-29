@@ -1,4 +1,6 @@
-package com.atonementcrystals.dnr.vikari.core.crystal;
+package com.atonementcrystals.dnr.vikari.core.crystal.operator;
+
+import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 
 public class BinaryOperatorCrystal extends AtonementCrystal {
 

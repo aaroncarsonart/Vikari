@@ -5,7 +5,8 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 
 /**
  * The reference equals operator <=> checks if the left operand
- * refers to the same instance as the right operand.
+ * refers to the same instance as the right operand. Which means
+ * both crystals are defined by the same AtonementField.
  */
 public class ReferenceEqualsOperatorCrystal extends AtonementCrystal {
 

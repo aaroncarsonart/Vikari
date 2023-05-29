@@ -1,6 +1,6 @@
 package com.atonementcrystals.dnr.vikari.parser.statement;
 
-import com.atonementcrystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;

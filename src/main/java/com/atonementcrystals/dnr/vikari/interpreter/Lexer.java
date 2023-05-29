@@ -5,6 +5,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.comment.CommentCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.comment.MultiLineCommentCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.StringLiteralCrystal;
@@ -484,6 +485,7 @@ public class Lexer {
                 }
 
                 if (Utils.isBooleanLiteral(stringToken)) {
+                    // TODO: Change to BooleanCrystal and add Type info.
                     BooleanLiteralCrystal booleanCrystal = new BooleanLiteralCrystal(stringToken);
                     Boolean booleanValue = Boolean.valueOf(stringToken);
                     booleanCrystal.setValue(booleanValue);
@@ -655,6 +657,15 @@ public class Lexer {
                     continue;
                 }
 
+                if (Utils.isTypeIdentifier(stringToken)) {
+                    // TODO: Impose maximum limits on length of variable-length Vikari identifiers.
+                    // Resolve actual type information at a later step.
+                    TypeReferenceCrystal any = new TypeReferenceCrystal(stringToken);
+                    any.setCoordinates(tokenCoordinates);
+                    statementOfCrystals.add(any);
+                    continue;
+                }
+
                 if (Utils.isSword(stringToken)) {
                     // TODO: Impose maximum limits on length of variable-length Vikari identifiers.
                     SwordCrystal swordCrystal = new SwordCrystal(stringToken);
@@ -726,16 +737,26 @@ public class Lexer {
                 // Not a built-in type. Resolve concrete instance of identifier in parsing step.
                 if (mapping == null) {
                     // TODO: Impose maximum limits on length of Vikari identifiers.
-                    ReferenceCrystal any = new ReferenceCrystal(stringToken);
-                    any.setCoordinates(tokenCoordinates);
-                    statementOfCrystals.add(any);
-                    continue;
+                    if (Utils.isCrystalIdentifier(stringToken) || Utils.isFieldRegionIdentifier(stringToken)) {
+                        ReferenceCrystal any = new ReferenceCrystal(stringToken);
+                        any.setCoordinates(tokenCoordinates);
+                        statementOfCrystals.add(any);
+                        continue;
+                    } else {
+                        if (!Utils.isMissingBacktickQuotation(stringToken)) {
+                            reportError("Invalid crystal reference identifier.", statementNumber, tokenNumber, statementsOfStringTokens);
+                        }
+                        ReferenceCrystal any = new ReferenceCrystal(stringToken);
+                        any.setCoordinates(tokenCoordinates);
+                        statementOfCrystals.add(any);
+                        continue;
+                    }
                 }
 
                 // One of the default identifier types of the Vikari language.
                 // Build a new instance of its crystal type using reflection.
                 try {
-                    Class<? extends AtonementCrystal> clazz = mapping.getType();
+                    Class<? extends AtonementCrystal> clazz = mapping.getJavaType();
                     Class<?>[] constructorParameters = {};
                     Constructor<?> constructor = clazz.getConstructor(constructorParameters);
                     AtonementCrystal crystal = (clazz.cast(constructor.newInstance(constructorParameters)));

@@ -1,6 +1,6 @@
 package com.atonementcrystals.dnr.vikari.parser.expression;
 
-import com.atonementcrystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
@@ -315,8 +315,6 @@ public class ParserTest_Grouping {
 
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
-
-        syntaxErrorReporter.reportErrors();
 
         int expectedSize = 2;
         int actualSize = parsedStatements.size();

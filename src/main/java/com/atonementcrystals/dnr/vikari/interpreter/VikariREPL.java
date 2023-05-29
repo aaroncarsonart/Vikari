@@ -91,7 +91,7 @@ public class VikariREPL {
 
         // Begin REPL loop.
         while (!exit) {
-            // TODO: Save program state in interpreter once assignment statements work.
+            // TODO: Save program state in Interpreter once assignment statements work.
             parser.clear();
             interpreter.clear();
 
@@ -136,8 +136,8 @@ public class VikariREPL {
                     }
 
                     // TODO: Once the index operator is implemented, assign each bare
-                    // TODO: ExpressionStatement result to $0, $1, $2 etc and report
-                    // TODO: the resulting assignment as e.g. ``$0 << 7`` in the REPL.
+                    //       ExpressionStatement result to $0, $1, $2 etc and report
+                    //       the resulting assignment as e.g. ``$0 << 7`` in the REPL.
 
                     // Cache the results if there were no runtime errors.
                     this.lexedStatements.addAll(lexedStatements);

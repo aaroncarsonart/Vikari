@@ -1,10 +1,20 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
-import com.atonementcrystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
+import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.RightAssignmentOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.BlankLineCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
+import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.PrintExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.RightAssignmentExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.VariableExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.BlankStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.PrintStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
@@ -19,9 +29,13 @@ import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.UnaryExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
+import com.atonementcrystals.dnr.vikari.core.statement.VariableDeclarationStatement;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
+import com.atonementcrystals.dnr.vikari.error.Vikari_FieldMemberExistsException;
 import com.atonementcrystals.dnr.vikari.error.Vikari_ParserException;
+import com.atonementcrystals.dnr.vikari.error.Vikari_UndefinedFieldMemberException;
+import com.atonementcrystals.dnr.vikari.interpreter.resolver.TypeResolver;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import com.atonementcrystals.dnr.vikari.util.TokenPosition;
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +44,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -51,12 +66,30 @@ public class Parser {
     private List<AtonementCrystal> currentLine;
 
     private SyntaxErrorReporter syntaxErrorReporter;
+    private TypeResolver typeResolver;
+
+    /** Parent field of the rootEnvironment. */
+    private AtonementField globalAtonementField;
+
+    /** Root environments are unique per source file. */
+    private Map<String, AtonementField> rootEnvironments;
+    private AtonementField rootEnvironment;
+    private AtonementField currentEnvironment;
 
     public Parser() {
+        typeResolver = new TypeResolver();
     }
 
     public void setSyntaxErrorReporter(SyntaxErrorReporter syntaxErrorReporter) {
         this.syntaxErrorReporter = syntaxErrorReporter;
+    }
+
+    public void setGlobalAtonementField(AtonementField globalAtonementField) {
+        this.globalAtonementField = globalAtonementField;
+    }
+
+    public AtonementField getRootEnvironment() {
+        return rootEnvironment;
     }
 
     public List<Statement> parse(File file, List<List<AtonementCrystal>> lexedStatements) {
@@ -69,8 +102,12 @@ public class Parser {
         if (lexedStatements.isEmpty()) {
             return statements;
         }
+
+        establishRootEnvironment();
+
         lastLineLength = lexedStatements.get(lexedStatements.size() - 1).size();
 
+        // Parse the file.
         while (!isAtEnd()) {
             currentLine = lexedStatements.get(lineNumber);
             do {
@@ -82,12 +119,45 @@ public class Parser {
             } while (!isAtEndOfStatement());
             advanceToNextLine();
         }
+
+        // Visit the Resolvers.
+        typeResolver.resolve(statements);
+        typeResolver.reportErrors(syntaxErrorReporter, file, lexedStatements);
+
         this.file = null;
         return statements;
     }
 
+    /**
+     * Environments are used in the Parser to detect variable declarations
+     * and to ensure that variables are declared before they are used.
+     */
+    private void establishRootEnvironment() {
+        // File is for a type or a script.
+        // Cache the environment with the file path.
+        if (file != null) {
+            String filePath = file.getAbsolutePath();
+            if (rootEnvironments.containsKey(filePath)) {
+                rootEnvironment = rootEnvironments.get(filePath);
+            } else {
+                rootEnvironment = new AtonementField(globalAtonementField);
+                rootEnvironments.put(filePath, rootEnvironment);
+            }
+        }
+
+        // Code is executed with -c or the REPL.
+        // So only one environment is necessary.
+        else if (rootEnvironment == null) {
+            rootEnvironment = new AtonementField(globalAtonementField);
+        }
+        currentEnvironment = rootEnvironment;
+    }
+
     private Statement statement() {
         try {
+            if (checkVariableDeclaration()) {
+                return variableDeclarationStatement();
+            }
             if (check(TokenType.TYPE_LABEL)) {
                 return printStatement();
             }
@@ -108,6 +178,89 @@ public class Parser {
             syntaxErrorStatement.setLocation(new CoordinatePair(errorLineNumber, 0));
             return syntaxErrorStatement;
         }
+    }
+
+    private boolean checkVariableDeclaration() {
+        if (check(ReferenceCrystal.class)) {
+            AtonementCrystal reference = peek();
+            String identifier = reference.getIdentifier();
+
+            // We know it is a variable declaration if it is undefined.
+            if (!currentEnvironment.hasFieldMember(identifier)) {
+                return true;
+            }
+
+            // Parse as a variable declaration for the error case.
+            if (lookAhead(1) instanceof TypeLabelOperatorCrystal) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Statement variableDeclarationStatement() {
+        ReferenceCrystal variableToDefine = consume(ReferenceCrystal.class, "Expected a variable reference.");
+
+        // Check for an optional type label.
+        TypeReferenceCrystal typeReference;
+        TypeCrystal declaredType = null;
+
+        if (match(TokenType.TYPE_LABEL)) {
+            typeReference = consume(TypeReferenceCrystal.class, "Expected type reference after type label operator.");
+            String typeName = typeReference.getIdentifier();
+
+            // Fetch the crystal definition from the environment.
+            try {
+                declaredType = (TypeCrystal) rootEnvironment.get(typeName);
+            } catch (Vikari_UndefinedFieldMemberException e) {
+                // TODO: Will need to move this check to the TypeResolver.
+                error(typeReference, "Unknown Type.");
+                declaredType = VikariType.ATONEMENT_CRYSTAL.getTypeCrystal();
+            } catch (ClassCastException e) {
+                throw new Vikari_ParserException("Internal error. Type identifier not mapped to a TypeCrystal.");
+            }
+        }
+
+        if (declaredType != null) {
+            variableToDefine.setDeclaredType(declaredType);
+        } else {
+            variableToDefine.setDeclaredType(VikariType.ATONEMENT_CRYSTAL);
+        }
+
+        // Set up the final expression statement.
+        VariableDeclarationStatement declarationStatement;
+
+        // Handle initializing to a non-default value.
+        if (match(TokenType.LEFT_ASSIGNMENT)) {
+            BinaryOperatorCrystal operator = (BinaryOperatorCrystal) previous();
+            Expression initializerExpression = expression();
+            declarationStatement = new VariableDeclarationStatement(variableToDefine, operator, initializerExpression);
+        }
+
+        // Case for not specifying a default value.
+        else {
+            declarationStatement = new VariableDeclarationStatement(variableToDefine, null, null);
+        }
+
+        // Define the crystal in the current scope. (For checking use of undefined crystals.)
+        String identifierToDefine = variableToDefine.getIdentifier();
+        try {
+            currentEnvironment.define(identifierToDefine, variableToDefine);
+        } catch (Vikari_FieldMemberExistsException e) {
+            error(variableToDefine, "Variable is already defined.");
+        }
+
+        if (!isAtEndOfStatement()) {
+            error(peek(), "Expected token(s) in variable declaration statement.");
+        }
+
+        // Advance past an optional statement separator , crystal.
+        // (And synchronize after an error case.)
+        advanceToEndOfStatement();
+
+        CoordinatePair location = variableToDefine.getCoordinates();
+        declarationStatement.setLocation(location);
+        return declarationStatement;
     }
 
     private Statement printStatement() {
@@ -156,7 +309,39 @@ public class Parser {
     }
 
     private Expression expression() {
-        return termExpression();
+        return assignment();
+    }
+
+    private Expression assignment() {
+        Expression left = termExpression();
+
+        if (match(TokenType.LEFT_ASSIGNMENT)) {
+            BinaryOperatorCrystal operator = (BinaryOperatorCrystal) previous();
+            Expression right = assignment();
+
+            if (!(left instanceof VariableExpression)) {
+                error(left.getLocation(), "Invalid target for assignment expression.");
+            }
+
+            LeftAssignmentExpression assignmentExpression = new LeftAssignmentExpression(left, operator, right);
+            return assignmentExpression;
+        }
+
+        if (match(TokenType.CONTINUE)) {
+            BinaryOperatorCrystal operator = new RightAssignmentOperatorCrystal();
+            operator.setCoordinates(previous().getCoordinates());
+
+            Expression right = assignment();
+
+            if (!(right instanceof VariableExpression)) {
+                error(right.getLocation(), "Invalid target for assignment expression.");
+            }
+
+            RightAssignmentExpression assignmentExpression = new RightAssignmentExpression(left, operator, right);
+            return assignmentExpression;
+        }
+
+        return left;
     }
 
     private Expression termExpression() {
@@ -204,12 +389,15 @@ public class Parser {
     }
 
     private Expression primary() {
+        // Number literal
         if (match(NumberCrystal.class)) {
             AtonementCrystal previous = previous();
             LiteralExpression literalExpression = new LiteralExpression(previous);
             literalExpression.setLocation(previous.getCoordinates());
             return literalExpression;
         }
+
+        // Grouping expression
         if (match(TokenType.LEFT_SQUARE_BRACKET)) {
             AtonementCrystal bracket = previous();
             CoordinatePair location = bracket.getCoordinates();
@@ -221,6 +409,22 @@ public class Parser {
             groupingExpression.setLocation(location);
             return groupingExpression;
         }
+
+        // Variable reference
+        if (match(ReferenceCrystal.class)) {
+            AtonementCrystal reference = previous();
+            String identifier = reference.getIdentifier();
+            if (!currentEnvironment.isDefined(identifier)) {
+                error(reference, "Undefined variable reference.");
+            } else {
+                // Since assignments aren't processed yet, need to fetch the declared type.
+                AtonementCrystal fieldMember = currentEnvironment.get(identifier);
+                TypeCrystal declaredType = fieldMember.getDeclaredType();
+                reference.setDeclaredType(declaredType);
+            }
+            return new VariableExpression(reference);
+        }
+
         AtonementCrystal errorCrystal;
         if (isAtEndOfStatement() || isAtEnd()) {
             errorCrystal = previous();
@@ -257,12 +461,24 @@ public class Parser {
         return new BlankStatement(location);
     }
 
+    public boolean isAtEndOfStatement(int tokenNumber) {
+        if (tokenNumber >= currentLine.size()) {
+            return true;
+        }
+        AtonementCrystal currentToken = currentLine.get(tokenNumber);
+        return TokenType.STATEMENT_SEPARATOR.getJavaType().isInstance(currentToken);
+    }
+
     public boolean isAtEndOfStatement() {
         return check(TokenType.STATEMENT_SEPARATOR) || tokenNumber >= currentLine.size();
     }
 
     public boolean isAtEnd(TokenPosition position) {
         return isAtEnd(position.getLineNumber(), position.getTokenNumber());
+    }
+
+    public boolean isAtEnd(int tokenNumber) {
+        return isAtEnd(lineNumber, tokenNumber);
     }
 
     public boolean isAtEnd(int lineNumber, int tokenNumber) {
@@ -293,6 +509,28 @@ public class Parser {
             }
         }
         return false;
+    }
+
+    private AtonementCrystal lookAhead(int distance) {
+        int position = tokenNumber;
+        AtonementCrystal current = currentLine.get(position);
+        for (int i = 0; i < distance; i++) {
+            position++;
+
+            if (!isAtEnd(position) && !isAtEndOfStatement(position)) {
+                current = currentLine.get(position);
+
+                // Advance past all whitespace that is not indentation.
+                if (position > 0 && current instanceof WhitespaceCrystal) {
+                    position++;
+
+                    if (!isAtEnd(position) && !isAtEndOfStatement(position)) {
+                        current = currentLine.get(position);
+                    }
+                }
+            }
+        }
+        return current;
     }
 
     public AtonementCrystal advance() {
@@ -338,7 +576,7 @@ public class Parser {
             return false;
         }
         AtonementCrystal crystal = peek();
-        return tokenType.getType().isInstance(crystal);
+        return tokenType.getJavaType().isInstance(crystal);
     }
 
     public boolean check(Class<? extends AtonementCrystal> crystalType) {
@@ -347,6 +585,30 @@ public class Parser {
         }
         AtonementCrystal crystal = peek();
         return crystalType.isInstance(crystal);
+    }
+
+    public boolean check(AtonementCrystal crystal, TokenType... tokenTypes) {
+        if (crystal == null) {
+            return false;
+        }
+        for (TokenType tokenType : tokenTypes) {
+            if (tokenType.getJavaType().isInstance(crystal)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean check(AtonementCrystal crystal, Class<? extends AtonementCrystal>... crystalTypes) {
+        if (crystal == null) {
+            return false;
+        }
+        for (Class<? extends AtonementCrystal> crystalType : crystalTypes) {
+            if (crystalType.isInstance(crystal)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private AtonementCrystal peek() {
@@ -393,8 +655,12 @@ public class Parser {
     }
 
     private AtonementCrystal consume(TokenType tokenType, String errorMessage) {
-        if (check(tokenType)) {
-            return advance();
+        return consume(tokenType.getJavaType(), errorMessage);
+    }
+
+    private <T extends AtonementCrystal> T consume(Class<T> crystalType, String errorMessage) {
+        if (check(crystalType)) {
+            return (T) advance();
         }
         AtonementCrystal errorCrystal;
         if (isAtEndOfStatement() || isAtEnd()) {
@@ -411,7 +677,10 @@ public class Parser {
 
     private Vikari_ParserException error(AtonementCrystal crystal, String errorMessage) {
         CoordinatePair location = crystal.getCoordinates();
+        return error(location, errorMessage);
+    }
 
+    private Vikari_ParserException error(CoordinatePair location, String errorMessage) {
         List<AtonementCrystal> lastVisitedLine = getLastVisitedLexedStatement();
         String lineString = lastVisitedLine.stream().map(AtonementCrystal::getIdentifier).collect(Collectors.joining());
         SyntaxError syntaxError = new SyntaxError(file, location, lineString, errorMessage);

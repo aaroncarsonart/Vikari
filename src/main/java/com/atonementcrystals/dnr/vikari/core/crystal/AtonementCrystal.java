@@ -1,5 +1,6 @@
 package com.atonementcrystals.dnr.vikari.core.crystal;
 
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 
 /**
@@ -11,7 +12,9 @@ public class AtonementCrystal {
     private String identifier;
     private AtonementField field = new AtonementField();
     private CoordinatePair coordinates;
-    private Type type;
+
+    private TypeCrystal declaredType;
+    private TypeCrystal instantiatedType;
 
     public AtonementCrystal(String identifier) {
         this.identifier = identifier;
@@ -41,11 +44,43 @@ public class AtonementCrystal {
         this.coordinates = coordinates;
     }
 
-    public void setCoordinates(int row, int column) {
-        this.coordinates = new CoordinatePair(row, column);
+    public TypeCrystal getDeclaredType() {
+        return declaredType;
+    }
+
+    public void setDeclaredType(TypeCrystal declaredType) {
+        this.declaredType = declaredType;
+    }
+
+    public void setDeclaredType(VikariType vikariType) {
+        TypeCrystal declaredType = vikariType.getTypeCrystal();
+        this.declaredType = declaredType;
+    }
+
+    public TypeCrystal getInstantiatedType() {
+        return instantiatedType;
+    }
+
+    public void setInstantiatedType(TypeCrystal instantiatedType) {
+        this.instantiatedType = instantiatedType;
+    }
+
+    /**
+     * Set the declared and instantiated types to the given type.
+     * @param vikariType The type to set.
+     */
+    public void setType(VikariType vikariType) {
+        TypeCrystal typeCrystal = vikariType.getTypeCrystal();
+        setDeclaredType(typeCrystal);
+        setInstantiatedType(typeCrystal);
     }
 
     public String getStringRepresentation() {
+        return identifier;
+    }
+
+    @Override
+    public String toString() {
         return identifier;
     }
 }

@@ -20,6 +20,9 @@ public abstract class Expression {
         E visit(LiteralExpression expr);
         E visit(PrintExpression expr);
         E visit(UnaryExpression expr);
+        E visit(VariableExpression expr);
+        E visit(LeftAssignmentExpression expr);
+        E visit(RightAssignmentExpression expr);
     }
 
     public abstract <E> E accept(Visitor<E> visitor);

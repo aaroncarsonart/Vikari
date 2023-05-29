@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UtilsTest {
@@ -673,5 +672,87 @@ class UtilsTest {
         assertFalse(Utils.isValidDecimalFractionalPart("5.0B"), "Expected to not be a valid decimal fractional part.");
         assertFalse(Utils.isValidDecimalFractionalPart("7Y"), "Expected to not be a valid decimal fractional part.");
         assertFalse(Utils.isValidDecimalFractionalPart("22BB"), "Expected to not be a valid decimal fractional part.");
+    }
+
+    @Test
+    @Order(26)
+    public void testIsCrystalIdentifier() {
+        assertTrue(Utils.isCrystalIdentifier("a"), "Expected to be a valid crystal identifier.");
+        assertTrue(Utils.isCrystalIdentifier("foo"), "Expected to be a valid crystal identifier.");
+        assertTrue(Utils.isCrystalIdentifier("foo_bar"), "Expected to be a valid crystal identifier.");
+        assertTrue(Utils.isCrystalIdentifier("a2"), "Expected to be a valid crystal identifier.");
+        assertTrue(Utils.isCrystalIdentifier("_a2"), "Expected to be a valid crystal identifier.");
+        assertTrue(Utils.isCrystalIdentifier("a2_"), "Expected to be a valid crystal identifier.");
+        assertTrue(Utils.isCrystalIdentifier("_a2_"), "Expected to be a valid crystal identifier.");
+        assertTrue(Utils.isCrystalIdentifier("_a_2_"), "Expected to be a valid crystal identifier.");
+        assertTrue(Utils.isCrystalIdentifier("`This is a sentence.`"), "Expected to be a valid crystal identifier.");
+        assertTrue(Utils.isCrystalIdentifier("`a:Integer << 3 + 7`"), "Expected to be a valid crystal identifier.");
+
+        assertFalse(Utils.isCrystalIdentifier("3"), "Expected to not be a valid crystal identifier.");
+        assertFalse(Utils.isCrystalIdentifier("3a"), "Expected to not be a valid crystal identifier.");
+        assertFalse(Utils.isCrystalIdentifier("Foo"), "Expected to not be a valid crystal identifier.");
+        assertFalse(Utils.isCrystalIdentifier("`foo"), "Expected to not be a valid crystal identifier.");
+        assertFalse(Utils.isCrystalIdentifier("foo`"), "Expected to not be a valid crystal identifier.");
+    }
+
+    @Test
+    @Order(27)
+    public void testIsFieldRegionIdentifier() {
+        assertTrue(Utils.isFieldRegionIdentifier("a"), "Expected to be a valid field region identifier.");
+        assertTrue(Utils.isFieldRegionIdentifier("foo"), "Expected to be a valid field region identifier.");
+        assertTrue(Utils.isFieldRegionIdentifier("foo_bar"), "Expected to be a valid field region identifier.");
+        assertTrue(Utils.isFieldRegionIdentifier("a2"), "Expected to be a valid field region identifier.");
+        assertTrue(Utils.isFieldRegionIdentifier("_a2"), "Expected to be a valid field region identifier.");
+        assertTrue(Utils.isFieldRegionIdentifier("a2_"), "Expected to be a valid field region identifier.");
+        assertTrue(Utils.isFieldRegionIdentifier("_a2_"), "Expected to be a valid field region identifier.");
+        assertTrue(Utils.isFieldRegionIdentifier("_a_2_"), "Expected to be a valid field region identifier.");
+
+        assertFalse(Utils.isFieldRegionIdentifier("`This is a sentence.`"), "Expected to not be a valid field region " +
+                "identifier.");
+        assertFalse(Utils.isFieldRegionIdentifier("`a:Integer << 3 + 7`"), "Expected to not be a valid field region " +
+                "identifier.");
+        assertFalse(Utils.isFieldRegionIdentifier("3"), "Expected to not be a valid field region identifier.");
+        assertFalse(Utils.isFieldRegionIdentifier("3a"), "Expected to not be a valid field region identifier.");
+        assertFalse(Utils.isFieldRegionIdentifier("Foo"), "Expected to not be a valid field region identifier.");
+        assertFalse(Utils.isFieldRegionIdentifier("`foo"), "Expected to not be a valid field region identifier.");
+        assertFalse(Utils.isFieldRegionIdentifier("foo`"), "Expected to not be a valid field region identifier.");
+    }
+
+    @Test
+    @Order(28)
+    public void testIsTypeIdentifier() {
+        assertTrue(Utils.isTypeIdentifier("Foo"), "Expected to  be a valid type identifier.");
+        assertTrue(Utils.isTypeIdentifier("BarBaz"), "Expected to  be a valid type identifier.");
+        assertTrue(Utils.isTypeIdentifier("A"), "Expected to  be a valid type identifier.");
+        assertTrue(Utils.isTypeIdentifier("Ba"), "Expected to be a valid type identifier.");
+        assertTrue(Utils.isTypeIdentifier("Cfoo"), "Expected to be a valid type identifier.");
+        assertTrue(Utils.isTypeIdentifier("Dfoo_bar"), "Expected to be a valid type identifier.");
+        assertTrue(Utils.isTypeIdentifier("E2"), "Expected to be a valid type identifier.");
+        assertTrue(Utils.isTypeIdentifier("F_a2"), "Expected to be a valid type identifier.");
+        assertTrue(Utils.isTypeIdentifier("Ha2_"), "Expected to be a valid type identifier.");
+        assertTrue(Utils.isTypeIdentifier("H_a2_"), "Expected to be a valid type identifier.");
+        assertTrue(Utils.isTypeIdentifier("I_a_2_"), "Expected to be a valid type identifier.");
+
+        assertFalse(Utils.isTypeIdentifier("a"), "Expected to not be a valid type identifier.");
+        assertFalse(Utils.isTypeIdentifier("foo"), "Expected to not be a valid type identifier.");
+        assertFalse(Utils.isTypeIdentifier("foo_bar"), "Expected to not be a valid type identifier.");
+        assertFalse(Utils.isTypeIdentifier("2"), "Expected to not be a valid type identifier.");
+        assertFalse(Utils.isTypeIdentifier("_a2"), "Expected to not be a valid type identifier.");
+        assertFalse(Utils.isTypeIdentifier("a2_"), "Expected to not be a valid type identifier.");
+        assertFalse(Utils.isTypeIdentifier("_a2_"), "Expected to not be a valid type identifier.");
+        assertFalse(Utils.isTypeIdentifier("_a_2_"), "Expected to not be a valid type identifier.");
+        assertFalse(Utils.isTypeIdentifier("`This is a sentence.`"), "Expected to not be a valid type identifier.");
+        assertFalse(Utils.isTypeIdentifier("`a:Integer << 3 + 7`"), "Expected to not be a valid type identifier.");
+    }
+
+    @Test
+    @Order(29)
+    public void testIsMissingBacktickQuotation() {
+        assertTrue(Utils.isMissingBacktickQuotation("`foo"), "Expected to be missing a backtick quotation.");
+        assertTrue(Utils.isMissingBacktickQuotation("foo`"), "Expected to be missing a backtick quotation.");
+
+        assertFalse(Utils.isMissingBacktickQuotation("3a"), "Expected to not be missing a backtick quotation.");
+        assertFalse(Utils.isMissingBacktickQuotation("foo"), "Expected to not be missing a backtick quotation.");
+        assertFalse(Utils.isMissingBacktickQuotation("`foo`"), "Expected to not be missing a backtick quotation.");
     }
 }

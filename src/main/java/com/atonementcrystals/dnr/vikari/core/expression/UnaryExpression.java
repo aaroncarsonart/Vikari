@@ -1,6 +1,6 @@
 package com.atonementcrystals.dnr.vikari.core.expression;
 
-import com.atonementcrystals.dnr.vikari.core.crystal.UnaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.UnaryOperatorCrystal;
 
 public class UnaryExpression extends Expression {
     private UnaryOperatorCrystal operator;

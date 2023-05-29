@@ -1,6 +1,6 @@
 package com.atonementcrystals.dnr.vikari.core.expression;
 
-import com.atonementcrystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 
 public class BinaryExpression extends Expression {
     private Expression left;

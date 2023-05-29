@@ -37,7 +37,7 @@ public class BinaryStringTokenTree {
         tokenRegexList.add(breakTokenRegex);
 
         // TODO: Support regex to collapse whitespaces without needing to stitch every individual space and tab
-        // TODO: together afterwards.
+        //       together afterwards.
 
         // split on whitespace first
         tokenRegexList.add(0, " ");

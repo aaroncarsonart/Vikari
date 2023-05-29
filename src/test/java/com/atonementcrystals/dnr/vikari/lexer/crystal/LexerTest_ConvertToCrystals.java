@@ -5,9 +5,14 @@ import com.atonementcrystals.dnr.vikari.core.crystal.comment.CommentCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.comment.MultiLineCommentCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.FunctionCallOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.WhitespaceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.RightParenthesisCrystal;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
@@ -58,7 +63,7 @@ public class LexerTest_ConvertToCrystals {
 
         for (TokenType tokenType : tokenTypesToTest) {
             String identifier = tokenType.getIdentifier();
-            Class<? extends AtonementCrystal> clazz = tokenType.getType();
+            Class<? extends AtonementCrystal> clazz = tokenType.getJavaType();
 
             String sourceString = identifier;
 
@@ -1863,6 +1868,196 @@ public class LexerTest_ConvertToCrystals {
 
         CoordinatePair expectedCoordinates = COORDINATE_PAIR_ZERO_ZERO;
         CoordinatePair actualCoordinates = crystal.getCoordinates();
+        assertEquals(expectedCoordinates, actualCoordinates, "Unexpected coordinates.");
+    }
+
+    @Test
+    @Order(26)
+    public void lexerTest_Crystals_TypeReferences_TypeLabel() {
+        String sourceString = "int:Integer";
+
+        Lexer lexer = new Lexer();
+        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
+        List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
+
+        int expectedStatementsCount = 1;
+        int actualStatementsCount = statementsOfCrystals.size();
+        assertEquals(expectedStatementsCount, actualStatementsCount, "Unexpected number of crystals in statement.");
+
+        // -----------
+        // statement 1
+        // -----------
+        List<AtonementCrystal> statement = statementsOfCrystals.get(0);
+
+        int expectedSize = 3;
+        int actualSize = statement.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of crystals in statement.");
+
+        // Reference
+        int tokenNumber = 0;
+        AtonementCrystal crystal = statement.get(tokenNumber);
+        assertEquals(ReferenceCrystal.class, crystal.getClass(), "Reference crystal has incorrect type.");
+
+        String expectedIdentifier = "int";
+        String lexedIdentifier = crystal.getIdentifier();
+        assertEquals(expectedIdentifier, lexedIdentifier, "A reference crystal's identifier should match its source " +
+                "string's identifier.");
+
+        CoordinatePair expectedCoordinates = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair actualCoordinates = crystal.getCoordinates();
+        assertEquals(expectedCoordinates, actualCoordinates, "Unexpected coordinates.");
+
+        // TypeLabel
+        tokenNumber = 1;
+        crystal = statement.get(tokenNumber);
+        assertEquals(TypeLabelOperatorCrystal.class, crystal.getClass(), "Reference crystal has incorrect type.");
+
+        expectedIdentifier = ":";
+        lexedIdentifier = crystal.getIdentifier();
+        assertEquals(expectedIdentifier, lexedIdentifier, "A reference crystal's identifier should match its source " +
+                "string's identifier.");
+
+        expectedCoordinates = new CoordinatePair(0, 3);
+        actualCoordinates = crystal.getCoordinates();
+        assertEquals(expectedCoordinates, actualCoordinates, "Unexpected coordinates.");
+
+        // TypeReference
+        tokenNumber = 2;
+        crystal = statement.get(tokenNumber);
+        assertEquals(TypeReferenceCrystal.class, crystal.getClass(), "Type reference crystal has incorrect type.");
+
+        expectedIdentifier = "Integer";
+        lexedIdentifier = crystal.getIdentifier();
+        assertEquals(expectedIdentifier, lexedIdentifier, "A type reference crystal's identifier should match its " +
+                "source string's identifier.");
+
+        expectedCoordinates = new CoordinatePair(0, 4);
+        actualCoordinates = crystal.getCoordinates();
+        assertEquals(expectedCoordinates, actualCoordinates, "Unexpected coordinates.");
+    }
+
+    @Test
+    @Order(27)
+    public void lexerTest_Crystals_TypeReferences_StaticFunctionCall() {
+        String sourceString = "Math::abs!(-1)";
+
+        Lexer lexer = new Lexer();
+        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
+        List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
+
+        int expectedStatementsCount = 1;
+        int actualStatementsCount = statementsOfCrystals.size();
+        assertEquals(expectedStatementsCount, actualStatementsCount, "Unexpected number of crystals in statement.");
+
+        // -----------
+        // statement 1
+        // -----------
+        List<AtonementCrystal> statement = statementsOfCrystals.get(0);
+
+        int expectedSize = 7;
+        int actualSize = statement.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of crystals in statement.");
+
+        // TypeReference
+        int tokenNumber = 0;
+        AtonementCrystal crystal = statement.get(tokenNumber);
+        assertEquals(TypeReferenceCrystal.class, crystal.getClass(), "Type reference crystal has incorrect type.");
+
+        String expectedIdentifier = "Math";
+        String lexedIdentifier = crystal.getIdentifier();
+        assertEquals(expectedIdentifier, lexedIdentifier, "A type reference crystal's identifier should match its " +
+                "source string.");
+
+        CoordinatePair expectedCoordinates = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair actualCoordinates = crystal.getCoordinates();
+        assertEquals(expectedCoordinates, actualCoordinates, "Unexpected coordinates.");
+
+        // TypeLabel
+        tokenNumber = 1;
+        crystal = statement.get(tokenNumber);
+        assertEquals(RegionOperatorCrystal.class, crystal.getClass(), "Region operator crystal has incorrect type.");
+
+        expectedIdentifier = "::";
+        lexedIdentifier = crystal.getIdentifier();
+        assertEquals(expectedIdentifier, lexedIdentifier, "A region operator's identifier should match its source " +
+                "string.");
+
+        expectedCoordinates = new CoordinatePair(0, 4);
+        actualCoordinates = crystal.getCoordinates();
+        assertEquals(expectedCoordinates, actualCoordinates, "Unexpected coordinates.");
+
+        // Reference
+        tokenNumber = 2;
+        crystal = statement.get(tokenNumber);
+        assertEquals(ReferenceCrystal.class, crystal.getClass(), "Reference crystal has incorrect type.");
+
+        expectedIdentifier = "abs";
+        lexedIdentifier = crystal.getIdentifier();
+        assertEquals(expectedIdentifier, lexedIdentifier, "A reference crystal's identifier should match its source " +
+                "string.");
+
+        expectedCoordinates = new CoordinatePair(0, 6);
+        actualCoordinates = crystal.getCoordinates();
+        assertEquals(expectedCoordinates, actualCoordinates, "Unexpected coordinates.");
+
+        // FunctionCallOperator
+        tokenNumber = 3;
+        crystal = statement.get(tokenNumber);
+        assertEquals(FunctionCallOperatorCrystal.class, crystal.getClass(), "Function call operator crystal has " +
+                "incorrect type.");
+
+        expectedIdentifier = "!";
+        lexedIdentifier = crystal.getIdentifier();
+        assertEquals(expectedIdentifier, lexedIdentifier, "A function call operator crystal's identifier should " +
+                "match its source string.");
+
+        expectedCoordinates = new CoordinatePair(0, 9);
+        actualCoordinates = crystal.getCoordinates();
+        assertEquals(expectedCoordinates, actualCoordinates, "Unexpected coordinates.");
+
+        // LeftParenthesis
+        tokenNumber = 4;
+        crystal = statement.get(tokenNumber);
+        assertEquals(LeftParenthesisCrystal.class, crystal.getClass(), "Left parenthesis crystal has incorrect type.");
+
+        expectedIdentifier = "(";
+        lexedIdentifier = crystal.getIdentifier();
+        assertEquals(expectedIdentifier, lexedIdentifier, "A left parenthesis crystal's identifier should match its " +
+                "source string.");
+
+        expectedCoordinates = new CoordinatePair(0, 10);
+        actualCoordinates = crystal.getCoordinates();
+        assertEquals(expectedCoordinates, actualCoordinates, "Unexpected coordinates.");
+
+        // Integer
+        tokenNumber = 5;
+        crystal = statement.get(tokenNumber);
+        assertEquals(IntegerCrystal.class, crystal.getClass(), "Integer literal crystal has incorrect type.");
+
+        expectedIdentifier = "-1";
+        lexedIdentifier = crystal.getIdentifier();
+        assertEquals(expectedIdentifier, lexedIdentifier, "An integer literal crystal's identifier should match its " +
+                "source string.");
+
+        expectedCoordinates = new CoordinatePair(0, 11);
+        actualCoordinates = crystal.getCoordinates();
+        assertEquals(expectedCoordinates, actualCoordinates, "Unexpected coordinates.");
+
+        // RightParenthesis
+        tokenNumber = 6;
+        crystal = statement.get(tokenNumber);
+        assertEquals(RightParenthesisCrystal.class, crystal.getClass(), "Right parenthesis crystal has incorrect" +
+                "type.");
+
+        expectedIdentifier = ")";
+        lexedIdentifier = crystal.getIdentifier();
+        assertEquals(expectedIdentifier, lexedIdentifier, "A right parenthesis crystal's identifier should match its " +
+                "source string.");
+
+        expectedCoordinates = new CoordinatePair(0, 13);
+        actualCoordinates = crystal.getCoordinates();
         assertEquals(expectedCoordinates, actualCoordinates, "Unexpected coordinates.");
     }
 }

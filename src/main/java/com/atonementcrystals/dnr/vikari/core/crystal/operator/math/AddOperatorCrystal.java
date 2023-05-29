@@ -1,6 +1,6 @@
 package com.atonementcrystals.dnr.vikari.core.crystal.operator.math;
 
-import com.atonementcrystals.dnr.vikari.core.crystal.BinaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 
 /**

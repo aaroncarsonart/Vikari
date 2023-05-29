@@ -1,7 +1,9 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.AstPrintVisitor;
-import com.atonementcrystals.dnr.vikari.core.crystal.Type;
+import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
+import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.util.Utils;
@@ -36,7 +38,9 @@ public class VikariProgram {
 
     private List<List<List<AtonementCrystal>>> replLexerResults;
     private List<List<Statement>> replParserResults;
-    private Map<String, Type> loadedTypes;
+
+    // TODO: Add these fields to VikariREPL.
+    private AtonementField globalAtonementField;
 
     public VikariProgram() {
         log.trace("VikariProgram constructor.");
@@ -53,25 +57,35 @@ public class VikariProgram {
 
         replLexerResults = new ArrayList<>();
         replParserResults = new ArrayList<>();
-        loadedTypes = new LinkedHashMap<>();
 
-        loadTypes();
+        globalAtonementField = initGlobalAtonementField();
+
+        parser.setGlobalAtonementField(globalAtonementField);
+        interpreter.setGlobalAtonementField(globalAtonementField);
     }
 
-    private void loadTypes() {
-        List<Type> types = new ArrayList<>();
+    /**
+     * Sets up the global, top-level AtonementField which is shared for all files
+     * in the parser and interpreter.
+     */
+    public static AtonementField initGlobalAtonementField() {
+        // Initialize with no parent and shadowing enabled.
+        AtonementField globalAtonementField = new AtonementField();
 
-        String langPackage = "dnr::vikari::lang";
-        types.add(new Type(langPackage, "Integer"));
-        types.add(new Type(langPackage, "Decimal"));
-        types.add(new Type(langPackage, "Boolean"));
-        types.add(new Type(langPackage, "Character"));
-        types.add(new Type(langPackage, "String"));
-        types.add(new Type(langPackage, "Null"));
+        // Add all lang types to the global field.
+        for (VikariType vikariType : VikariType.LANG_TYPES) {
+            TypeCrystal typeCrystal = vikariType.getTypeCrystal();
+            String typeName = typeCrystal.getTypeName();
+            String fullyQualifiedTypeName = typeCrystal.getFullyQualifiedTypeName();
 
-        for (Type type : types) {
-            loadedTypes.put(type.getFullyQualifiedTypeName(), type);
+            globalAtonementField.define(typeName, typeCrystal);
+            globalAtonementField.define(fullyQualifiedTypeName, typeCrystal);
         }
+        return globalAtonementField;
+    }
+
+    public AtonementField getGlobalAtonementField() {
+        return globalAtonementField;
     }
 
     public void setLexerOptions(LexerOptions lexerOptions) {

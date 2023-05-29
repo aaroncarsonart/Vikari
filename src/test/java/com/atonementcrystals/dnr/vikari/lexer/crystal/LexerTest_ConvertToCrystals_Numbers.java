@@ -10,7 +10,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.number.LongCrystal;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.interpreter.Arithmetic;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
-import com.atonementcrystals.dnr.vikari.interpreter.VikariProgram;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -523,7 +522,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
-        VikariProgram.printLexedStatements(statementsOfCrystals, true, true, true, true);
 
         int expectedStatementsCount = 1;
         int actualStatementsCount = statementsOfCrystals.size();
@@ -564,7 +562,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
-        VikariProgram.printLexedStatements(statementsOfCrystals, true, true, true, true);
 
         int expectedStatementsCount = 1;
         int actualStatementsCount = statementsOfCrystals.size();
