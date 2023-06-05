@@ -31,7 +31,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ParserTest_DeclarationStatement {
+public class ParserTest_VariableDeclarationStatements {
     private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
     private final AtonementField globalAtonementField = VikariProgram.initGlobalAtonementField();
     private AtonementField rootEnvironment;

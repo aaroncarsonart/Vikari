@@ -10,6 +10,18 @@ public class LongCrystal extends NumberCrystal<Long> {
 
     public LongCrystal(String identifier, Long value) {
         super(identifier, value);
+        setType(VikariType.LONG);
+    }
+
+    public LongCrystal(Long value) {
+        this(value.toString(), value);
+    }
+
+    @Override
+    public LongCrystal copy() {
+        LongCrystal copy = new LongCrystal(getIdentifier(), getValue());
+        copyFields(this, copy);
+        return copy;
     }
 
     @Override

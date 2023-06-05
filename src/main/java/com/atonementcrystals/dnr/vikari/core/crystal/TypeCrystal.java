@@ -103,9 +103,19 @@ public class TypeCrystal extends AtonementCrystal {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof VikariType) {
-            return this == ((VikariType) obj).getTypeCrystal();
-        }
         return this == obj;
+    }
+
+    public boolean isEqual(VikariType vikariType) {
+        return vikariType != null &&  this == vikariType.getTypeCrystal();
+    }
+
+    public boolean isEqual(VikariType... vikariTypes) {
+        for (VikariType other : vikariTypes) {
+            if (this == other.getTypeCrystal()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

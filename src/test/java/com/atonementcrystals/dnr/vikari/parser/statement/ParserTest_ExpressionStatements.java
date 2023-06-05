@@ -29,7 +29,7 @@ import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ParserTest_ExpressionStatement {
+public class ParserTest_ExpressionStatements {
     private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test

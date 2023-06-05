@@ -502,116 +502,132 @@ public class ParserTest_Assignment {
     @Order(11)
     public void testLeftAssignment_NumericUpcasts() {
         String sourceString = """
-                long:Long
-                bigInteger:BigInteger
-                float:Float
-                double:Double
-                bigDecimal:BigDecimal
+                long1:Long
+                bigInteger1:BigInteger
+                bigInteger2:BigInteger
+                float1:Float
+                float2:Float
+                float3:Float
+                double1:Double
+                double2:Double
+                double3:Double
+                double4:Double
+                bigDecimal1:BigDecimal
+                bigDecimal2:BigDecimal
+                bigDecimal3:BigDecimal
+                bigDecimal4:BigDecimal
+                bigDecimal5:BigDecimal
                 
-                long << 1
-                bigInteger << 2
-                bigInteger << 3L
-                float << 4
-                float << 5L
-                float << 6B
-                double << 7
-                double << 8L
-                double << 9B
-                double << 10.0F
-                bigDecimal << 11
-                bigDecimal << 12L
-                bigDecimal << 13B
-                bigDecimal << 14.0F
-                bigDecimal << 15.0D
+                long1 << 1
+                bigInteger1 << 2
+                bigInteger2 << 3L
+                float1 << 4
+                float2 << 5L
+                float3 << 6B
+                double1 << 7
+                double2 << 8L
+                double3 << 9B
+                double4 << 10.0F
+                bigDecimal1 << 11
+                bigDecimal2 << 12L
+                bigDecimal3 << 13B
+                bigDecimal4 << 14.0F
+                bigDecimal5 << 15.0D
                 """;
         List<Statement> statements = lexAndParse(sourceString);
 
-        int expectedStatementCount = 20;
+        int expectedStatementCount = 30;
         int actualStatementCount = statements.size();
         assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
 
         // declaration statements
-        assertEquals(VariableDeclarationStatement.class, statements.get(0).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(1).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(2).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(3).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(4).getClass(), "Unexpected statement type.");
+        for (int i = 0; i <= 14; i++) {
+            assertEquals(VariableDeclarationStatement.class, statements.get(i).getClass(), "Unexpected statement type.");
+        }
 
         // assignment statements
-        testSimpleLeftAssignment(statements.get(5), "long", VikariType.LONG, VikariType.INTEGER, new CoordinatePair(6, 0), 1);
-        testSimpleLeftAssignment(statements.get(6), "bigInteger", VikariType.BIG_INTEGER, VikariType.INTEGER, new CoordinatePair(7, 0), 2);
-        testSimpleLeftAssignment(statements.get(7), "bigInteger", VikariType.BIG_INTEGER, VikariType.LONG, new CoordinatePair(8, 0), 3L);
-        testSimpleLeftAssignment(statements.get(8), "float", VikariType.FLOAT, VikariType.INTEGER, new CoordinatePair(9, 0), 4);
-        testSimpleLeftAssignment(statements.get(9), "float", VikariType.FLOAT, VikariType.LONG, new CoordinatePair(10, 0), 5L);
-        testSimpleLeftAssignment(statements.get(10), "float", VikariType.FLOAT, VikariType.BIG_INTEGER, new CoordinatePair(11, 0), new BigInteger("6"));
-        testSimpleLeftAssignment(statements.get(11), "double", VikariType.DOUBLE, VikariType.INTEGER, new CoordinatePair(12, 0), 7);
-        testSimpleLeftAssignment(statements.get(12), "double", VikariType.DOUBLE, VikariType.LONG, new CoordinatePair(13, 0), 8L);
-        testSimpleLeftAssignment(statements.get(13), "double", VikariType.DOUBLE, VikariType.BIG_INTEGER, new CoordinatePair(14, 0), new BigInteger("9"));
-        testSimpleLeftAssignment(statements.get(14), "double", VikariType.DOUBLE, VikariType.FLOAT, new CoordinatePair(15, 0), 10.0F);
-        testSimpleLeftAssignment(statements.get(15), "bigDecimal", VikariType.BIG_DECIMAL, VikariType.INTEGER, new CoordinatePair(16, 0), 11);
-        testSimpleLeftAssignment(statements.get(16), "bigDecimal", VikariType.BIG_DECIMAL, VikariType.LONG, new CoordinatePair(17, 0), 12L);
-        testSimpleLeftAssignment(statements.get(17), "bigDecimal", VikariType.BIG_DECIMAL, VikariType.BIG_INTEGER, new CoordinatePair(18, 0), new BigInteger("13"));
-        testSimpleLeftAssignment(statements.get(18), "bigDecimal", VikariType.BIG_DECIMAL, VikariType.FLOAT, new CoordinatePair(19, 0), 14.0F);
-        testSimpleLeftAssignment(statements.get(19), "bigDecimal", VikariType.BIG_DECIMAL, VikariType.DOUBLE, new CoordinatePair(20, 0), 15.0D);
+        testSimpleLeftAssignment(statements.get(15), "long1", VikariType.LONG, VikariType.INTEGER, new CoordinatePair(16, 0), 1);
+        testSimpleLeftAssignment(statements.get(16), "bigInteger1", VikariType.BIG_INTEGER, VikariType.INTEGER, new CoordinatePair(17, 0), 2);
+        testSimpleLeftAssignment(statements.get(17), "bigInteger2", VikariType.BIG_INTEGER, VikariType.LONG, new CoordinatePair(18, 0), 3L);
+        testSimpleLeftAssignment(statements.get(18), "float1", VikariType.FLOAT, VikariType.INTEGER, new CoordinatePair(19, 0), 4);
+        testSimpleLeftAssignment(statements.get(19), "float2", VikariType.FLOAT, VikariType.LONG, new CoordinatePair(20, 0), 5L);
+        testSimpleLeftAssignment(statements.get(20), "float3", VikariType.FLOAT, VikariType.BIG_INTEGER, new CoordinatePair(21, 0), new BigInteger("6"));
+        testSimpleLeftAssignment(statements.get(21), "double1", VikariType.DOUBLE, VikariType.INTEGER, new CoordinatePair(22, 0), 7);
+        testSimpleLeftAssignment(statements.get(22), "double2", VikariType.DOUBLE, VikariType.LONG, new CoordinatePair(23, 0), 8L);
+        testSimpleLeftAssignment(statements.get(23), "double3", VikariType.DOUBLE, VikariType.BIG_INTEGER, new CoordinatePair(24, 0), new BigInteger("9"));
+        testSimpleLeftAssignment(statements.get(24), "double4", VikariType.DOUBLE, VikariType.FLOAT, new CoordinatePair(25, 0), 10.0F);
+        testSimpleLeftAssignment(statements.get(25), "bigDecimal1", VikariType.BIG_DECIMAL, VikariType.INTEGER, new CoordinatePair(26, 0), 11);
+        testSimpleLeftAssignment(statements.get(26), "bigDecimal2", VikariType.BIG_DECIMAL, VikariType.LONG, new CoordinatePair(27, 0), 12L);
+        testSimpleLeftAssignment(statements.get(27), "bigDecimal3", VikariType.BIG_DECIMAL, VikariType.BIG_INTEGER, new CoordinatePair(28, 0), new BigInteger("13"));
+        testSimpleLeftAssignment(statements.get(28), "bigDecimal4", VikariType.BIG_DECIMAL, VikariType.FLOAT, new CoordinatePair(29, 0), 14.0F);
+        testSimpleLeftAssignment(statements.get(29), "bigDecimal5", VikariType.BIG_DECIMAL, VikariType.DOUBLE, new CoordinatePair(30, 0), 15.0D);
     }
 
     @Test
     @Order(12)
     public void testLeftAssignment_NumericDowncasts() {
         String sourceString = """
-                integer:Integer
-                long:Long
-                bigInteger:BigInteger
-                float:Float
-                double:Double
+                integer1:Integer
+                integer2:Integer
+                integer3:Integer
+                integer4:Integer
+                integer5:Integer
+                long1:Long
+                long2:Long
+                long3:Long
+                long4:Long
+                bigInteger1:BigInteger
+                bigInteger2:BigInteger
+                bigInteger3:BigInteger
+                float1:Float
+                float2:Float
+                double1:Double
 
-                integer << 1L
-                integer << 2B
-                integer << 3.0F
-                integer << 4.0D
-                integer << 5.0B
-                long << 6B
-                long << 7.0F
-                long << 8.0D
-                long << 9.0B
-                bigInteger << 10.0F
-                bigInteger << 11.0D
-                bigInteger << 12.0B
-                float << 13.0D
-                float << 14.0B
-                double << 15.0B
+                integer1 << 1L
+                integer2 << 2B
+                integer3 << 3.0F
+                integer4 << 4.0D
+                integer5 << 5.0B
+                long1 << 6B
+                long2 << 7.0F
+                long3 << 8.0D
+                long4 << 9.0B
+                bigInteger1 << 10.0F
+                bigInteger2 << 11.0D
+                bigInteger3 << 12.0B
+                float1 << 13.0D
+                float2 << 14.0B
+                double1 << 15.0B
                 """;
         List<Statement> statements = lexAndParse(sourceString);
 
-        int expectedStatementCount = 20;
+        int expectedStatementCount = 30;
         int actualStatementCount = statements.size();
         assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
 
         // declaration statements
-        assertEquals(VariableDeclarationStatement.class, statements.get(0).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(1).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(2).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(3).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(4).getClass(), "Unexpected statement type.");
+        for (int i = 0; i <= 14; i++) {
+            assertEquals(VariableDeclarationStatement.class, statements.get(i).getClass(), "Unexpected statement type.");
+        }
 
         MathContext mathContext = Arithmetic.getMathContext();
 
         // assignment statements
-        testSimpleLeftAssignment(statements.get(5), "integer", VikariType.INTEGER, VikariType.LONG, new CoordinatePair(6, 0), 1L);
-        testSimpleLeftAssignment(statements.get(6), "integer", VikariType.INTEGER, VikariType.BIG_INTEGER, new CoordinatePair(7, 0), new BigInteger("2"));
-        testSimpleLeftAssignment(statements.get(7), "integer", VikariType.INTEGER, VikariType.FLOAT, new CoordinatePair(8, 0), 3.0F);
-        testSimpleLeftAssignment(statements.get(8), "integer", VikariType.INTEGER, VikariType.DOUBLE, new CoordinatePair(9, 0), 4.0D);
-        testSimpleLeftAssignment(statements.get(9), "integer", VikariType.INTEGER, VikariType.BIG_DECIMAL, new CoordinatePair(10, 0), new BigDecimal("5.0", mathContext));
-        testSimpleLeftAssignment(statements.get(10), "long", VikariType.LONG, VikariType.BIG_INTEGER, new CoordinatePair(11, 0), new BigInteger("6"));
-        testSimpleLeftAssignment(statements.get(11), "long", VikariType.LONG, VikariType.FLOAT, new CoordinatePair(12, 0), 7.0F);
-        testSimpleLeftAssignment(statements.get(12), "long", VikariType.LONG, VikariType.DOUBLE, new CoordinatePair(13, 0), 8.0D);
-        testSimpleLeftAssignment(statements.get(13), "long", VikariType.LONG, VikariType.BIG_DECIMAL, new CoordinatePair(14, 0), new BigDecimal("9.0", mathContext));
-        testSimpleLeftAssignment(statements.get(14), "bigInteger", VikariType.BIG_INTEGER, VikariType.FLOAT, new CoordinatePair(15, 0), 10.0F);
-        testSimpleLeftAssignment(statements.get(15), "bigInteger", VikariType.BIG_INTEGER, VikariType.DOUBLE, new CoordinatePair(16, 0), 11.0D);
-        testSimpleLeftAssignment(statements.get(16), "bigInteger", VikariType.BIG_INTEGER, VikariType.BIG_DECIMAL, new CoordinatePair(17, 0), new BigDecimal("12.0", mathContext));
-        testSimpleLeftAssignment(statements.get(17), "float", VikariType.FLOAT, VikariType.DOUBLE, new CoordinatePair(18, 0), 13.0D);
-        testSimpleLeftAssignment(statements.get(18), "float", VikariType.FLOAT, VikariType.BIG_DECIMAL, new CoordinatePair(19, 0), new BigDecimal("14.0", mathContext));
-        testSimpleLeftAssignment(statements.get(19), "double", VikariType.DOUBLE, VikariType.BIG_DECIMAL, new CoordinatePair(20, 0), new BigDecimal("15.0", mathContext));
+        testSimpleLeftAssignment(statements.get(15), "integer1", VikariType.INTEGER, VikariType.LONG, new CoordinatePair(16, 0), 1L);
+        testSimpleLeftAssignment(statements.get(16), "integer2", VikariType.INTEGER, VikariType.BIG_INTEGER, new CoordinatePair(17, 0), new BigInteger("2"));
+        testSimpleLeftAssignment(statements.get(17), "integer3", VikariType.INTEGER, VikariType.FLOAT, new CoordinatePair(18, 0), 3.0F);
+        testSimpleLeftAssignment(statements.get(18), "integer4", VikariType.INTEGER, VikariType.DOUBLE, new CoordinatePair(19, 0), 4.0D);
+        testSimpleLeftAssignment(statements.get(19), "integer5", VikariType.INTEGER, VikariType.BIG_DECIMAL, new CoordinatePair(20, 0), new BigDecimal("5.0", mathContext));
+        testSimpleLeftAssignment(statements.get(20), "long1", VikariType.LONG, VikariType.BIG_INTEGER, new CoordinatePair(21, 0), new BigInteger("6"));
+        testSimpleLeftAssignment(statements.get(21), "long2", VikariType.LONG, VikariType.FLOAT, new CoordinatePair(22, 0), 7.0F);
+        testSimpleLeftAssignment(statements.get(22), "long3", VikariType.LONG, VikariType.DOUBLE, new CoordinatePair(23, 0), 8.0D);
+        testSimpleLeftAssignment(statements.get(23), "long4", VikariType.LONG, VikariType.BIG_DECIMAL, new CoordinatePair(24, 0), new BigDecimal("9.0", mathContext));
+        testSimpleLeftAssignment(statements.get(24), "bigInteger1", VikariType.BIG_INTEGER, VikariType.FLOAT, new CoordinatePair(25, 0), 10.0F);
+        testSimpleLeftAssignment(statements.get(25), "bigInteger2", VikariType.BIG_INTEGER, VikariType.DOUBLE, new CoordinatePair(26, 0), 11.0D);
+        testSimpleLeftAssignment(statements.get(26), "bigInteger3", VikariType.BIG_INTEGER, VikariType.BIG_DECIMAL, new CoordinatePair(27, 0), new BigDecimal("12.0", mathContext));
+        testSimpleLeftAssignment(statements.get(27), "float1", VikariType.FLOAT, VikariType.DOUBLE, new CoordinatePair(28, 0), 13.0D);
+        testSimpleLeftAssignment(statements.get(28), "float2", VikariType.FLOAT, VikariType.BIG_DECIMAL, new CoordinatePair(29, 0), new BigDecimal("14.0", mathContext));
+        testSimpleLeftAssignment(statements.get(29), "double1", VikariType.DOUBLE, VikariType.BIG_DECIMAL, new CoordinatePair(30, 0), new BigDecimal("15.0", mathContext));
     }
 
     @Test
@@ -995,174 +1011,189 @@ public class ParserTest_Assignment {
     @Order(26)
     public void testRightAssignment_NumericUpcasts() {
         String sourceString = """
-                long:Long
-                bigInteger:BigInteger
-                float:Float
-                double:Double
-                bigDecimal:BigDecimal
+                long1:Long
+                bigInteger1:BigInteger
+                bigInteger2:BigInteger
+                float1:Float
+                float2:Float
+                float3:Float
+                double1:Double
+                double2:Double
+                double3:Double
+                double4:Double
+                bigDecimal1:BigDecimal
+                bigDecimal2:BigDecimal
+                bigDecimal3:BigDecimal
+                bigDecimal4:BigDecimal
+                bigDecimal5:BigDecimal
 
-                1 >> long
-                2 >> bigInteger
-                3L >> bigInteger
-                4 >> float
-                5L >> float
-                6B >> float
-                7 >> double
-                8L >> double
-                9B >> double
-                10.0F >> double
-                11 >> bigDecimal
-                12L >> bigDecimal
-                13B >> bigDecimal
-                14.0F >> bigDecimal
-                15.0D >> bigDecimal
+                1 >> long1
+                2 >> bigInteger1
+                3L >> bigInteger2
+                4 >> float1
+                5L >> float2
+                6B >> float3
+                7 >> double1
+                8L >> double2
+                9B >> double3
+                10.0F >> double4
+                11 >> bigDecimal1
+                12L >> bigDecimal2
+                13B >> bigDecimal3
+                14.0F >> bigDecimal4
+                15.0D >> bigDecimal5
                 """;
         List<Statement> statements = lexAndParse(sourceString);
 
-        int expectedStatementCount = 20;
+        int expectedStatementCount = 30;
         int actualStatementCount = statements.size();
         assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
 
         // declaration statements
-        assertEquals(VariableDeclarationStatement.class, statements.get(0).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(1).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(2).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(3).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(4).getClass(), "Unexpected statement type.");
-
+        for (int i = 0; i <= 14; i++) {
+            assertEquals(VariableDeclarationStatement.class, statements.get(i).getClass(), "Unexpected statement type.");
+        }
         // assignment statements
-        testSimpleRightAssignment(statements.get(5), new CoordinatePair(6, 0), "long", VikariType.LONG,
-                VikariType.INTEGER, new CoordinatePair(6, 5), 1);
+        testSimpleRightAssignment(statements.get(15), new CoordinatePair(16, 0), "long1", VikariType.LONG,
+                VikariType.INTEGER, new CoordinatePair(16, 5), 1);
 
-        testSimpleRightAssignment(statements.get(6), new CoordinatePair(7, 0), "bigInteger", VikariType.BIG_INTEGER,
-                VikariType.INTEGER, new CoordinatePair(7, 5), 2);
+        testSimpleRightAssignment(statements.get(16), new CoordinatePair(17, 0), "bigInteger1", VikariType.BIG_INTEGER,
+                VikariType.INTEGER, new CoordinatePair(17, 5), 2);
 
-        testSimpleRightAssignment(statements.get(7), new CoordinatePair(8, 0), "bigInteger", VikariType.BIG_INTEGER,
-                VikariType.LONG, new CoordinatePair(8, 6), 3L);
+        testSimpleRightAssignment(statements.get(17), new CoordinatePair(18, 0), "bigInteger2", VikariType.BIG_INTEGER,
+                VikariType.LONG, new CoordinatePair(18, 6), 3L);
 
-        testSimpleRightAssignment(statements.get(8), new CoordinatePair(9, 0), "float", VikariType.FLOAT,
-                VikariType.INTEGER, new CoordinatePair(9, 5), 4);
+        testSimpleRightAssignment(statements.get(18), new CoordinatePair(19, 0), "float1", VikariType.FLOAT,
+                VikariType.INTEGER, new CoordinatePair(19, 5), 4);
 
-        testSimpleRightAssignment(statements.get(9), new CoordinatePair(10, 0), "float", VikariType.FLOAT,
-                VikariType.LONG, new CoordinatePair(10, 6), 5L);
+        testSimpleRightAssignment(statements.get(19), new CoordinatePair(20, 0), "float2", VikariType.FLOAT,
+                VikariType.LONG, new CoordinatePair(20, 6), 5L);
 
-        testSimpleRightAssignment(statements.get(10), new CoordinatePair(11, 0), "float", VikariType.FLOAT,
-                VikariType.BIG_INTEGER, new CoordinatePair(11, 6), new BigInteger("6"));
+        testSimpleRightAssignment(statements.get(20), new CoordinatePair(21, 0), "float3", VikariType.FLOAT,
+                VikariType.BIG_INTEGER, new CoordinatePair(21, 6), new BigInteger("6"));
 
-        testSimpleRightAssignment(statements.get(11), new CoordinatePair(12, 0), "double", VikariType.DOUBLE,
-                VikariType.INTEGER, new CoordinatePair(12, 5), 7);
+        testSimpleRightAssignment(statements.get(21), new CoordinatePair(22, 0), "double1", VikariType.DOUBLE,
+                VikariType.INTEGER, new CoordinatePair(22, 5), 7);
 
-        testSimpleRightAssignment(statements.get(12), new CoordinatePair(13, 0), "double", VikariType.DOUBLE,
-                VikariType.LONG, new CoordinatePair(13, 6), 8L);
+        testSimpleRightAssignment(statements.get(22), new CoordinatePair(23, 0), "double2", VikariType.DOUBLE,
+                VikariType.LONG, new CoordinatePair(23, 6), 8L);
 
-        testSimpleRightAssignment(statements.get(13), new CoordinatePair(14, 0), "double", VikariType.DOUBLE,
-                VikariType.BIG_INTEGER, new CoordinatePair(14, 6), new BigInteger("9"));
+        testSimpleRightAssignment(statements.get(23), new CoordinatePair(24, 0), "double3", VikariType.DOUBLE,
+                VikariType.BIG_INTEGER, new CoordinatePair(24, 6), new BigInteger("9"));
 
-        testSimpleRightAssignment(statements.get(14), new CoordinatePair(15, 0), "double", VikariType.DOUBLE,
-                VikariType.FLOAT, new CoordinatePair(15, 9), 10.0F);
+        testSimpleRightAssignment(statements.get(24), new CoordinatePair(25, 0), "double4", VikariType.DOUBLE,
+                VikariType.FLOAT, new CoordinatePair(25, 9), 10.0F);
 
-        testSimpleRightAssignment(statements.get(15), new CoordinatePair(16, 0), "bigDecimal", VikariType.BIG_DECIMAL,
-                VikariType.INTEGER, new CoordinatePair(16, 6), 11);
+        testSimpleRightAssignment(statements.get(25), new CoordinatePair(26, 0), "bigDecimal1", VikariType.BIG_DECIMAL,
+                VikariType.INTEGER, new CoordinatePair(26, 6), 11);
 
-        testSimpleRightAssignment(statements.get(16), new CoordinatePair(17, 0), "bigDecimal", VikariType.BIG_DECIMAL,
-                VikariType.LONG, new CoordinatePair(17, 7), 12L);
+        testSimpleRightAssignment(statements.get(26), new CoordinatePair(27, 0), "bigDecimal2", VikariType.BIG_DECIMAL,
+                VikariType.LONG, new CoordinatePair(27, 7), 12L);
 
-        testSimpleRightAssignment(statements.get(17), new CoordinatePair(18, 0), "bigDecimal", VikariType.BIG_DECIMAL,
-                VikariType.BIG_INTEGER, new CoordinatePair(18, 7), new BigInteger("13"));
+        testSimpleRightAssignment(statements.get(27), new CoordinatePair(28, 0), "bigDecimal3", VikariType.BIG_DECIMAL,
+                VikariType.BIG_INTEGER, new CoordinatePair(28, 7), new BigInteger("13"));
 
-        testSimpleRightAssignment(statements.get(18), new CoordinatePair(19, 0), "bigDecimal", VikariType.BIG_DECIMAL,
-                VikariType.FLOAT, new CoordinatePair(19, 9), 14.0F);
+        testSimpleRightAssignment(statements.get(28), new CoordinatePair(29, 0), "bigDecimal4", VikariType.BIG_DECIMAL,
+                VikariType.FLOAT, new CoordinatePair(29, 9), 14.0F);
 
-        testSimpleRightAssignment(statements.get(19), new CoordinatePair(20, 0), "bigDecimal", VikariType.BIG_DECIMAL,
-                VikariType.DOUBLE, new CoordinatePair(20, 9), 15.0D);
+        testSimpleRightAssignment(statements.get(29), new CoordinatePair(30, 0), "bigDecimal5", VikariType.BIG_DECIMAL,
+                VikariType.DOUBLE, new CoordinatePair(30, 9), 15.0D);
     }
 
     @Test
     @Order(27)
     public void testRightAssignment_NumericDowncasts() {
         String sourceString = """
-                integer:Integer
-                long:Long
-                bigInteger:BigInteger
-                float:Float
-                double:Double
+                integer1:Integer
+                integer2:Integer
+                integer3:Integer
+                integer4:Integer
+                integer5:Integer
+                long1:Long
+                long2:Long
+                long3:Long
+                long4:Long
+                bigInteger1:BigInteger
+                bigInteger2:BigInteger
+                bigInteger3:BigInteger
+                float1:Float
+                float2:Float
+                double1:Double
 
-                1L >> integer
-                2B >> integer
-                3.0F >> integer
-                4.0D >> integer
-                5.0B >> integer
-                6B >> long
-                7.0F >> long
-                8.0D >> long
-                9.0B >> long
-                10.0F >> bigInteger
-                11.0D >> bigInteger
-                12.0B >> bigInteger
-                13.0D >> float
-                14.0B >> float
-                15.0B >> double
+                1L >> integer1
+                2B >> integer2
+                3.0F >> integer3
+                4.0D >> integer4
+                5.0B >> integer5
+                6B >> long1
+                7.0F >> long2
+                8.0D >> long3
+                9.0B >> long4
+                10.0F >> bigInteger1
+                11.0D >> bigInteger2
+                12.0B >> bigInteger3
+                13.0D >> float1
+                14.0B >> float2
+                15.0B >> double1
                 """;
         List<Statement> statements = lexAndParse(sourceString);
 
-        int expectedStatementCount = 20;
+        int expectedStatementCount = 30;
         int actualStatementCount = statements.size();
         assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
 
         // declaration statements
-        assertEquals(VariableDeclarationStatement.class, statements.get(0).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(1).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(2).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(3).getClass(), "Unexpected statement type.");
-        assertEquals(VariableDeclarationStatement.class, statements.get(4).getClass(), "Unexpected statement type.");
+        for (int i = 0; i <= 14; i++) {
+            assertEquals(VariableDeclarationStatement.class, statements.get(i).getClass(), "Unexpected statement type.");
+        }
 
         MathContext mathContext = Arithmetic.getMathContext();
 
         // assignment statements
-        testSimpleRightAssignment(statements.get(5), new CoordinatePair(6, 0), "integer", VikariType.INTEGER,
-                VikariType.LONG, new CoordinatePair(6, 6), 1L);
+        testSimpleRightAssignment(statements.get(15), new CoordinatePair(16, 0), "integer1", VikariType.INTEGER,
+                VikariType.LONG, new CoordinatePair(16, 6), 1L);
 
-        testSimpleRightAssignment(statements.get(6), new CoordinatePair(7, 0), "integer", VikariType.INTEGER,
-                VikariType.BIG_INTEGER, new CoordinatePair(7, 6), new BigInteger("2"));
+        testSimpleRightAssignment(statements.get(16), new CoordinatePair(17, 0), "integer2", VikariType.INTEGER,
+                VikariType.BIG_INTEGER, new CoordinatePair(17, 6), new BigInteger("2"));
 
-        testSimpleRightAssignment(statements.get(7), new CoordinatePair(8, 0), "integer", VikariType.INTEGER,
-                VikariType.FLOAT, new CoordinatePair(8, 8), 3.0F);
+        testSimpleRightAssignment(statements.get(17), new CoordinatePair(18, 0), "integer3", VikariType.INTEGER,
+                VikariType.FLOAT, new CoordinatePair(18, 8), 3.0F);
 
-        testSimpleRightAssignment(statements.get(8), new CoordinatePair(9, 0), "integer", VikariType.INTEGER,
-                VikariType.DOUBLE, new CoordinatePair(9, 8), 4.0D);
+        testSimpleRightAssignment(statements.get(18), new CoordinatePair(19, 0), "integer4", VikariType.INTEGER,
+                VikariType.DOUBLE, new CoordinatePair(19, 8), 4.0D);
 
-        testSimpleRightAssignment(statements.get(9), new CoordinatePair(10, 0), "integer", VikariType.INTEGER,
-                VikariType.BIG_DECIMAL, new CoordinatePair(10, 8), new BigDecimal("5.0", mathContext));
+        testSimpleRightAssignment(statements.get(19), new CoordinatePair(20, 0), "integer5", VikariType.INTEGER,
+                VikariType.BIG_DECIMAL, new CoordinatePair(20, 8), new BigDecimal("5.0", mathContext));
 
-        testSimpleRightAssignment(statements.get(10), new CoordinatePair(11, 0), "long", VikariType.LONG,
-                VikariType.BIG_INTEGER, new CoordinatePair(11, 6), new BigInteger("6"));
+        testSimpleRightAssignment(statements.get(20), new CoordinatePair(21, 0), "long1", VikariType.LONG,
+                VikariType.BIG_INTEGER, new CoordinatePair(21, 6), new BigInteger("6"));
 
-        testSimpleRightAssignment(statements.get(11), new CoordinatePair(12, 0), "long", VikariType.LONG,
-                VikariType.FLOAT, new CoordinatePair(12, 8), 7.0F);
+        testSimpleRightAssignment(statements.get(21), new CoordinatePair(22, 0), "long2", VikariType.LONG,
+                VikariType.FLOAT, new CoordinatePair(22, 8), 7.0F);
 
-        testSimpleRightAssignment(statements.get(12), new CoordinatePair(13, 0), "long", VikariType.LONG,
-                VikariType.DOUBLE, new CoordinatePair(13, 8), 8.0D);
+        testSimpleRightAssignment(statements.get(22), new CoordinatePair(23, 0), "long3", VikariType.LONG,
+                VikariType.DOUBLE, new CoordinatePair(23, 8), 8.0D);
 
-        testSimpleRightAssignment(statements.get(13), new CoordinatePair(14, 0), "long", VikariType.LONG,
-                VikariType.BIG_DECIMAL, new CoordinatePair(14, 8), new BigDecimal("9.0", mathContext));
+        testSimpleRightAssignment(statements.get(23), new CoordinatePair(24, 0), "long4", VikariType.LONG,
+                VikariType.BIG_DECIMAL, new CoordinatePair(24, 8), new BigDecimal("9.0", mathContext));
 
-        testSimpleRightAssignment(statements.get(14), new CoordinatePair(15, 0), "bigInteger", VikariType.BIG_INTEGER,
-                VikariType.FLOAT, new CoordinatePair(15, 9), 10.0F);
+        testSimpleRightAssignment(statements.get(24), new CoordinatePair(25, 0), "bigInteger1", VikariType.BIG_INTEGER,
+                VikariType.FLOAT, new CoordinatePair(25, 9), 10.0F);
 
-        testSimpleRightAssignment(statements.get(15), new CoordinatePair(16, 0), "bigInteger", VikariType.BIG_INTEGER,
-                VikariType.DOUBLE, new CoordinatePair(16, 9), 11.0D);
+        testSimpleRightAssignment(statements.get(25), new CoordinatePair(26, 0), "bigInteger2", VikariType.BIG_INTEGER,
+                VikariType.DOUBLE, new CoordinatePair(26, 9), 11.0D);
 
-        testSimpleRightAssignment(statements.get(16), new CoordinatePair(17, 0), "bigInteger", VikariType.BIG_INTEGER,
-                VikariType.BIG_DECIMAL, new CoordinatePair(17, 9), new BigDecimal("12.0", mathContext));
+        testSimpleRightAssignment(statements.get(26), new CoordinatePair(27, 0), "bigInteger3", VikariType.BIG_INTEGER,
+                VikariType.BIG_DECIMAL, new CoordinatePair(27, 9), new BigDecimal("12.0", mathContext));
 
-        testSimpleRightAssignment(statements.get(17), new CoordinatePair(18, 0), "float", VikariType.FLOAT,
-                VikariType.DOUBLE, new CoordinatePair(18, 9), 13.0D);
+        testSimpleRightAssignment(statements.get(27), new CoordinatePair(28, 0), "float1", VikariType.FLOAT,
+                VikariType.DOUBLE, new CoordinatePair(28, 9), 13.0D);
 
-        testSimpleRightAssignment(statements.get(18), new CoordinatePair(19, 0), "float", VikariType.FLOAT,
-                VikariType.BIG_DECIMAL, new CoordinatePair(19, 9), new BigDecimal("14.0", mathContext));
+        testSimpleRightAssignment(statements.get(28), new CoordinatePair(29, 0), "float2", VikariType.FLOAT,
+                VikariType.BIG_DECIMAL, new CoordinatePair(29, 9), new BigDecimal("14.0", mathContext));
 
-        testSimpleRightAssignment(statements.get(19), new CoordinatePair(20, 0), "double", VikariType.DOUBLE,
-                VikariType.BIG_DECIMAL, new CoordinatePair(20, 9), new BigDecimal("15.0", mathContext));
+        testSimpleRightAssignment(statements.get(29), new CoordinatePair(30, 0), "double1", VikariType.DOUBLE,
+                VikariType.BIG_DECIMAL, new CoordinatePair(30, 9), new BigDecimal("15.0", mathContext));
     }
 
     @Test

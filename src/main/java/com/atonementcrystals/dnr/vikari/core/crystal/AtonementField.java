@@ -12,6 +12,12 @@ import java.util.Map;
  * All type members are contained within regions of its associated
  * field. Two identifiers which point to the same crystal instance
  * share the same AtonementField.
+ * <p>
+ * AtonementFields are also used to model environments in which
+ * program variables exist. So the main program has a global field,
+ * which encloses each file's root environment. Then each new scope
+ * introduced produces a new environment, which is linked to the
+ * outer enclosing environment with a parent reference.
  */
 public class AtonementField {
     private Map<String, AtonementCrystal> fieldMembers;
@@ -29,6 +35,12 @@ public class AtonementField {
      */
     private boolean shadowVariables;
 
+    /**
+     * The concrete, instantiated type of all crystals holding a
+     * reference to this AtonementField.
+     */
+    private TypeCrystal instantiatedType;
+
     public AtonementField() {
         this.fieldMembers = new HashMap<>();
     }
@@ -43,6 +55,14 @@ public class AtonementField {
         this.shadowVariables = shadowVariables;
     }
 
+    public TypeCrystal getInstantiatedType() {
+        return instantiatedType;
+    }
+
+    public void setInstantiatedType(TypeCrystal instantiatedType) {
+        this.instantiatedType = instantiatedType;
+    }
+
     public AtonementCrystal get(String identifier) {
         if (hasFieldMember(identifier)) {
             return fieldMembers.get(identifier);
@@ -53,8 +73,8 @@ public class AtonementField {
     }
 
     /**
-     * Check if a crystal with the given identifier is defined in only
-     * this field. Does not check any parent fields.
+     * Check if a crystal with the given identifier is defined in either
+     * this field and any parent fields.
      * @param identifier The crystal identifier to check.
      * @return True if this field contains a reference, else null.
      */
@@ -65,7 +85,7 @@ public class AtonementField {
                 return true;
             }
             field = field.parentField;
-        } while(!shadowVariables && parentField != null);
+        } while(!shadowVariables && field != null);
         return false;
     }
 
@@ -81,13 +101,13 @@ public class AtonementField {
                 return field;
             }
             field = field.parentField;
-        } while(!shadowVariables && parentField != null);
+        } while(!shadowVariables && field != null);
         return null;
     }
 
     /**
-     * Check if a crystal with the given identifier is defined in either
-     * this field and any parent fields.
+     * Check if a crystal with the given identifier is defined in only
+     * this field. Does not check any parent fields.
      * @param identifier The crystal identifier to check.
      * @return True if this crystal is defined, else null.
      */
@@ -118,7 +138,7 @@ public class AtonementField {
      */
     public void assign(String identifier, AtonementCrystal crystal) {
         AtonementField fieldWithDefinition = getFieldWithDefinition(identifier);
-        boolean isDefined = fieldWithDefinition == null;
+        boolean isDefined = fieldWithDefinition != null;
         if (isDefined) {
             fieldWithDefinition.fieldMembers.put(identifier, crystal);
         } else {

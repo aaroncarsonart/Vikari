@@ -1,6 +1,8 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigDecimalCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigIntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.DoubleCrystal;
@@ -527,5 +529,74 @@ public class Arithmetic {
             negatedCrystal = new BigDecimalCrystal(identifier, ((BigDecimal) value).negate());
         }
         return negatedCrystal;
+    }
+
+    public static NumberCrystal maybeUpcastOrDowncast(NumberCrystal numberCrystal, TypeCrystal declaredType) {
+
+        if (declaredType.isEqual(VikariType.ATONEMENT_CRYSTAL, VikariType.VALUE, VikariType.NUMBER)) {
+            return numberCrystal;
+        }
+
+        TypeCrystal expressionType = numberCrystal.getInstantiatedType();
+
+        if (declaredType == expressionType) {
+            return numberCrystal;
+        }
+
+        Number number = (Number) numberCrystal.getValue();
+
+        if (declaredType.isEqual(VikariType.INTEGER)) {
+            int intValue;
+            if (expressionType.isEqual(VikariType.FLOAT, VikariType.DOUBLE)) {
+                long longValue = number.longValue();
+                intValue = (int) longValue;
+            } else {
+                intValue = number.intValue();
+            }
+            return new IntegerCrystal(intValue);
+
+        } else if (declaredType.isEqual(VikariType.LONG)) {
+            long longValue;
+            if (expressionType.isEqual(VikariType.FLOAT, VikariType.DOUBLE)) {
+                BigInteger bigIntegerValue = BigDecimal.valueOf(number.doubleValue()).toBigInteger();
+                longValue = bigIntegerValue.longValue();
+            } else {
+                longValue = number.longValue();
+            }
+            return new LongCrystal(longValue);
+
+        } else if (declaredType.isEqual(VikariType.BIG_INTEGER)) {
+            BigInteger bigIntegerValue;
+            if (expressionType.isEqual(VikariType.FLOAT, VikariType.DOUBLE)) {
+                String stringValue = number.toString();
+                BigDecimal bigDecimalValue = new BigDecimal(stringValue, mathContext);
+                bigIntegerValue = bigDecimalValue.toBigInteger();
+            } else if (expressionType.isEqual(VikariType.BIG_DECIMAL)) {
+                BigDecimal bigDecimalValue = ((BigDecimalCrystal) numberCrystal).getValue();
+                bigIntegerValue = bigDecimalValue.toBigInteger();
+            } else if (expressionType.isEqual(VikariType.BIG_INTEGER)) {
+                bigIntegerValue = ((BigIntegerCrystal) numberCrystal).getValue();
+            } else {
+                // it is an integer or float type.
+                long longValue = number.longValue();
+                bigIntegerValue = BigInteger.valueOf(longValue);
+            }
+            return new BigIntegerCrystal(bigIntegerValue);
+
+        } else if (declaredType.isEqual(VikariType.FLOAT)) {
+            float floatValue = number.floatValue();
+            return new FloatCrystal(floatValue);
+
+        } else if (declaredType.isEqual(VikariType.DOUBLE)) {
+            double doubleValue = number.doubleValue();
+            return new DoubleCrystal(doubleValue);
+
+        } else if (declaredType.isEqual(VikariType.BIG_DECIMAL)) {
+            String stringValue = number.toString();
+            BigDecimal bigDecimalValue = new BigDecimal(stringValue, mathContext);
+            return new BigDecimalCrystal(bigDecimalValue);
+        }
+
+        throw new IllegalStateException("Unreachable code.");
     }
 }

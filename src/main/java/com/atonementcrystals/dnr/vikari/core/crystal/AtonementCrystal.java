@@ -14,10 +14,13 @@ public class AtonementCrystal {
     private CoordinatePair coordinates;
 
     private TypeCrystal declaredType;
-    private TypeCrystal instantiatedType;
 
     public AtonementCrystal(String identifier) {
         this.identifier = identifier;
+    }
+
+    /** Only for use in the copy() method. */
+    private AtonementCrystal() {
     }
 
     public String getIdentifier() {
@@ -58,11 +61,11 @@ public class AtonementCrystal {
     }
 
     public TypeCrystal getInstantiatedType() {
-        return instantiatedType;
+        return field.getInstantiatedType();
     }
 
     public void setInstantiatedType(TypeCrystal instantiatedType) {
-        this.instantiatedType = instantiatedType;
+        field.setInstantiatedType(instantiatedType);
     }
 
     /**
@@ -82,5 +85,19 @@ public class AtonementCrystal {
     @Override
     public String toString() {
         return identifier;
+    }
+
+    public AtonementCrystal copy() {
+        AtonementCrystal copy = new AtonementCrystal();
+        copyFields(this, copy);
+        return copy;
+    }
+
+    public static void copyFields(AtonementCrystal original, AtonementCrystal copy) {
+        copy.setIdentifier(original.getIdentifier());
+        copy.setField(original.getField());
+        // NOTE: A copied crystal's original coordinates will be invalid for the copy.
+        // NOTE: A copied crystal's declared type will always be overridden.
+        // NOTE: A copied crystal's instantiated type is located in its AtonementField.
     }
 }

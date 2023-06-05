@@ -16,6 +16,9 @@ public abstract class NumberCrystal<V> extends ValueCrystal {
         this.value = value;
     }
 
+    @Override
+    public abstract NumberCrystal<V> copy();
+
     public V getValue() {
         return value;
     }
@@ -31,7 +34,7 @@ public abstract class NumberCrystal<V> extends ValueCrystal {
         if (value != null) {
             return value.toString();
         }
-        // TODO: Add support for null values in Vikari.
-        return "_";
+
+        throw new IllegalStateException("A NumberCrystal's value cannot be null.");
     }
 }

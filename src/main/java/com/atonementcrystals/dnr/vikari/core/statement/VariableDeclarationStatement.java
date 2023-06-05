@@ -7,25 +7,24 @@ import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 
 public class VariableDeclarationStatement extends Statement {
     private AtonementCrystal declaredVariable;
-
-    // TODO: Refactor declarations to keep a declared type reference.
-    //       The Interpreter will need to re-process all declarations
-    //       because by the end of the TypeResolver's resolutions, all
-    //       variables will contain their last assigned type.
     private TypeCrystal declaredType;
-
     private BinaryOperatorCrystal assignmentOperator;
     private Expression initializerExpression;
 
-    public VariableDeclarationStatement(AtonementCrystal declaredVariable, BinaryOperatorCrystal assignmentOperator,
-                                        Expression initializerExpression) {
+    public VariableDeclarationStatement(AtonementCrystal declaredVariable, TypeCrystal declaredType,
+                                        BinaryOperatorCrystal assignmentOperator, Expression initializerExpression) {
         this.declaredVariable = declaredVariable;
+        this.declaredType = declaredType;
         this.assignmentOperator = assignmentOperator;
         this.initializerExpression = initializerExpression;
     }
 
     public AtonementCrystal getDeclaredVariable() {
         return declaredVariable;
+    }
+
+    public TypeCrystal getDeclaredType() {
+        return declaredType;
     }
 
     public BinaryOperatorCrystal getAssignmentOperator() {

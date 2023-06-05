@@ -1,6 +1,8 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
+import com.atonementcrystals.dnr.vikari.core.crystal.NullCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
@@ -97,6 +99,10 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         currentEnvironment = rootEnvironment;
     }
 
+    public AtonementField getCurrentEnvironment() {
+        return currentEnvironment;
+    }
+
     private void reportError(Vikari_RuntimeException e) {
         RuntimeError runtimeError = e.getRuntimeError();
         String errorReport = runtimeError.getErrorReport();
@@ -179,32 +185,113 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     @Override
     public AtonementCrystal visit(VariableExpression expr) {
         AtonementCrystal reference = expr.getReference();
-        // TODO: Resolve reference in current environment.
-        return null;
+        String identifier = reference.getIdentifier();
+
+        if (currentEnvironment.isDefined(identifier)) {
+            AtonementCrystal value = currentEnvironment.get(identifier);
+            return value;
+        }
+
+        throw internalRuntimeErrorForUndefinedVariable(reference);
     }
 
     @Override
     public AtonementCrystal visit(VariableDeclarationStatement stmt) {
-        // TODO: Implement.
-        return null;
+        // Evaluate the initializer expression.
+        Expression initializerExpression = stmt.getInitializerExpression();
+        AtonementCrystal initialValue = null;
+        if (initializerExpression != null) {
+            initialValue = evaluate(stmt.getInitializerExpression());
+        }
+
+        // Create the crystal to be stored in the environment.
+        AtonementCrystal reference = stmt.getDeclaredVariable();
+        String identifier = reference.getIdentifier();
+
+        AtonementCrystal variableToDefine = initializeVariableDeclaration(initialValue, identifier, stmt.getDeclaredType());
+
+        // Store the crystal in the environment.
+        if (!currentEnvironment.isDefined(identifier)) {
+            currentEnvironment.define(identifier, variableToDefine);
+        } else {
+            throw internalRuntimeErrorForRedeclaredVariable(reference);
+        }
+
+        return initialValue;
+    }
+
+    private AtonementCrystal initializeVariableDeclaration(AtonementCrystal value, String identifier,
+                                                           TypeCrystal declaredType) {
+        AtonementCrystal declaredVariable;
+
+        if (value instanceof NumberCrystal) {
+            declaredVariable = Arithmetic.maybeUpcastOrDowncast((NumberCrystal) value, declaredType);
+        } else if (value != null) {
+            declaredVariable = value.copy();
+        } else {
+            declaredVariable = new NullCrystal(0);
+        }
+
+        declaredVariable.setIdentifier(identifier);
+        declaredVariable.setDeclaredType(declaredType);
+        // NOTE: The initializedType is already set!
+
+        return declaredVariable;
+    }
+
+    private AtonementCrystal initializeVariableAssignment(AtonementCrystal value, String identifier,
+                                                          TypeCrystal declaredType) {
+        AtonementCrystal variable;
+
+        if (value instanceof NumberCrystal) {
+            variable = Arithmetic.maybeUpcastOrDowncast((NumberCrystal) value, declaredType);
+        } else {
+            variable = value.copy();
+        }
+
+        variable.setIdentifier(identifier);
+        variable.setDeclaredType(declaredType);
+        // NOTE: The initializedType is already set!
+
+        return variable;
     }
 
     @Override
     public AtonementCrystal visit(LeftAssignmentExpression expr) {
         AtonementCrystal rvalue = evaluate(expr.getRvalue());
         AtonementCrystal lvalue = evaluate(expr.getLvalue());
-        // TODO: Check types and promote/demote values before assignment.
-        //       Int << Long truncates value.
-        return null;
+
+        String identifier = lvalue.getIdentifier();
+        if (currentEnvironment.isDefined(identifier)) {
+            AtonementCrystal currentValue = currentEnvironment.get(identifier);
+            TypeCrystal declaredType = currentValue.getDeclaredType();
+
+            AtonementCrystal variableToAssign = initializeVariableAssignment(rvalue, identifier, declaredType);
+            currentEnvironment.assign(identifier, variableToAssign);
+        } else {
+            throw internalRuntimeErrorForUndefinedVariable(lvalue);
+        }
+
+        return rvalue;
     }
 
     @Override
     public AtonementCrystal visit(RightAssignmentExpression expr) {
         AtonementCrystal rvalue = evaluate(expr.getRvalue());
         AtonementCrystal lvalue = evaluate(expr.getLvalue());
-        // TODO: Check types and promote/demote values before assignment.
-        //       Int << Long truncates value.
-        return null;
+
+        String identifier = lvalue.getIdentifier();
+        if (currentEnvironment.isDefined(identifier)) {
+            AtonementCrystal currentValue = currentEnvironment.get(identifier);
+            TypeCrystal declaredType = currentValue.getDeclaredType();
+
+            AtonementCrystal variableToAssign = initializeVariableAssignment(rvalue, identifier, declaredType);
+            currentEnvironment.assign(identifier, variableToAssign);
+        } else {
+            throw internalRuntimeErrorForUndefinedVariable(lvalue);
+        }
+
+        return rvalue;
     }
 
     @Override
@@ -281,6 +368,18 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     private Vikari_RuntimeException internalRuntimeErrorForUnexpectedBinaryOperands(AtonementCrystal operator) {
         CoordinatePair location = operator.getCoordinates();
         String errorMessage = "Invalid operands for operator ``" + operator.getIdentifier() + "``.";
+        return internalRuntimeError(location, errorMessage);
+    }
+
+    private Vikari_RuntimeException internalRuntimeErrorForRedeclaredVariable(AtonementCrystal operator) {
+        CoordinatePair location = operator.getCoordinates();
+        String errorMessage = "Redeclared variable: ``" + operator.getIdentifier() + "``.";
+        return internalRuntimeError(location, errorMessage);
+    }
+
+    private Vikari_RuntimeException internalRuntimeErrorForUndefinedVariable(AtonementCrystal operator) {
+        CoordinatePair location = operator.getCoordinates();
+        String errorMessage = "Undefined variable: ``" + operator.getIdentifier() + "``.";
         return internalRuntimeError(location, errorMessage);
     }
 

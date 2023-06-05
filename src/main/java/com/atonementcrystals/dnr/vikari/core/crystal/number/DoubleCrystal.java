@@ -13,6 +13,17 @@ public class DoubleCrystal extends NumberCrystal<Double> {
         setType(VikariType.DOUBLE);
     }
 
+    public DoubleCrystal(Double value) {
+        this(value.toString(), value);
+    }
+
+    @Override
+    public DoubleCrystal copy() {
+        DoubleCrystal copy = new DoubleCrystal(getIdentifier(), getValue());
+        copyFields(this, copy);
+        return copy;
+    }
+
     @Override
     public Double initialize(String value) {
         return Double.valueOf(value);

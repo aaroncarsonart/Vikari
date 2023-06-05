@@ -13,6 +13,17 @@ public class FloatCrystal extends NumberCrystal<Float> {
         setType(VikariType.FLOAT);
     }
 
+    public FloatCrystal(Float value) {
+        this(value.toString(), value);
+    }
+
+    @Override
+    public FloatCrystal copy() {
+        FloatCrystal copy = new FloatCrystal(getIdentifier(), getValue());
+        copyFields(this, copy);
+        return copy;
+    }
+
     @Override
     public Float initialize(String value) {
         return Float.valueOf(value);

@@ -221,11 +221,10 @@ public class Parser {
             }
         }
 
-        if (declaredType != null) {
-            variableToDefine.setDeclaredType(declaredType);
-        } else {
-            variableToDefine.setDeclaredType(VikariType.ATONEMENT_CRYSTAL);
+        if (declaredType == null) {
+            declaredType = VikariType.ATONEMENT_CRYSTAL.getTypeCrystal();
         }
+        variableToDefine.setDeclaredType(declaredType);
 
         // Set up the final expression statement.
         VariableDeclarationStatement declarationStatement;
@@ -234,12 +233,13 @@ public class Parser {
         if (match(TokenType.LEFT_ASSIGNMENT)) {
             BinaryOperatorCrystal operator = (BinaryOperatorCrystal) previous();
             Expression initializerExpression = expression();
-            declarationStatement = new VariableDeclarationStatement(variableToDefine, operator, initializerExpression);
+            declarationStatement = new VariableDeclarationStatement(variableToDefine, declaredType, operator,
+                    initializerExpression);
         }
 
         // Case for not specifying a default value.
         else {
-            declarationStatement = new VariableDeclarationStatement(variableToDefine, null, null);
+            declarationStatement = new VariableDeclarationStatement(variableToDefine, declaredType, null, null);
         }
 
         // Define the crystal in the current scope. (For checking use of undefined crystals.)
@@ -419,8 +419,8 @@ public class Parser {
             } else {
                 // Since assignments aren't processed yet, need to fetch the declared type.
                 AtonementCrystal fieldMember = currentEnvironment.get(identifier);
-                TypeCrystal declaredType = fieldMember.getDeclaredType();
-                reference.setDeclaredType(declaredType);
+                reference.setDeclaredType(fieldMember.getDeclaredType());
+                reference.setField(fieldMember.getField());
             }
             return new VariableExpression(reference);
         }
