@@ -43,6 +43,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -78,6 +79,7 @@ public class Parser {
 
     public Parser() {
         typeResolver = new TypeResolver();
+        rootEnvironments = new HashMap<>();
     }
 
     public void setSyntaxErrorReporter(SyntaxErrorReporter syntaxErrorReporter) {
@@ -95,21 +97,30 @@ public class Parser {
     public List<Statement> parse(File file, List<List<AtonementCrystal>> lexedStatements) {
         log.trace("parse({})", file == null ? "null" : "\"" + file + "\"");
         this.file = file;
-        this.lexedStatements = lexedStatements;
-        lineCount = lexedStatements.size();
 
+        // Short-circuit if no statements exist to parse.
         List<Statement> statements = new ArrayList<>();
         if (lexedStatements.isEmpty()) {
             return statements;
         }
 
-        establishRootEnvironment();
+        // First pass on user input.
+        if (lineNumber == 0) {
+            this.lexedStatements = lexedStatements;
+            establishRootEnvironment();
+        }
 
-        lastLineLength = lexedStatements.get(lexedStatements.size() - 1).size();
+        // REPL mode is reusing the Parser state.
+        else {
+            this.lexedStatements.addAll(lexedStatements);
+        }
+
+        lineCount = this.lexedStatements.size();
+        lastLineLength = this.lexedStatements.get(this.lexedStatements.size() - 1).size();
 
         // Parse the file.
         while (!isAtEnd()) {
-            currentLine = lexedStatements.get(lineNumber);
+            currentLine = this.lexedStatements.get(lineNumber);
             do {
                 Statement statement = statement();
                 if (!(statement instanceof BlankStatement)) {
@@ -122,7 +133,7 @@ public class Parser {
 
         // Visit the Resolvers.
         typeResolver.resolve(statements);
-        typeResolver.reportErrors(syntaxErrorReporter, file, lexedStatements);
+        typeResolver.reportErrors(syntaxErrorReporter, file, this.lexedStatements);
 
         this.file = null;
         return statements;
@@ -710,5 +721,7 @@ public class Parser {
         lastLineLength = 0;
         statementNumber = 0;
         currentLine = null;
+        rootEnvironment = null;
+        currentEnvironment = null;
     }
 }

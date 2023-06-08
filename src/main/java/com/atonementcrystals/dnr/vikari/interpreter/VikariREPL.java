@@ -1,8 +1,9 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
-import com.atonementcrystals.dnr.vikari.core.statement.PrintStatement;
+import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
+import com.atonementcrystals.dnr.vikari.core.statement.VariableDeclarationStatement;
 import com.atonementcrystals.dnr.vikari.error.RuntimeError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
@@ -33,13 +34,8 @@ public class VikariREPL {
 
     private Lexer lexer;
     private Parser parser;
-    private TreeWalkInterpreter interpreter;
+    private REPL_Interpreter interpreter;
     private SyntaxErrorReporter syntaxErrorReporter;
-
-    private List<String> lineHistory;
-    private List<List<AtonementCrystal>> lexedStatements;
-    private List<Statement> parsedStatements;
-    private List<AtonementCrystal> interpretedResults;
 
     private boolean exit;
     private LineReader userInput;
@@ -48,20 +44,23 @@ public class VikariREPL {
      * Instantiate a new VikariRepl instance.
      */
     public VikariREPL() {
+       init();
+    }
+
+    private void init() {
         lexer = new Lexer();
         parser = new Parser();
-        interpreter = new TreeWalkInterpreter();
+        interpreter = new REPL_Interpreter();
+
+        AtonementField globalAtonementField = VikariProgram.initGlobalAtonementField();
+        parser.setGlobalAtonementField(globalAtonementField);
+        interpreter.setGlobalAtonementField(globalAtonementField);
+        interpreter.establishRootEnvironment();
+        interpreter.setLexedStatements(new ArrayList<>());
 
         syntaxErrorReporter = new SyntaxErrorReporter();
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
-
-        lineHistory = new ArrayList<>();
-        lexedStatements = new ArrayList<>();
-        parsedStatements = new ArrayList<>();
-        interpretedResults = new ArrayList();
-
-        userInput = LineReaderBuilder.builder().build();
     }
 
     /**
@@ -69,7 +68,7 @@ public class VikariREPL {
      * to drive the behavior of the REPL mode.
      */
     public enum ReplCommand {
-        NONE, HELP, CLEAR, EXIT, QUIT;
+        NONE, HELP, VERBOSE, CLEAR, EXIT, QUIT;
 
         private String nameLowerCase;
 
@@ -88,76 +87,14 @@ public class VikariREPL {
     public void start() {
         log.trace("start()");
         exit = false;
+        userInput = LineReaderBuilder.builder().build();
 
         // Begin REPL loop.
         while (!exit) {
-            // TODO: Save program state in Interpreter once assignment statements work.
-            parser.clear();
-            interpreter.clear();
-
             try {
                 // Get next line of user input.
                 String nextLineOfUserInput = userInput.readLine(REPL_PROMPT);
-
-                if (nextLineOfUserInput.isBlank()) {
-                    continue;
-                }
-
-                // Parse REPL commands.
-                ReplCommand replCommand = getReplCommand(nextLineOfUserInput);
-                if (replCommand == ReplCommand.NONE) {
-                    System.out.println("Unrecognized Vikari REPL command.");
-                    continue;
-                } else if (replCommand != null) {
-                    executeReplCommand(replCommand);
-                    continue;
-                }
-
-                // Lex and parse as Vikari code statement(s).
-                List<List<AtonementCrystal>> lexedStatements = lexer.lex(nextLineOfUserInput);
-                List<Statement> parsedStatements = parser.parse(null, lexedStatements);
-
-                lineHistory.add(nextLineOfUserInput);
-
-                // Report syntax errors, if any.
-                if (syntaxErrorReporter.hasErrors()) {
-                    reportSyntaxErrors(nextLineOfUserInput);
-                    syntaxErrorReporter.clear();
-                    continue;
-                }
-
-                // Execute the Vikari code statement(s).
-                try {
-                    log.trace("interpret()");
-                    List<AtonementCrystal> currentResults = new ArrayList<>();
-                    for (Statement statement : parsedStatements) {
-                        AtonementCrystal result = interpreter.execute(statement);
-                        currentResults.add(result);
-                    }
-
-                    // TODO: Once the index operator is implemented, assign each bare
-                    //       ExpressionStatement result to $0, $1, $2 etc and report
-                    //       the resulting assignment as e.g. ``$0 << 7`` in the REPL.
-
-                    // Cache the results if there were no runtime errors.
-                    this.lexedStatements.addAll(lexedStatements);
-                    this.parsedStatements.addAll(parsedStatements);
-                    interpretedResults.addAll(currentResults);
-
-                    // Report the output of the last statement.
-                    if (!currentResults.isEmpty()) {
-                        Statement lastStatement = parsedStatements.get(parsedStatements.size() - 1);
-                        if (!(lastStatement instanceof PrintStatement)) {
-                            AtonementCrystal lastResult = currentResults.get(currentResults.size() - 1);
-                            System.out.println(lastResult.getStringRepresentation());
-                        }
-                    }
-                }
-
-                // Report runtime errors.
-                catch (Vikari_RuntimeException e) {
-                    reportRuntimeError(e);
-                }
+                lexParseAndInterpret(nextLineOfUserInput);
             }
 
             // Handle signal for Ctrl+C.
@@ -170,6 +107,65 @@ public class VikariREPL {
                 exitReplMode();
             }
         }
+    }
+
+    /**
+     * Execute one iteration of the REPL loop body on the next line of user input.
+     * @param nextLineOfUserInput The string to lex, parse, and interpret as Vikari code,
+     *                            or else to read as a REPL command if it begins with !.
+     */
+    public void lexParseAndInterpret(String nextLineOfUserInput) {
+        if (nextLineOfUserInput.isBlank()) {
+            return;
+        }
+
+        // Parse REPL commands.
+        ReplCommand replCommand = getReplCommand(nextLineOfUserInput);
+        if (replCommand == ReplCommand.NONE) {
+            System.out.println("Unrecognized REPL command.");
+            return;
+        } else if (replCommand != null) {
+            executeReplCommand(replCommand);
+            return;
+        }
+
+        // Lex and parse as Vikari code statement(s).
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(nextLineOfUserInput);
+        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
+
+        // Report syntax errors, if any.
+        if (syntaxErrorReporter.hasErrors()) {
+            reportSyntaxErrors(nextLineOfUserInput);
+            syntaxErrorReporter.clear();
+            return;
+        }
+
+        // Execute the Vikari code statement(s).
+        try {
+            log.trace("interpret()");
+            this.interpreter.addLexedStatements(lexedStatements);
+
+            for (Statement statement : parsedStatements) {
+                interpreter.execute(statement);
+            }
+        }
+
+        // Report runtime errors.
+        catch (Vikari_RuntimeException e) {
+            reportRuntimeError(e);
+        }
+    }
+
+    private void reportVariableDeclaration(VariableDeclarationStatement statement, AtonementCrystal result) {
+        AtonementCrystal declaredVariable = statement.getDeclaredVariable();
+        String declaredVariableIdentifier = declaredVariable.getIdentifier();
+        String initializedValue;
+        if (result == null) {
+            initializedValue = declaredVariable.getStringRepresentation();
+        } else {
+            initializedValue = result.getStringRepresentation();
+        }
+        System.out.printf("%s = %s\n", declaredVariableIdentifier, initializedValue);
     }
 
     /**
@@ -205,6 +201,9 @@ public class VikariREPL {
             case CLEAR:
                 clearReplState();
                 break;
+            case VERBOSE:
+                toggleVerbose();
+                break;
             case EXIT:
             case QUIT:
                 exitReplMode();
@@ -224,6 +223,7 @@ public class VikariREPL {
         formatter.format("\n");
         formatter.format("!%-6s Print help menu.\n", ReplCommand.HELP);
         formatter.format("!%-6s Clear REPL state.\n", ReplCommand.CLEAR);
+        formatter.format("!%-6s Toggle results of declarations, assignments, and expressions.\n", ReplCommand.VERBOSE);
         formatter.format("!%-6s Exit REPL mode.\n", ReplCommand.EXIT);
         formatter.format("!%-6s Exit REPL mode.\n", ReplCommand.QUIT);
         formatter.format("\n");
@@ -236,13 +236,17 @@ public class VikariREPL {
     /**
      * Clear all cached program state.
      */
-    private void clearReplState() {
-        lexedStatements.clear();
-        parsedStatements.clear();
-        interpretedResults.clear();
+    public void clearReplState() {
+        init();
+    }
 
-        parser.clear();
-        interpreter.clear();
+    public void toggleVerbose() {
+        boolean enabled = interpreter.toggleVerboseOutput();
+        if (enabled) {
+            System.out.println("Verbose output mode enabled.");
+        } else {
+            System.out.println("Verbose output mode disabled.");
+        }
     }
 
     /**

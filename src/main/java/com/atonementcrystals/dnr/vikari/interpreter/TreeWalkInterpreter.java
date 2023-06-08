@@ -35,6 +35,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -56,7 +57,15 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     private AtonementField rootEnvironment;
     private AtonementField currentEnvironment;
 
+    public TreeWalkInterpreter() {
+        rootEnvironments = new HashMap<>();
+    }
+
     public void setLexedStatements(List<List<AtonementCrystal>> lexedStatements) {
+        this.lexedStatements = lexedStatements;
+    }
+
+    public void addLexedStatements(List<List<AtonementCrystal>> lexedStatements) {
         this.lexedStatements = lexedStatements;
     }
 
@@ -78,7 +87,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         this.globalAtonementField = globalAtonementField;
     }
 
-    private void establishRootEnvironment() {
+    public void establishRootEnvironment() {
         // File is for a type or a script.
         // Cache the environment with the file path.
         if (currentFile != null) {
@@ -99,11 +108,15 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         currentEnvironment = rootEnvironment;
     }
 
+    public AtonementField getRootEnvironment() {
+        return rootEnvironment;
+    }
+
     public AtonementField getCurrentEnvironment() {
         return currentEnvironment;
     }
 
-    private void reportError(Vikari_RuntimeException e) {
+    public void reportError(Vikari_RuntimeException e) {
         RuntimeError runtimeError = e.getRuntimeError();
         String errorReport = runtimeError.getErrorReport();
         System.out.println(errorReport);
@@ -217,7 +230,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
             throw internalRuntimeErrorForRedeclaredVariable(reference);
         }
 
-        return initialValue;
+        return variableToDefine;
     }
 
     private AtonementCrystal initializeVariableDeclaration(AtonementCrystal value, String identifier,
@@ -268,11 +281,10 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
 
             AtonementCrystal variableToAssign = initializeVariableAssignment(rvalue, identifier, declaredType);
             currentEnvironment.assign(identifier, variableToAssign);
-        } else {
-            throw internalRuntimeErrorForUndefinedVariable(lvalue);
-        }
 
-        return rvalue;
+            return variableToAssign;
+        }
+        throw internalRuntimeErrorForUndefinedVariable(lvalue);
     }
 
     @Override
@@ -287,11 +299,10 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
 
             AtonementCrystal variableToAssign = initializeVariableAssignment(rvalue, identifier, declaredType);
             currentEnvironment.assign(identifier, variableToAssign);
-        } else {
-            throw internalRuntimeErrorForUndefinedVariable(lvalue);
-        }
 
-        return rvalue;
+            return variableToAssign;
+        }
+        throw internalRuntimeErrorForUndefinedVariable(lvalue);
     }
 
     @Override
@@ -386,5 +397,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     public void clear() {
         currentFile = null;
         lexedStatements = null;
+        rootEnvironment = null;
+        currentEnvironment = null;
     }
 }
