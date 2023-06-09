@@ -56,7 +56,8 @@ public class VikariError {
         int tabCount = Utils.countOccurrences(line, tab, column);
         line = line.replaceAll(tab, tabReplacement);
 
-        formatter.format("%s:%d:%d:\n", filename, row, column);
+        // Add 1 to row and column because counting in error report should start from 1.
+        formatter.format("%s:%d:%d:\n", filename, row + 1, column + 1);
         formatter.format("    %s\n", line);
 
         // Need to offset the caret placement based on the sanitized tabs.
