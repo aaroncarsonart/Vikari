@@ -337,6 +337,12 @@ class UtilsTest {
         stringLiteral = "``int:Integer << 5``";
         assertTrue(Utils.isStringLiteral(stringLiteral), "A string literal should return true for " +
                 "Utils::isStringLiteral.");
+        stringLiteral = "``This token contains \\`` a quoted capture quotation.``";
+        assertTrue(Utils.isStringLiteral(stringLiteral), "A string that contains a quoted capture quotation " +
+                " that is not at the end of the string should return true for Utils::isStringLiteral.");
+        stringLiteral = "``This token contains a backslash. \\ ``";
+        assertTrue(Utils.isStringLiteral(stringLiteral), "A string that contains a backslash not immediately " +
+                " adjacent to the closing capture quotation should return true for Utils::isStringLiteral.");
 
         // negative tests
         String nonStringLiteral = "``foo";
@@ -354,6 +360,12 @@ class UtilsTest {
         nonStringLiteral = "str:String << ``I am a string.``, :str";
         assertFalse(Utils.isStringLiteral(nonStringLiteral), "A string that contains a string literal but isn't " +
                 "entirely a string literal should return false for Utils::isStringLiteral.");
+        nonStringLiteral = "``This token contains a quoted capture quotation: \\``";
+        assertFalse(Utils.isStringLiteral(nonStringLiteral), "A string that is ended by a quoted capture quotation " +
+                "should return false for Utils::isStringLiteral.");
+        nonStringLiteral = "This token contains a quoted capture quotation: \\``";
+        assertFalse(Utils.isStringLiteral(nonStringLiteral), "A string that does not contain an opening capture " +
+                "quotation and is ended by a quoted capture quotation should return false for Utils::isStringLiteral.");
     }
 
     @Test
@@ -398,6 +410,18 @@ class UtilsTest {
         String nonStringLiteral = "foo``";
         assertTrue(Utils.isEndOfStringLiteral(nonStringLiteral), "The end of a multi-string literal should return " +
                 "true for Utils::isEndOfStringLiteral.");
+        stringLiteral = "``This token contains \\`` a quoted capture quotation.``";
+        assertTrue(Utils.isEndOfStringLiteral(stringLiteral), "A string that contains a quoted capture quotation " +
+                " that is not at the end of the string should return true for Utils::isEndOfStringLiteral.");
+        stringLiteral = "This token contains \\`` a quoted capture quotation.``";
+        assertTrue(Utils.isEndOfStringLiteral(stringLiteral), "A string that contains a quoted capture quotation " +
+                " that is not at the end of the string should return true for Utils::isEndOfStringLiteral.");
+        stringLiteral = "``This token contains a backslash. \\ ``";
+        assertTrue(Utils.isEndOfStringLiteral(stringLiteral), "A string that contains a backslash not immediately " +
+                " adjacent to the closing capture quotation should return true for Utils::isEndOfStringLiteral.");
+        stringLiteral = "This token contains a backslash. \\ ``";
+        assertTrue(Utils.isEndOfStringLiteral(stringLiteral), "A string that contains a backslash not immediately " +
+                " adjacent to the closing capture quotation should return true for Utils::isEndOfStringLiteral.");
 
         // negative tests
         nonStringLiteral = "``foo";
@@ -412,6 +436,12 @@ class UtilsTest {
         nonStringLiteral = "str:String << ``I am a string.``, :str";
         assertFalse(Utils.isEndOfStringLiteral(nonStringLiteral), "A string that contains a string literal but " +
                 "isn't entirely a string literal should return false for Utils::isEndOfStringLiteral.");
+        nonStringLiteral = "``This token contains a quoted capture quotation: \\``";
+        assertFalse(Utils.isEndOfStringLiteral(nonStringLiteral), "A string that is ended by a quoted capture quotation " +
+                "should return false for Utils::isEndOfStringLiteral.");
+        nonStringLiteral = "This token contains a quoted capture quotation: \\``";
+        assertFalse(Utils.isEndOfStringLiteral(nonStringLiteral), "A string that is ended by a quoted capture quotation " +
+                "should return false for Utils::isEndOfStringLiteral.");
     }
 
     @Test
@@ -479,6 +509,18 @@ class UtilsTest {
         String endOfComment = "End of a multi-line comment.:~";
         assertTrue(Utils.isEndOfComment(endOfComment), "The end of a multi-line comment should return false for " +
                 "Utils::isEndOfComment.");
+        String commentWithQuotedSuffixToken = "~:This comment contains \\:~ a quoted comment suffix token.:~";
+        assertTrue(Utils.isEndOfComment(commentWithQuotedSuffixToken), "A string that contains a quoted comment " +
+                "suffix token that is not at the end of the string should return true for Utils::isEndOfComment.");
+        String stringWithQuotedSuffixToken = "This string contains \\:~ a quoted comment suffix token.:~";
+        assertTrue(Utils.isEndOfComment(stringWithQuotedSuffixToken), "A string that contains a quoted comment " +
+                "suffix token that is not at the end of the string should return true for Utils::isEndOfComment.");
+        String commentWithBackslash = "~:This comment contains a backslash. \\ :~";
+        assertTrue(Utils.isEndOfComment(commentWithBackslash), "A string that contains a backslash not immediately " +
+                " adjacent to the closing comment suffix token should return true for Utils::isEndOfComment.");
+        String stringWithBackslash = "This string contains a backslash. \\ :~";
+        assertTrue(Utils.isEndOfComment(stringWithBackslash), "A string that contains a backslash not immediately " +
+                " adjacent to the closing comment suffix token should return true for Utils::isEndOfComment.");
 
         // negative tests
         String startOfComment = "~:Start of a multi-line comment.";
@@ -490,6 +532,12 @@ class UtilsTest {
         String stringContainingAComment = "int:Integer << 5 ~:I am a comment.:~ + foo";
         assertFalse(Utils.isEndOfComment(stringContainingAComment), "A string that contains a comment but isn't " +
                 "entirely a comment should return false for Utils::isEndOfComment.");
+        String stringEndingInEscapedSuffixToken = "~:This string contains a quoted comment suffix token: \\:~";
+        assertFalse(Utils.isEndOfComment(stringEndingInEscapedSuffixToken), "A string that is ended by a quoted " +
+                "comment suffix token should return false for Utils::isEndOfComment.");
+        stringEndingInEscapedSuffixToken = "This string contains a quoted comment suffix token: \\:~";
+        assertFalse(Utils.isEndOfComment(stringEndingInEscapedSuffixToken), "A string that is ended by a quoted " +
+                "comment suffix token should return false for Utils::isEndOfComment.");
     }
 
     @Test
@@ -747,12 +795,25 @@ class UtilsTest {
 
     @Test
     @Order(29)
-    public void testIsMissingBacktickQuotation() {
-        assertTrue(Utils.isMissingBacktickQuotation("`foo"), "Expected to be missing a backtick quotation.");
-        assertTrue(Utils.isMissingBacktickQuotation("foo`"), "Expected to be missing a backtick quotation.");
+    public void testUtils_isEscapedByBackslash() {
+        // negative tests
+        assertFalse(Utils.isEscapedByBackslash("", 0), "Expected to return false for Utils::isEscapedByBackSlash");
+        assertFalse(Utils.isEscapedByBackslash("a", 0), "Expected to return false for Utils::isEscapedByBackSlash");
+        assertFalse(Utils.isEscapedByBackslash("aa", 1), "Expected to return false for Utils::isEscapedByBackSlash");
+        assertFalse(Utils.isEscapedByBackslash("aaa", 1), "Expected to return false for Utils::isEscapedByBackSlash");
+        assertFalse(Utils.isEscapedByBackslash("\\a", 2), "Expected to return false for Utils::isEscapedByBackSlash");
+        assertFalse(Utils.isEscapedByBackslash("\\a", -1), "Expected to return false for Utils::isEscapedByBackSlash");
+        assertFalse(Utils.isEscapedByBackslash("\\\\a", 2), "Expected to return false for Utils::isEscapedByBackSlash");
+        assertFalse(Utils.isEscapedByBackslash("\\\\\\a", 4), "Expected to return false for Utils::isEscapedByBackSlash");
+        assertFalse(Utils.isEscapedByBackslash("\\\\\\\\a", 6), "Expected to return false for Utils::isEscapedByBackSlash");
 
-        assertFalse(Utils.isMissingBacktickQuotation("3a"), "Expected to not be missing a backtick quotation.");
-        assertFalse(Utils.isMissingBacktickQuotation("foo"), "Expected to not be missing a backtick quotation.");
-        assertFalse(Utils.isMissingBacktickQuotation("`foo`"), "Expected to not be missing a backtick quotation.");
+        // positive tests
+        assertTrue(Utils.isEscapedByBackslash("\\a", 1), "Expected to return true for Utils::isEscapedByBackSlash");
+        assertTrue(Utils.isEscapedByBackslash("\\\\\\a", 3), "Expected to return true for Utils::isEscapedByBackSlash");
+        assertTrue(Utils.isEscapedByBackslash("\\\\\\\\\\a", 5), "Expected to return true for Utils::isEscapedByBackSlash");
+        assertTrue(Utils.isEscapedByBackslash("\\aa", 1), "Expected to return true for Utils::isEscapedByBackSlash");
+        assertTrue(Utils.isEscapedByBackslash("a\\a", 2), "Expected to return true for Utils::isEscapedByBackSlash");
+        assertTrue(Utils.isEscapedByBackslash("aa\\a", 3), "Expected to return true for Utils::isEscapedByBackSlash");
+        assertTrue(Utils.isEscapedByBackslash("aa\\aa", 3), "Expected to return true for Utils::isEscapedByBackSlash");
     }
 }

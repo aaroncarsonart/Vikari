@@ -38,7 +38,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -78,7 +77,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -118,7 +116,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -158,7 +155,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -198,7 +194,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -238,7 +233,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -278,7 +272,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -318,7 +311,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -358,7 +350,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -398,7 +389,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -438,7 +428,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -478,7 +467,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -518,7 +506,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);
@@ -558,7 +545,6 @@ public class LexerTest_ConvertToCrystals_Numbers {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertNoSyntaxErrors(syntaxErrorReporter);

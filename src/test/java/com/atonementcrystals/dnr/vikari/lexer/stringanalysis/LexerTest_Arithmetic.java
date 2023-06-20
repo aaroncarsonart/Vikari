@@ -20,7 +20,6 @@ public class LexerTest_Arithmetic {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 1;
         int actualStatementCount = listOfStatementTokens.size();
@@ -28,7 +27,7 @@ public class LexerTest_Arithmetic {
 
         List<String> statementTokens = listOfStatementTokens.get(0);
 
-        int expectedTokenCount = 18;
+        int expectedTokenCount = 19;
         int actualTokenCount = statementTokens.size();
         assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
 
@@ -68,12 +67,16 @@ public class LexerTest_Arithmetic {
         actualToken = statementTokens.get(14);
         assertEquals(expectedToken, actualToken, "Expected the addition operator.");
 
-        expectedToken = "-2.4";
+        expectedToken = "-";
         actualToken = statementTokens.get(16);
+        assertEquals(expectedToken, actualToken, "Expected the addition operator.");
+
+        expectedToken = "2.4";
+        actualToken = statementTokens.get(17);
         assertEquals(expectedToken, actualToken, "Expected a negative decimal number literal.");
 
         expectedToken = "]";
-        actualToken = statementTokens.get(17);
+        actualToken = statementTokens.get(18);
         assertEquals(expectedToken, actualToken, "Expected the right square bracket.");
     }
 }

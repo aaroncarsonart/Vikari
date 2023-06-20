@@ -11,8 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Test that decimal number literal values (i.e. "3.14" are properly collapsed
- * down into a singular string after the lexical analysis step.
+ * Test that decimal number literal values (i.e. "3.14") are properly tokenized by the Lexer.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_DecimalNumbers {
@@ -24,7 +23,6 @@ public class LexerTest_DecimalNumbers {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 1;
         int actualStatementCount = listOfStatementTokens.size();
@@ -48,7 +46,6 @@ public class LexerTest_DecimalNumbers {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 1;
         int actualStatementCount = listOfStatementTokens.size();
@@ -81,7 +78,6 @@ public class LexerTest_DecimalNumbers {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 2;
         int actualStatementCount = listOfStatementTokens.size();

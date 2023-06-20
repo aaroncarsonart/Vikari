@@ -12,8 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Test that constant declarations (i.e. "{foo}") are properly
- * lex during the first step of lexical analysis.
+ * Test that constant declarations (i.e. "{foo}") are properly tokenized by the Lexer.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_ConstantDeclarations {
@@ -25,7 +24,6 @@ public class LexerTest_ConstantDeclarations {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 1;
         int actualStatementCount = listOfStatementTokens.size();
@@ -52,7 +50,6 @@ public class LexerTest_ConstantDeclarations {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 1;
         int actualStatementCount = listOfStatementTokens.size();
@@ -79,7 +76,6 @@ public class LexerTest_ConstantDeclarations {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 1;
         int actualStatementCount = listOfStatementTokens.size();

@@ -267,7 +267,11 @@ public class Utils {
 
     public static boolean isStringLiteral(String string) {
         String captureQuotation = TokenType.CAPTURE_QUOTATION.getIdentifier();
-        return isEnclosedString(string, captureQuotation, captureQuotation);
+        if (isEnclosedString(string, captureQuotation, captureQuotation)) {
+            int closingTokenIndex = string.length() - captureQuotation.length();
+            return !isEscapedByBackslash(string, closingTokenIndex);
+        }
+        return false;
     }
 
     public static boolean isStartOfStringLiteral(String string) {
@@ -277,7 +281,33 @@ public class Utils {
 
     public static boolean isEndOfStringLiteral(String string) {
         String captureQuotation = TokenType.CAPTURE_QUOTATION.getIdentifier();
-        return string != null && string.endsWith(captureQuotation);
+        if (string != null && string.endsWith(captureQuotation)) {
+            int closingTokenIndex = string.length() - captureQuotation.length();
+            return !isEscapedByBackslash(string, closingTokenIndex);
+        }
+        return false;
+    }
+
+    /**
+     * Ensure an odd number of backslashes precedes the character marked by the index in the given string.
+     * @param text The string to check for backslashes in.
+     * @param index The index behind which to count the backslashes.
+     * @return True if the character marked by the index is escaped by a backslash.
+     */
+    public static boolean isEscapedByBackslash(String text, int index) {
+        if (text.isEmpty() || index < 0 || index >= text.length()) {
+            return false;
+        }
+        int backslashCount = 0;
+        for (int i = index - 1; i >= 0; i--) {
+            char prev = text.charAt(i);
+            if (prev == '\\') {
+                backslashCount++;
+            } else {
+                break;
+            }
+        }
+        return backslashCount % 2 == 1;
     }
 
     public static boolean isBacktickQuotedIdentifier(String string) {
@@ -299,7 +329,11 @@ public class Utils {
 
     public static boolean isEndOfComment(String string) {
         String commentSuffix = TokenType.COMMENT_SUFFIX_CRYSTAL.getIdentifier();
-        return string != null && string.endsWith(commentSuffix);
+        if (string != null && string.endsWith(commentSuffix)) {
+            int closingTokenIndex = string.length() - commentSuffix.length();
+            return !isEscapedByBackslash(string, closingTokenIndex);
+        }
+        return false;
     }
 
     public static String stripEnclosure(String enclosedString, String startEnclosure, String endEnclosure) {
@@ -497,17 +531,5 @@ public class Utils {
     public static boolean isTypeIdentifier(String identifier) {
         Matcher matcher = typeIdentifierRegex.matcher(identifier);
         return matcher.matches();
-    }
-
-    public static boolean isMissingBacktickQuotation(String identifier) {
-        if (identifier == null) {
-            return false;
-        }
-        String backtick = "`";
-
-        boolean startsWithBacktick = identifier.startsWith(backtick);
-        boolean endsWithBacktick = identifier.endsWith(backtick);
-
-        return (startsWithBacktick && !endsWithBacktick) || (!startsWithBacktick && endsWithBacktick);
     }
 }

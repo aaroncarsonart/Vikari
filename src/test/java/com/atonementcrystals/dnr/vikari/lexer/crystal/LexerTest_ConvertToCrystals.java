@@ -68,9 +68,17 @@ public class LexerTest_ConvertToCrystals {
             String sourceString = identifier;
 
             Lexer lexer = new Lexer();
+
+            SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
+            lexer.setSyntaxErrorReporter(syntaxErrorReporter);
+
             List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-            listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
             List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
+
+            if (syntaxErrorReporter.hasErrors()) {
+                syntaxErrorReporter.reportErrors();
+                fail("Expected no syntax errors.");
+            }
 
             int expectedStatementsCount = 1;
             int actualStatementsCount = statementsOfCrystals.size();
@@ -105,7 +113,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -180,10 +187,9 @@ public class LexerTest_ConvertToCrystals {
         lexer.setSyntaxErrorReporter(errorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         lexer.convertTokensToCrystals(listOfStatementTokens);
 
-        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing comment prefix.");
+        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing comment suffix.");
 
         List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
         int expectedSize = 1;
@@ -214,7 +220,6 @@ public class LexerTest_ConvertToCrystals {
         String sourceString = "~:This is a comment.:~";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -252,7 +257,6 @@ public class LexerTest_ConvertToCrystals {
                 "across two lines.:~";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 2;
@@ -327,7 +331,6 @@ public class LexerTest_ConvertToCrystals {
                 "without indentation.:~";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 3;
@@ -440,7 +443,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 5;
@@ -610,7 +612,6 @@ public class LexerTest_ConvertToCrystals {
         String sourceString = "``This is a string literal.``";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -644,7 +645,6 @@ public class LexerTest_ConvertToCrystals {
                 "across two lines.``";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 2;
@@ -717,7 +717,6 @@ public class LexerTest_ConvertToCrystals {
                 "without indentation.``";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 3;
@@ -814,7 +813,6 @@ public class LexerTest_ConvertToCrystals {
                 "across two lines.``|baz)";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 2;
@@ -989,7 +987,6 @@ public class LexerTest_ConvertToCrystals {
         String sourceString = "``a << *``";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -1031,7 +1028,6 @@ public class LexerTest_ConvertToCrystals {
                               "`` + foo";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 3;
@@ -1264,7 +1260,6 @@ public class LexerTest_ConvertToCrystals {
                 "``";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 5;
@@ -1434,7 +1429,6 @@ public class LexerTest_ConvertToCrystals {
         lexer.setSyntaxErrorReporter(errorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         lexer.convertTokensToCrystals(listOfStatementTokens);
 
         assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing backtick.");
@@ -1469,7 +1463,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -1510,7 +1503,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -1554,7 +1546,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -1593,7 +1584,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -1632,7 +1622,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -1671,7 +1660,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -1710,7 +1698,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -1749,7 +1736,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -1793,7 +1779,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -1837,7 +1822,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -1878,7 +1862,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -1944,7 +1927,6 @@ public class LexerTest_ConvertToCrystals {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         int expectedStatementsCount = 1;
@@ -2041,7 +2023,8 @@ public class LexerTest_ConvertToCrystals {
         assertEquals(expectedIdentifier, lexedIdentifier, "An integer literal crystal's identifier should match its " +
                 "source string.");
 
-        expectedCoordinates = new CoordinatePair(0, 11);
+        // NOTE: A negative number's location starts AFTER the negation operator.
+        expectedCoordinates = new CoordinatePair(0, 12);
         actualCoordinates = crystal.getCoordinates();
         assertEquals(expectedCoordinates, actualCoordinates, "Unexpected coordinates.");
 

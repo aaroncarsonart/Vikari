@@ -8,9 +8,9 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
  * performing a logical AND operation on the left and right operands, and then
  * assigning the result to the right operand.
  */
-public class RightAndAssignmentOperatorCrystal extends AtonementCrystal {
+public class RightLogicalAndAssignmentOperatorCrystal extends AtonementCrystal {
 
-    public RightAndAssignmentOperatorCrystal() {
+    public RightLogicalAndAssignmentOperatorCrystal() {
         super(TokenType.RIGHT_LOGICAL_AND_ASSIGNMENT.getIdentifier());
     }
 

@@ -35,7 +35,6 @@ public class LexerTest_SyntaxErrors {
         lexer.setSyntaxErrorReporter(errorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        lexer.collapseTokens(listOfStatementTokens);
 
         assertTrue(errorReporter.hasErrors(), "Expected syntax errors for multiple error types.");
 
@@ -124,7 +123,6 @@ public class LexerTest_SyntaxErrors {
         lexer.setSyntaxErrorReporter(errorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        lexer.collapseTokens(listOfStatementTokens);
 
         assertTrue(errorReporter.hasErrors(), "Expected syntax errors for multiple error types.");
 
@@ -196,7 +194,6 @@ public class LexerTest_SyntaxErrors {
         lexer.setSyntaxErrorReporter(errorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        lexer.collapseTokens(listOfStatementTokens);
 
         assertTrue(errorReporter.hasErrors(), "Expected syntax errors for multiple error types.");
 

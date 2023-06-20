@@ -15,8 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test that String literal identifiers (i.e. ``foo``) are properly
- * collapsed down into a singular string after the lexical analysis step.
+ * Test that string literal identifiers (i.e. ``foo``) are properly tokenized by the Lexer.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_Strings {
@@ -29,7 +28,6 @@ public class LexerTest_Strings {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 1;
         int actualStatementCount = listOfStatementTokens.size();
@@ -53,7 +51,6 @@ public class LexerTest_Strings {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 1;
         int actualStatementCount = listOfStatementTokens.size();
@@ -78,7 +75,6 @@ public class LexerTest_Strings {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 2;
         int actualStatementCount = listOfStatementTokens.size();
@@ -116,7 +112,6 @@ public class LexerTest_Strings {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 3;
         int actualStatementCount = listOfStatementTokens.size();
@@ -164,7 +159,6 @@ public class LexerTest_Strings {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 2;
         int actualStatementCount = listOfStatementTokens.size();
@@ -200,7 +194,6 @@ public class LexerTest_Strings {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 1;
         int actualStatementCount = listOfStatementTokens.size();
@@ -227,7 +220,6 @@ public class LexerTest_Strings {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 4;
         int actualStatementCount = listOfStatementTokens.size();
@@ -288,7 +280,6 @@ public class LexerTest_Strings {
         lexer.setSyntaxErrorReporter(errorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        lexer.collapseTokens(listOfStatementTokens);
 
         assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing capture quotation.");
 
@@ -326,7 +317,6 @@ public class LexerTest_Strings {
         lexer.setSyntaxErrorReporter(errorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        lexer.collapseTokens(listOfStatementTokens);
 
         assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing capture quotation.");
 

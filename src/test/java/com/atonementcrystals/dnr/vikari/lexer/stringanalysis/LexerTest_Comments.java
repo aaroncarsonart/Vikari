@@ -12,11 +12,11 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.io.File;
 import java.util.List;
 
+import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test that comment crystal enclosed text (i.e. ~:foo:~) are properly
- * collapsed down into a singular string after the lexical analysis step.
+ * Test that comment crystals (i.e. ~:foo:~) are properly tokenized by the Lexer.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_Comments {
@@ -29,7 +29,6 @@ public class LexerTest_Comments {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 1;
         int actualStatementCount = listOfStatementTokens.size();
@@ -54,7 +53,6 @@ public class LexerTest_Comments {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 2;
         int actualStatementCount = listOfStatementTokens.size();
@@ -92,7 +90,6 @@ public class LexerTest_Comments {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 3;
         int actualStatementCount = listOfStatementTokens.size();
@@ -140,7 +137,6 @@ public class LexerTest_Comments {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 1;
         int actualStatementCount = listOfStatementTokens.size();
@@ -165,7 +161,6 @@ public class LexerTest_Comments {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 2;
         int actualStatementCount = listOfStatementTokens.size();
@@ -202,7 +197,6 @@ public class LexerTest_Comments {
 
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        listOfStatementTokens = lexer.collapseTokens(listOfStatementTokens);
 
         int expectedStatementCount = 2;
         int actualStatementCount = listOfStatementTokens.size();
@@ -241,7 +235,6 @@ public class LexerTest_Comments {
         lexer.setSyntaxErrorReporter(errorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        lexer.collapseTokens(listOfStatementTokens);
 
         assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing comment suffix.");
 
@@ -279,7 +272,6 @@ public class LexerTest_Comments {
         lexer.setSyntaxErrorReporter(errorReporter);
 
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-        lexer.collapseTokens(listOfStatementTokens);
 
         assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing comment suffix.");
 
@@ -304,5 +296,174 @@ public class LexerTest_Comments {
 
         String errorMessage = syntaxError.getMessage();
         assertTrue(errorMessage.contains("comment suffix"), "Unexpected syntax error message.");
+    }
+
+    @Test
+    @Order(9)
+    public void testLexer_StringAnalysis_Comments_QuotedSuffixToken_AfterOneBackslash() {
+        List<String> statement = lexSingleStatementAsTokens("~:This is a comment.\\:~:~a", 2);
+        testToken(statement.get(0), "~:This is a comment.\\:~:~");
+        testToken(statement.get(1), "a");
+    }
+
+    @Test
+    @Order(10)
+    public void testLexer_StringAnalysis_Comments_UnQuotedSuffixToken_AfterTwoBackslashes() {
+        List<String> statement = lexSingleStatementAsTokens("~:This is a comment.\\\\:~:~a", 4);
+        testToken(statement.get(0), "~:This is a comment.\\\\:~");
+        testToken(statement.get(1), ":");
+        testToken(statement.get(2), "~");
+        testToken(statement.get(3), "a");
+    }
+
+    @Test
+    @Order(11)
+    public void testLexer_StringAnalysis_Comments_QuotedSuffixToken_AfterThreeBackslashes() {
+        List<String> statement = lexSingleStatementAsTokens("~:This is a comment.\\\\\\:~:~", 1);
+        testToken(statement.get(0), "~:This is a comment.\\\\\\:~:~");
+    }
+
+    @Test
+    @Order(12)
+    public void testLexer_StringAnalysis_Comments_UnQuotedSuffixToken_AfterFourBackslashes() {
+        List<String> statement = lexSingleStatementAsTokens("~:This is a comment.\\\\\\\\:~:~a", 4);
+        testToken(statement.get(0), "~:This is a comment.\\\\\\\\:~");
+        testToken(statement.get(1), ":");
+        testToken(statement.get(2), "~");
+        testToken(statement.get(3), "a");
+    }
+
+    @Test
+    @Order(13)
+    public void testLexer_StringAnalysis_MultLineComment_QuotedSuffixToken_BeforeEndOfLine() {
+        String sourceString = """
+            ~:This suffix token is quoted: \\:~ and so,
+            the comment can then span across two lines.:~
+            """;
+
+        List<List<String>> statements = lexAsTokens(sourceString, 2, tokenCounts(1, 1));
+        testToken(statements.get(0).get(0), "~:This suffix token is quoted: \\:~ and so,");
+        testToken(statements.get(1).get(0), "the comment can then span across two lines.:~");
+    }
+
+    @Test
+    @Order(14)
+    public void testLexer_StringAnalysis_MultLineComment_QuotedSuffixToken_BeforeEndOfLine_OneCharacterAfter() {
+        String sourceString = """
+            ~:This suffix token is quoted \\:~,
+            and so the comment can then span across two lines.:~
+            """;
+
+        List<List<String>> statements = lexAsTokens(sourceString, 2, tokenCounts(1, 1));
+        testToken(statements.get(0).get(0), "~:This suffix token is quoted \\:~,");
+        testToken(statements.get(1).get(0), "and so the comment can then span across two lines.:~");
+    }
+
+    @Test
+    @Order(15)
+    public void testLexer_StringAnalysis_MultLineComment_QuotedSuffixToken_AtEndOfLine() {
+        String sourceString = """
+            ~:This suffix token is quoted: \\:~
+            and so, the comment can then span across two lines.:~
+            """;
+
+        List<List<String>> statements = lexAsTokens(sourceString, 2, tokenCounts(1, 1));
+        testToken(statements.get(0).get(0), "~:This suffix token is quoted: \\:~");
+        testToken(statements.get(1).get(0), "and so, the comment can then span across two lines.:~");
+    }
+
+    @Test
+    @Order(16)
+    public void testLexer_StringAnalysis_CommentBeforePrintStatement() {
+        List<String> statement = lexSingleStatementAsTokens("~:Comment.:~:", 2);
+        testToken(statement.get(0), "~:Comment.:~");
+        testToken(statement.get(1), ":");
+    }
+
+    @Test
+    @Order(17)
+    public void testLexer_StringAnalysis_CommentAfterPrintStatement() {
+        List<String> statement = lexSingleStatementAsTokens(":~:Comment.:~", 2);
+        testToken(statement.get(0), ":");
+        testToken(statement.get(1), "~:Comment.:~");
+    }
+
+    @Test
+    @Order(18)
+    public void testLexer_StringAnalysis_CommentBeforeTypeLabel() {
+        List<String> statement = lexSingleStatementAsTokens("foo~:Comment.:~:Integer", 4);
+        testToken(statement.get(0), "foo");
+        testToken(statement.get(1), "~:Comment.:~");
+        testToken(statement.get(2), ":");
+        testToken(statement.get(3), "Integer");
+    }
+
+    @Test
+    @Order(19)
+    public void testLexer_StringAnalysis_CommentAfterTypeLabel() {
+        List<String> statement = lexSingleStatementAsTokens("foo:~:Comment.:~Integer", 4);
+        testToken(statement.get(0), "foo");
+        testToken(statement.get(1), ":");
+        testToken(statement.get(2), "~:Comment.:~");
+        testToken(statement.get(3), "Integer");
+    }
+
+    @Test
+    @Order(20)
+    public void testLexer_StringAnalysis_MultiLineCommentBeforePrintStatement() {
+        List<List<String>> statements = lexAsTokens("~:Multi-line\ncomment.:~:", 2, tokenCounts(1, 2));
+        testToken(statements.get(0).get(0), "~:Multi-line");
+        testToken(statements.get(1).get(0), "comment.:~");
+        testToken(statements.get(1).get(1), ":");
+    }
+
+    @Test
+    @Order(21)
+    public void testLexer_StringAnalysis_MultiLineCommentAfterPrintStatement() {
+        List<List<String>> statements = lexAsTokens(":~:Multi-line\ncomment.:~", 2, tokenCounts(2, 1));
+        testToken(statements.get(0).get(0), ":");
+        testToken(statements.get(0).get(1), "~:Multi-line");
+        testToken(statements.get(1).get(0), "comment.:~");
+    }
+
+    @Test
+    @Order(22)
+    public void testLexer_StringAnalysis_MultiLineCommentBeforeTypeLabel() {
+        List<List<String>> statements = lexAsTokens("foo~:Multi-line\ncomment.:~:Integer", 2, tokenCounts(2, 3));
+        testToken(statements.get(0).get(0), "foo");
+        testToken(statements.get(0).get(1), "~:Multi-line");
+        testToken(statements.get(1).get(0), "comment.:~");
+        testToken(statements.get(1).get(1), ":");
+        testToken(statements.get(1).get(2), "Integer");
+    }
+
+    @Test
+    @Order(23)
+    public void testLexer_StringAnalysis_MultiLineCommentAfterTypeLabel() {
+        List<List<String>> statements = lexAsTokens("foo:~:Multi-line\ncomment.:~Integer", 2, tokenCounts(3, 2));
+        testToken(statements.get(0).get(0), "foo");
+        testToken(statements.get(0).get(1), ":");
+        testToken(statements.get(0).get(2), "~:Multi-line");
+        testToken(statements.get(1).get(0), "comment.:~");
+        testToken(statements.get(1).get(1), "Integer");
+    }
+
+    @Test
+    @Order(24)
+    public void testLexer_StringAnalysis_TwoSequentialComments() {
+        List<String> statement = lexSingleStatementAsTokens("~:Comment 1.:~~:Comment 2.:~", 2);
+        testToken(statement.get(0), "~:Comment 1.:~");
+        testToken(statement.get(1), "~:Comment 2.:~");
+    }
+
+    @Test
+    @Order(25)
+    public void testLexer_StringAnalysis_TwoSequentialMultiLineComments() {
+        String sourceString = "~:Multi-line\ncomment 1.:~~:Multi-line\ncomment 2.:~";
+        List<List<String>> statements = lexAsTokens(sourceString, 3, tokenCounts(1, 2, 1));
+        testToken(statements.get(0).get(0), "~:Multi-line");
+        testToken(statements.get(1).get(0), "comment 1.:~");
+        testToken(statements.get(1).get(1), "~:Multi-line");
+        testToken(statements.get(2).get(0), "comment 2.:~");
     }
 }
