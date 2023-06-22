@@ -106,6 +106,7 @@ public class Lexer {
     private int lineLength;
     private char nextChar;
 
+    List<String> lines;
     List<String> stringTokens;
     List<List<String>> statementsOfStringTokens;
 
@@ -186,6 +187,7 @@ public class Lexer {
         this.reader = reader;
         statementsOfStringTokens = new ArrayList<>();
         stringTokens = new ArrayList<>();
+        lines = new ArrayList<>();
 
         line = readNextLine();
         lineLength = atEndOfFile() ? 0 : line.length();
@@ -301,12 +303,17 @@ public class Lexer {
                 advanceToNextLine();
             }
         }
+        cacheLineData();
         return statementsOfStringTokens;
     }
 
     private String readNextLine() {
         try {
-            return reader.readLine();
+            String line = reader.readLine();
+            if (line != null) {
+                lines.add(line);
+            }
+            return line;
         } catch (IOException e) {
             String messageSuffix;
             if (currentFile != null) {
@@ -342,6 +349,13 @@ public class Lexer {
         if (!atEndOfFile()) {
             lineLength = line.length();
         }
+    }
+
+    private void cacheLineData() {
+        if (syntaxErrorReporter == null) {
+            syntaxErrorReporter = new SyntaxErrorReporter();
+        }
+        syntaxErrorReporter.addLinesForFile(currentFile, lines);
     }
 
     private void token() {
@@ -963,4 +977,6 @@ public class Lexer {
         }
         return sum;
     }
+
+
 }

@@ -38,7 +38,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.function.BiFunction;
 
 /**
  * Interpret the output of the Parser using a simple tree-walking approach.
@@ -47,7 +47,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     private static final Logger log = LogManager.getLogger(TreeWalkInterpreter.class);
 
     private File currentFile;
-    private List<List<AtonementCrystal>> lexedStatements;
+    private BiFunction<File, Integer, String> getLineFunction;
 
     /** Parent field of the rootEnvironment. */
     private AtonementField globalAtonementField;
@@ -61,12 +61,8 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         rootEnvironments = new HashMap<>();
     }
 
-    public void setLexedStatements(List<List<AtonementCrystal>> lexedStatements) {
-        this.lexedStatements = lexedStatements;
-    }
-
-    public void addLexedStatements(List<List<AtonementCrystal>> lexedStatements) {
-        this.lexedStatements = lexedStatements;
+    public void setGetLineFunction(BiFunction<File, Integer, String> getLineFunction) {
+        this.getLineFunction = getLineFunction;
     }
 
     public void interpret(File file, List<Statement> statements) {
@@ -358,8 +354,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
 
     private Vikari_RuntimeException internalRuntimeError(CoordinatePair location, String errorMessage) {
         int lineNumber = location.getRow();
-        List<AtonementCrystal> lexedLine = lexedStatements.get(lineNumber);
-        String line = lexedLine.stream().map(AtonementCrystal::getIdentifier).collect(Collectors.joining());
+        String line = getLineFunction.apply(currentFile, lineNumber);
         RuntimeError runtimeError = new RuntimeError(currentFile, location, line, errorMessage);
         return new Vikari_RuntimeException("Internal Error", runtimeError);
     }
@@ -396,7 +391,6 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
 
     public void clear() {
         currentFile = null;
-        lexedStatements = null;
         rootEnvironment = null;
         currentEnvironment = null;
     }

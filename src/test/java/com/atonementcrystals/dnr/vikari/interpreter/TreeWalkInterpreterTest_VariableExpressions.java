@@ -33,6 +33,7 @@ public class TreeWalkInterpreterTest_VariableExpressions {
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
+        interpreter.setGetLineFunction(syntaxErrorReporter::getLine);
 
         parser.setGlobalAtonementField(globalAtonementField);
         interpreter.setGlobalAtonementField(globalAtonementField);

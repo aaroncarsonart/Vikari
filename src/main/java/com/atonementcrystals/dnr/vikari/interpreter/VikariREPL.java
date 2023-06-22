@@ -56,11 +56,11 @@ public class VikariREPL {
         parser.setGlobalAtonementField(globalAtonementField);
         interpreter.setGlobalAtonementField(globalAtonementField);
         interpreter.establishRootEnvironment();
-        interpreter.setLexedStatements(new ArrayList<>());
 
         syntaxErrorReporter = new SyntaxErrorReporter();
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
+        interpreter.setGetLineFunction(syntaxErrorReporter::getLine);
     }
 
     /**
@@ -143,7 +143,6 @@ public class VikariREPL {
         // Execute the Vikari code statement(s).
         try {
             log.trace("interpret()");
-            this.interpreter.addLexedStatements(lexedStatements);
 
             for (Statement statement : parsedStatements) {
                 interpreter.execute(statement);

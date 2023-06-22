@@ -54,6 +54,7 @@ public class VikariProgram {
 
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
+        interpreter.setGetLineFunction(syntaxErrorReporter::getLine);
 
         replLexerResults = new ArrayList<>();
         replParserResults = new ArrayList<>();
@@ -239,8 +240,6 @@ public class VikariProgram {
         // -----------------------------
         // 3. Execute the resulting AST.
         // -----------------------------
-        List<List<AtonementCrystal>> lexedStatements = lexerResults.get(filePath);
-        interpreter.setLexedStatements(lexedStatements);
         List<Statement> parsedStatements = parserResults.get(filePath);
         interpreter.interpret(sourceFile, parsedStatements);
     }
@@ -254,8 +253,6 @@ public class VikariProgram {
         // -----------------------------
         // 3. Execute the resulting AST.
         // -----------------------------
-        List<List<AtonementCrystal>> lastReplLexerResults = replLexerResults.get(replLexerResults.size() - 1);
-        interpreter.setLexedStatements(lastReplLexerResults);
         interpreter.interpret(null, parsedStatements);
     }
 

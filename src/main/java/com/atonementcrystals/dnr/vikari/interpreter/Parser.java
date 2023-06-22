@@ -46,7 +46,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Parses the output of the Lexer into an abstract syntax tree consisting of
@@ -179,14 +178,9 @@ public class Parser {
         } catch (Vikari_ParserException e) {
             synchronize();
 
-            List<AtonementCrystal> lastVisitedLine = getLastVisitedLexedStatement();
-            String statementString = lastVisitedLine.stream()
-                    .map(AtonementCrystal::getIdentifier)
-                    .collect(Collectors.joining(""));
-
-            SyntaxErrorStatement syntaxErrorStatement = new SyntaxErrorStatement(statementString);
-            int errorLineNumber = statementNumber - 1;
-            syntaxErrorStatement.setLocation(new CoordinatePair(errorLineNumber, 0));
+            String line = syntaxErrorReporter.getLine(file, statementNumber);
+            SyntaxErrorStatement syntaxErrorStatement = new SyntaxErrorStatement(line);
+            syntaxErrorStatement.setLocation(new CoordinatePair(statementNumber, 0));
             return syntaxErrorStatement;
         }
     }
@@ -262,7 +256,7 @@ public class Parser {
         }
 
         if (!isAtEndOfStatement()) {
-            error(peek(), "Expected token(s) in variable declaration statement.");
+            error(peek(), "Unexpected token(s) in variable declaration statement.");
         }
 
         // Advance past an optional statement separator , crystal.
@@ -692,9 +686,9 @@ public class Parser {
     }
 
     private Vikari_ParserException error(CoordinatePair location, String errorMessage) {
-        List<AtonementCrystal> lastVisitedLine = getLastVisitedLexedStatement();
-        String lineString = lastVisitedLine.stream().map(AtonementCrystal::getIdentifier).collect(Collectors.joining());
-        SyntaxError syntaxError = new SyntaxError(file, location, lineString, errorMessage);
+        int lineNumber = location.getRow();
+        String line = syntaxErrorReporter.getLine(file, lineNumber);
+        SyntaxError syntaxError = new SyntaxError(file, location, line, errorMessage);
         syntaxErrorReporter.add(syntaxError);
         return new Vikari_ParserException(errorMessage);
     }

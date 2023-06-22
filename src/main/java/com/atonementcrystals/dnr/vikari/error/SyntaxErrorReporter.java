@@ -1,20 +1,26 @@
 package com.atonementcrystals.dnr.vikari.error;
 
+import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SyntaxErrorReporter {
     private static final Logger log = LogManager.getLogger(SyntaxErrorReporter.class);
 
     private List<SyntaxError> syntaxErrors;
+    private Map<File, List<String>> fileToLinesMap;
 
     public SyntaxErrorReporter() {
         this.syntaxErrors = new ArrayList<>();
+        this.fileToLinesMap = new HashMap<>();
     }
 
     public List<SyntaxError> getSyntaxErrors() {
@@ -62,5 +68,23 @@ public class SyntaxErrorReporter {
 
     public void clear() {
         syntaxErrors.clear();
+    }
+
+    public void addLinesForFile(File file, List<String> lines) {
+        if (fileToLinesMap.containsKey(file)) {
+            List<String> existingLines = fileToLinesMap.get(file);
+            existingLines.addAll(lines);
+        } else {
+            fileToLinesMap.put(file, lines);
+        }
+    }
+
+    public String getLine(File file, int lineNumber) {
+        if (fileToLinesMap.containsKey(file)) {
+            List<String> lines = fileToLinesMap.get(file);
+            return lines.get(lineNumber);
+        }
+        throw new SyntaxErrorReportingException("Internal Error: No line data mapped to file: " +
+                "\"" + file.getAbsolutePath() + "\"");
     }
 }

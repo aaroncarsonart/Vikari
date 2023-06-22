@@ -27,6 +27,7 @@ public class InterpreterTest_Utils {
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
+        interpreter.setGetLineFunction(syntaxErrorReporter::getLine);
 
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
@@ -38,29 +39,5 @@ public class InterpreterTest_Utils {
         Statement statement = parsedStatements.get(0);
         AtonementCrystal crystal = interpreter.execute(statement);
         TestUtils.testNumberCrystal(crystal, expectedValue, expectedClass);
-    }
-
-    /**
-     * Run a series of Vikari code statements, and get the final result of the final statement.
-     * @param sourceString The Vikari source code string to run.
-     * @return The result of evaluating the final statement.
-     */
-    public static AtonementCrystal executeVikariCode(String sourceString) {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-        TreeWalkInterpreter interpreter = new TreeWalkInterpreter();
-
-        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
-        parser.setSyntaxErrorReporter(syntaxErrorReporter);
-
-        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
-        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
-
-        AtonementCrystal crystal = null;
-        for (Statement statement : parsedStatements) {
-            crystal = interpreter.execute(statement);
-        }
-        return crystal;
     }
 }
