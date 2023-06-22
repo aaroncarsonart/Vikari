@@ -89,7 +89,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(1)
-    public void testVariableDeclaration_Basic() {
+    public void testTreeWalkInterpreter_VariableDeclaration_Basic() {
         String sourceString = "foo";
         lexParseAndInterpret(sourceString);
 
@@ -98,7 +98,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(2)
-    public void testVariableDeclaration_WithTypeLabel() {
+    public void testTreeWalkInterpreter_VariableDeclaration_WithTypeLabel() {
         String sourceString = "foo:Integer";
         lexParseAndInterpret(sourceString);
 
@@ -107,7 +107,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(3)
-    public void testVariableDeclaration_WithAssignment() {
+    public void testTreeWalkInterpreter_VariableDeclaration_WithAssignment() {
         String sourceString = "foo << 2";
         lexParseAndInterpret(sourceString);
 
@@ -116,7 +116,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(4)
-    public void testVariableDeclaration_WithTypeLabel_AndAssignment() {
+    public void testTreeWalkInterpreter_VariableDeclaration_WithTypeLabel_AndAssignment() {
         String sourceString = "foo:Integer << 2";
         lexParseAndInterpret(sourceString);
 
@@ -125,7 +125,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(5)
-    public void testVariableDeclaration_MultipleDeclarations_SingleLine() {
+    public void testTreeWalkInterpreter_VariableDeclaration_Multiple_SingleLine() {
         String sourceString = "foo,bar,baz";
         lexParseAndInterpret(sourceString);
 
@@ -136,7 +136,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(6)
-    public void testVariableDeclaration_MultipleDeclarations_SeparateLines() {
+    public void testTreeWalkInterpreter_VariableDeclaration_Multiple_SeparateLines() {
         String sourceString = "foo\nbar\nbaz";
         lexParseAndInterpret(sourceString);
 
@@ -147,7 +147,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(7)
-    public void testVariableDeclaration_MultipleDeclarations_SingleLine_WithTypeLabels() {
+    public void testTreeWalkInterpreter_VariableDeclaration_Multiple_SingleLine_WithTypeLabels() {
         String sourceString = "foo:Integer,bar:Integer,baz:Integer";
         lexParseAndInterpret(sourceString);
 
@@ -158,7 +158,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(8)
-    public void testVariableDeclaration_MultipleDeclarations_SeparateLines_WithTypeLabels() {
+    public void testTreeWalkInterpreter_VariableDeclaration_Multiple_SeparateLines_WithTypeLabels() {
         String sourceString = "foo:Integer\nbar:Integer\nbaz:Integer";
         lexParseAndInterpret(sourceString);
 
@@ -169,7 +169,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(9)
-    public void testVariableDeclaration_MultipleDeclarations_SingleLine_WithInitializerExpressions() {
+    public void testTreeWalkInterpreter_VariableDeclaration_Multiple_SingleLine_WithInitializerExpressions() {
         String sourceString = "foo << 2, bar << 3, baz << 4";
         lexParseAndInterpret(sourceString);
 
@@ -180,7 +180,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(10)
-    public void testVariableDeclaration_MultipleDeclarations_SeparateLines_WithInitializerExpressions() {
+    public void testTreeWalkInterpreter_VariableDeclaration_Multiple_SeparateLines_WithInitializerExpressions() {
         String sourceString = "foo << 2\nbar << 3\nbaz << 4";
         lexParseAndInterpret(sourceString);
 
@@ -191,7 +191,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(11)
-    public void testVariableDeclaration_MultipleDeclarations_SingleLine_WithTypeLabels_AndInitializerExpressions() {
+    public void testTreeWalkInterpreter_VariableDeclaration_Multiple_SingleLine_WithTypeLabels_AndInitializerExpressions() {
         String sourceString = "foo:Integer << 2, bar:Integer << 3, baz:Integer << 4";
         lexParseAndInterpret(sourceString);
 
@@ -202,7 +202,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(12)
-    public void testVariableDeclaration_MultipleDeclarations_SeparateLines_WithTypeLabels_AndInitializerExpressions() {
+    public void testTreeWalkInterpreter_VariableDeclaration_Multiple_SeparateLines_WithTypeLabels_AndInitializerExpressions() {
         String sourceString = "foo:Integer << 2\nbar:Integer << 3\nbaz:Integer << 4";
         lexParseAndInterpret(sourceString);
 
@@ -213,7 +213,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(13)
-    public void testVariableDeclaration_AllNumericTypes() {
+    public void testTreeWalkInterpreter_VariableDeclaration_AllNumericTypes() {
         String sourceString = """
                 a:Integer
                 b:Long
@@ -234,7 +234,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(14)
-    public void testVariableDeclaration_AllNumericTypes_WithInitializer() {
+    public void testTreeWalkInterpreter_VariableDeclaration_AllNumericTypes_WithInitializer() {
         String sourceString = """
                 a:Integer << 1
                 b:Long << 2L
@@ -257,7 +257,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(15)
-    public void testVariableDeclaration_NumericUpcasts() {
+    public void testTreeWalkInterpreter_VariableDeclaration_NumericUpcasts() {
         String sourceString = """
                 a:Long << 1
                 b:BigInteger << 2
@@ -298,7 +298,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(16)
-    public void testVariableDeclaration_NumericDowncasts() {
+    public void testTreeWalkInterpreter_VariableDeclaration_NumericDowncasts() {
         String sourceString = """
                 a:Integer << 1L
                 b:Integer << 2B
@@ -337,7 +337,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(17)
-    public void testVariableDeclaration_NumericDowncasts_TruncatedValues_Overflow() {
+    public void testTreeWalkInterpreter_VariableDeclaration_NumericDowncasts_TruncatedValues_Overflow() {
         String sourceString = """
                 a:Integer << 3000000000L
                 b:Integer << 3000000000B
@@ -376,7 +376,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(18)
-    public void testVariableDeclaration_NumericDowncasts_TruncatedValues_Underflow() {
+    public void testTreeWalkInterpreter_VariableDeclaration_NumericDowncasts_TruncatedValues_Underflow() {
         String sourceString = """
                 a:Integer << -3000000000L
                 b:Integer << -3000000000B
@@ -415,7 +415,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
     @Test
     @Order(19)
-    public void testVariableDeclaration_AssignmentToParentTypes() {
+    public void testTreeWalkInterpreter_VariableDeclaration_AssignmentToParentTypes() {
         String sourceString = """
                 a << 1
                 b:AtonementCrystal << 2

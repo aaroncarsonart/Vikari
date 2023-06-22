@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.stringanalysis;
+package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
@@ -20,11 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * all for the same source string.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_SyntaxErrors {
+public class LexerTest_StringTokens_SyntaxErrors {
 
     @Test
     @Order(1)
-    public void testSyntaxErrorCombos_multipleBacktickQuotations_andCaptureQuotation() {
+    public void testLexer_StringTokens_SyntaxErrorCombos_multipleBacktickQuotations_andCaptureQuotation() {
         String sourceString = "a << `foo\n" +
                               "`z\tz` << a * 2\n" +
                               "bar:String << `  `\n" +
@@ -114,7 +114,7 @@ public class LexerTest_SyntaxErrors {
 
     @Test
     @Order(2)
-    public void testSyntaxErrorCombos_multipleErrorsOnSameLine_andCommentSuffix() {
+    public void testLexer_StringTokens_SyntaxErrorCombos_multipleErrorsOnSameLine_andCommentSuffix() {
         String sourceString = "`z\tz` << `foo\n" +
                               "~:Unclosed comment.";
 
@@ -185,7 +185,7 @@ public class LexerTest_SyntaxErrors {
 
     @Test
     @Order(3)
-    public void testSyntaxErrors_tabIndentedCode() {
+    public void testLexer_StringTokens_SyntaxErrors_tabIndentedCode() {
         String sourceString = "\t\t`z` << `foo\n" +
                               "\t\t~:Unclosed comment.";
 

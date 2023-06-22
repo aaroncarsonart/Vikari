@@ -34,7 +34,7 @@ public class ParserTest_ExpressionStatements {
 
     @Test
     @Order(1)
-    public void testMultipleStatements_Simple() {
+    public void testParser_Statement_MultipleStatements_Simple() {
         String sourceString = "22\n7";
 
         Lexer lexer = new Lexer();
@@ -100,7 +100,7 @@ public class ParserTest_ExpressionStatements {
 
     @Test
     @Order(2)
-    public void testMultipleStatements_Arithmetic() {
+    public void testParser_Statement_MultipleStatements_Arithmetic() {
         String sourceString = "3 - 7\n" +
                               "12 * 24";
 
@@ -203,7 +203,7 @@ public class ParserTest_ExpressionStatements {
 
     @Test
     @Order(3)
-    public void testMultipleStatements_MixOfExpressionTypes() {
+    public void testParser_Statement_MultipleStatements_MixOfExpressionTypes() {
         String sourceString = "2 - 7\n" +
                               "5\n" +
                               "[22 / 3] + 2\n" +

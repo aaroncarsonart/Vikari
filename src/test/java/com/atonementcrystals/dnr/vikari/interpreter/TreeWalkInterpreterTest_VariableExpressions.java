@@ -85,7 +85,7 @@ public class TreeWalkInterpreterTest_VariableExpressions {
 
     @Test
     @Order(1)
-    public void testVariableExpression_InVariableDeclaration() {
+    public void testTreeWalkInterpreter_VariableExpression_InVariableDeclaration() {
         String sourceString = "foo << 2, bar << foo";
         lexParseAndInterpret(sourceString);
 
@@ -95,7 +95,7 @@ public class TreeWalkInterpreterTest_VariableExpressions {
 
     @Test
     @Order(2)
-    public void testVariableExpression_InArithmeticExpression() {
+    public void testTreeWalkInterpreter_VariableExpression_InArithmeticExpression() {
         String sourceString = """
             foo << 22
             a << foo + 7
@@ -116,7 +116,7 @@ public class TreeWalkInterpreterTest_VariableExpressions {
 
     @Test
     @Order(3)
-    public void testVariableExpression_InArithmeticExpression_NumericConversions() {
+    public void testTreeWalkInterpreter_VariableExpression_InArithmeticExpression_NumericConversions() {
         String sourceString = """
             foo << 22L
             a:Number << foo + 7
@@ -143,7 +143,7 @@ public class TreeWalkInterpreterTest_VariableExpressions {
 
     @Test
     @Order(4)
-    public void testVariableExpression_InArithmeticExpression_NumericConversions_LeftAssignment() {
+    public void testTreeWalkInterpreter_VariableExpression_InArithmeticExpression_NumericConversions_LeftAssignment() {
         String sourceString = """
             foo << 22L
             a:Number
@@ -178,7 +178,7 @@ public class TreeWalkInterpreterTest_VariableExpressions {
 
     @Test
     @Order(5)
-    public void testVariableExpression_InArithmeticExpression_NumericConversions_RightAssignment() {
+    public void testTreeWalkInterpreter_VariableExpression_InArithmeticExpression_NumericConversions_RightAssignment() {
         String sourceString = """
             foo << 22L
             a:Number
@@ -213,7 +213,7 @@ public class TreeWalkInterpreterTest_VariableExpressions {
 
     @Test
     @Order(6)
-    public void testVariableExpression_InArithmeticExpression_NumericConversions_ComplexArithmetic() {
+    public void testTreeWalkInterpreter_VariableExpression_InArithmeticExpression_NumericConversions_ComplexArithmetic() {
         String sourceString = """
             a:Integer << 1
             b:Long << 2

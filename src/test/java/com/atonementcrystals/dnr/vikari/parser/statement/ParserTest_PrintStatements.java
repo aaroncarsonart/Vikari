@@ -32,7 +32,7 @@ public class ParserTest_PrintStatements {
 
     @Test
     @Order(1)
-    public void testEmptyPrintStatement() {
+    public void testParser_Statement_EmptyPrintStatement() {
         String sourceString = ":";
 
         Lexer lexer = new Lexer();
@@ -72,7 +72,7 @@ public class ParserTest_PrintStatements {
 
     @Test
     @Order(2)
-    public void testSimplePrintStatement() {
+    public void testParser_Statement_SimplePrintStatement() {
         String sourceString = ":2";
 
         Lexer lexer = new Lexer();
@@ -115,7 +115,7 @@ public class ParserTest_PrintStatements {
 
     @Test
     @Order(3)
-    public void testPrintStatement_WithNewline() {
+    public void testParser_Statement_PrintStatement_WithNewline() {
         String sourceString = ":12:";
 
         Lexer lexer = new Lexer();
@@ -163,7 +163,7 @@ public class ParserTest_PrintStatements {
 
     @Test
     @Order(4)
-    public void testPrintStatement_TermExpression() {
+    public void testParser_Statement_PrintStatement_TermExpression() {
         String sourceString = ":12 + 24:";
 
         Lexer lexer = new Lexer();
@@ -209,7 +209,7 @@ public class ParserTest_PrintStatements {
 
     @Test
     @Order(5)
-    public void testPrintStatement_ThreePrintExpressions() {
+    public void testParser_Statement_PrintStatement_ThreePrintExpressions() {
         String sourceString = ":1:2:3";
 
         Lexer lexer = new Lexer();
@@ -255,7 +255,7 @@ public class ParserTest_PrintStatements {
 
     @Test
     @Order(6)
-    public void testPrintStatement_Grouping() {
+    public void testParser_Statement_PrintStatement_Grouping() {
         String sourceString = ":[3 * 2]";
 
         Lexer lexer = new Lexer();
@@ -300,7 +300,7 @@ public class ParserTest_PrintStatements {
 
     @Test
     @Order(7)
-    public void testPrintStatement_MultipleLines() {
+    public void testParser_Statement_PrintStatement_MultipleLines() {
         String sourceString = ":1:2 - 3:\n" +
                               ":[12 / 7]:\n" +
                               ":4:5:6\n" +

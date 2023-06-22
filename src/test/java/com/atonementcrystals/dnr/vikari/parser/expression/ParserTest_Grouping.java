@@ -32,7 +32,7 @@ public class ParserTest_Grouping {
 
     @Test
     @Order(1)
-    public void testGrouping_IntegerLiteral() {
+    public void testParser_Expression_Grouping_IntegerLiteral() {
         String sourceString = "[5]";
 
         Lexer lexer = new Lexer();
@@ -75,7 +75,7 @@ public class ParserTest_Grouping {
 
     @Test
     @Order(2)
-    public void testGrouping_BinaryExpression() {
+    public void testParser_Expression_Grouping_BinaryExpression() {
         String sourceString = "[22 / 7]";
 
         Lexer lexer = new Lexer();
@@ -134,7 +134,7 @@ public class ParserTest_Grouping {
 
     @Test
     @Order(3)
-    public void testGrouping_MissingOpeningSquareBracket() {
+    public void testParser_Expression_Grouping_MissingOpeningSquareBracket() {
         String sourceString = "22 / 7]";
 
         Lexer lexer = new Lexer();
@@ -161,7 +161,7 @@ public class ParserTest_Grouping {
 
     @Test
     @Order(4)
-    public void testGrouping_MissingClosingSquareBracket_Factor() {
+    public void testParser_Expression_Grouping_MissingClosingSquareBracket_Factor() {
         String sourceString = "[22 / 7";
 
         Lexer lexer = new Lexer();
@@ -188,7 +188,7 @@ public class ParserTest_Grouping {
 
     @Test
     @Order(5)
-    public void testGrouping_MissingClosingSquareBracket_Term() {
+    public void testParser_Expression_Grouping_MissingClosingSquareBracket_Term() {
         String sourceString = "[3 - 2";
 
         Lexer lexer = new Lexer();
@@ -215,7 +215,7 @@ public class ParserTest_Grouping {
 
     @Test
     @Order(6)
-    public void testGrouping_EmptyGrouping() {
+    public void testParser_Expression_Grouping_EmptyGrouping() {
         String sourceString = "[]";
 
         Lexer lexer = new Lexer();
@@ -242,7 +242,7 @@ public class ParserTest_Grouping {
 
     @Test
     @Order(7)
-    public void testGrouping_BareSingleBrackets() {
+    public void testParser_Expression_Grouping_BareSingleBrackets() {
         List<String> sourceStrings = List.of("[", "]");
         for (String sourceString : sourceStrings) {
 
@@ -271,7 +271,7 @@ public class ParserTest_Grouping {
 
     @Test
     @Order(8)
-    public void testGrouping_MissingOpeningSquareBracket_twoLines() {
+    public void testParser_Expression_Grouping_MissingOpeningSquareBracket_twoLines() {
         String sourceString = "3 - 2]\n" +
                               "3 - 2]";
 
@@ -302,7 +302,7 @@ public class ParserTest_Grouping {
 
     @Test
     @Order(9)
-    public void testGrouping_MissingClosingSquareBracket_twoLines() {
+    public void testParser_Expression_Grouping_MissingClosingSquareBracket_twoLines() {
         String sourceString = "[3 - 2\n" +
                               "[3 - 2";
 

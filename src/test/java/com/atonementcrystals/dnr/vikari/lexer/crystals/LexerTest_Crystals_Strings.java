@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.crystal;
+package com.atonementcrystals.dnr.vikari.lexer.crystals;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
@@ -11,7 +11,7 @@ import java.util.List;
 import static com.atonementcrystals.dnr.vikari.TestUtils.*;
 import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.*;
 
-public class LexerTest_ConvertToCrystals_Strings {
+public class LexerTest_Crystals_Strings {
 
     @Test
     @Order(1)

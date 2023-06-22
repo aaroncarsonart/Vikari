@@ -65,73 +65,73 @@ public class TreeWalkInterpreterTest_StatementSeparator {
 
     @Test
     @Order(1)
-    public void testPrintExpression_Empty() {
+    public void testTreeWalkInterpreter_StatementSeparator_PrintExpression_Empty() {
         testPrintStatement(":,", "\n");
     }
 
     @Test
     @Order(2)
-    public void testPrintExpression_Simple() {
+    public void testTreeWalkInterpreter_StatementSeparator_PrintExpression_Simple() {
         testPrintStatement(":5,", "5");
     }
 
     @Test
     @Order(3)
-    public void testPrintExpression_Chained() {
+    public void testTreeWalkInterpreter_StatementSeparator_PrintExpression_Chained() {
         testPrintStatement(":5,:3,:7", "537");
     }
 
     @Test
     @Order(4)
-    public void testPrintlnExpression_Simple() {
+    public void testTreeWalkInterpreter_StatementSeparator_PrintlnExpression_Simple() {
         testPrintStatement(":5,:", "5\n");
     }
 
     @Test
     @Order(5)
-    public void testPrintlnExpression_Chained() {
+    public void testTreeWalkInterpreter_StatementSeparator_PrintlnExpression_Chained() {
         testPrintStatement(":5,:3,:7,:", "537\n");
     }
 
     @Test
     @Order(6)
-    public void testPrintExpression_BinaryExpression() {
+    public void testTreeWalkInterpreter_StatementSeparator_PrintExpression_BinaryExpression() {
         testPrintStatement(":5 + 3,", "8");
     }
 
     @Test
     @Order(7)
-    public void testPrintlnExpression_BinaryExpression() {
+    public void testTreeWalkInterpreter_StatementSeparator_PrintlnExpression_BinaryExpression() {
         testPrintStatement(":5 + 3,:,", "8\n");
     }
 
     @Test
     @Order(8)
-    public void testPrintlnExpression_BinaryExpression_Chained() {
+    public void testTreeWalkInterpreter_StatementSeparator_PrintlnExpression_BinaryExpression_Chained() {
         testPrintStatement(":5 + 3:7 - 2:,", "85\n");
     }
 
     @Test
     @Order(9)
-    public void testPrintExpression_MultiLine() {
+    public void testTreeWalkInterpreter_StatementSeparator_PrintExpression_MultiLine() {
         testPrintStatement(":5 + 3,\n:7 - 2,", "85");
     }
 
     @Test
     @Order(10)
-    public void testPrintlnExpression_MultiLine() {
+    public void testTreeWalkInterpreter_StatementSeparator_PrintlnExpression_MultiLine() {
         testPrintStatement(":5 + 3,:\n:7 - 2,:,", "8\n5\n");
     }
 
     @Test
     @Order(11)
-    public void testPrintExpression_Chained_MultiLine() {
+    public void testTreeWalkInterpreter_StatementSeparator_PrintExpression_Chained_MultiLine() {
         testPrintStatement(":5 + 3,\n:7 - 2,\n:\n:22,:7,", "85\n227");
     }
 
     @Test
     @Order(12)
-    public void testPrintlnExpression_Chained_MultiLine() {
+    public void testTreeWalkInterpreter_StatementSeparator_PrintlnExpression_Chained_MultiLine() {
         testPrintStatement(":5 + 3,:,\n:7 - 2,:,\n:,\n:22,:7,:,", "8\n5\n\n227\n");
     }
 }

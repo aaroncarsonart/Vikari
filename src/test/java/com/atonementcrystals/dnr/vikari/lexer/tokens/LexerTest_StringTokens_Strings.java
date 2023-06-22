@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.stringanalysis;
+package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
@@ -18,12 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test that string literal identifiers (i.e. ``foo``) are properly tokenized by the Lexer.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_Strings {
+public class LexerTest_StringTokens_Strings {
     private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test
     @Order(1)
-    public void testLexer_StringAnalysis_CaptureQuotations_BasicStringLiteral() {
+    public void testLexer_StringTokens_CaptureQuotations_BasicStringLiteral() {
         String sourceString = "``a:Integer << 2, :a + 5, _``";
 
         Lexer lexer = new Lexer();
@@ -46,7 +46,7 @@ public class LexerTest_Strings {
 
     @Test
     @Order(2)
-    public void testLexer_StringAnalysis_CaptureQuotations_BasicStringLiteralAssignment() {
+    public void testLexer_StringTokens_CaptureQuotations_BasicStringLiteralAssignment() {
         String sourceString = "a << ``b:Integer << 2, :b + 5, _``";
 
         Lexer lexer = new Lexer();
@@ -69,7 +69,7 @@ public class LexerTest_Strings {
 
     @Test
     @Order(3)
-    public void testLexer_StringAnalysis_CaptureQuotations_BasicTwoLineString() {
+    public void testLexer_StringTokens_CaptureQuotations_BasicTwoLineString() {
         String sourceString = "``This is a string which spans \n" +
                                 "across two individual lines.``";
 
@@ -105,7 +105,7 @@ public class LexerTest_Strings {
 
     @Test
     @Order(4)
-    public void testLexer_StringAnalysis_CaptureQuotations_BasicThreeLineString() {
+    public void testLexer_StringTokens_CaptureQuotations_BasicThreeLineString() {
         String sourceString = "``This string needs to span \n" +
                 "across 3 lines. So I'm going to \n" +
                 "ensure that it most certainly does.``";
@@ -153,7 +153,7 @@ public class LexerTest_Strings {
 
     @Test
     @Order(5)
-    public void testLexer_StringAnalysis_CaptureQuotations_MultiLineStringAfterCodeStatement() {
+    public void testLexer_StringTokens_CaptureQuotations_MultiLineStringAfterCodeStatement() {
         String sourceString = "foo << ``This is a string being assigned \n" +
                 "to an identifier named: `foo`.``";
 
@@ -189,7 +189,7 @@ public class LexerTest_Strings {
 
     @Test
     @Order(6)
-    public void testLexer_StringAnalysis_CaptureQuotations_StringLiteralContainingCodeWithOtherEnclosures() {
+    public void testLexer_StringTokens_CaptureQuotations_StringLiteralContainingCodeWithOtherEnclosures() {
         String sourceString = "foo << ``{bar} << 2, :foo.`baz`, buzz << _``";
 
         Lexer lexer = new Lexer();
@@ -212,7 +212,7 @@ public class LexerTest_Strings {
 
     @Test
     @Order(7)
-    public void testLexer_StringAnalysis_CaptureQuotations_StringLiteralContainingCodeAcrossMultipleLines() {
+    public void testLexer_StringTokens_CaptureQuotations_StringLiteralContainingCodeAcrossMultipleLines() {
         String sourceString = "function << () :: ``{foo} << *\n" +
                 "{bar} << 2\n" +
                 ":foo.`baz`\n" +
@@ -272,7 +272,7 @@ public class LexerTest_Strings {
 
     @Test
     @Order(8)
-    public void testLexer_StringAnalysis_CaptureQuotations_ErrorHandlingForUnclosedString_SingleLine() {
+    public void testLexer_StringTokens_CaptureQuotations_ErrorHandlingForUnclosedString_SingleLine() {
         String sourceString = "``This is a malformed string literal.";
 
         Lexer lexer = new Lexer();
@@ -308,7 +308,7 @@ public class LexerTest_Strings {
 
     @Test
     @Order(9)
-    public void testLexer_StringAnalysis_CaptureQuotations_ErrorHandlingForUnclosedString_MultiLine() {
+    public void testLexer_StringTokens_CaptureQuotations_ErrorHandlingForUnclosedString_MultiLine() {
         String sourceString = "``This is a malformed string literal \n" +
                 "because it has no ending capture quotation!";
 

@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.crystal;
+package com.atonementcrystals.dnr.vikari.lexer.crystals;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
@@ -19,11 +19,11 @@ import java.util.List;
 import static com.atonementcrystals.dnr.vikari.TestUtils.*;
 import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.*;
 
-public class LexerTest_ConvertToCrystals_InvalidCharacters {
+public class LexerTest_Crystals_InvalidCharacters {
 
     @Test
     @Order(1)
-    public void invalidCharacters_SingleInvalidCharacters() {
+    public void testLexer_Crystals_InvalidCharacters_SingleInvalidCharacters() {
         String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
                 "ç√∫˜µ≤≥÷¸˛Ç◊ı˜Â¯˘¿";
 
@@ -40,7 +40,7 @@ public class LexerTest_ConvertToCrystals_InvalidCharacters {
 
     @Test
     @Order(2)
-    public void invalidCharacters_SingleLargeErrorToken() {
+    public void testLexer_Crystals_InvalidCharacters_SingleLargeErrorToken() {
         String sourceString = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈ç√∫˜µ≤≥÷¸˛Ç" +
                 "◊ı˜Â¯˘¿";
 
@@ -53,7 +53,7 @@ public class LexerTest_ConvertToCrystals_InvalidCharacters {
 
     @Test
     @Order(3)
-    public void invalidCharacters_TestMultipleLargeTokens() {
+    public void testLexer_Crystals_InvalidCharacters_TestMultipleLargeTokens() {
         String invalidToken1 = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°";
         String invalidToken3 = "·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´";
         String invalidToken5 = "ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æ";
@@ -98,7 +98,7 @@ public class LexerTest_ConvertToCrystals_InvalidCharacters {
 
     @Test
     @Order(4)
-    public void invalidCharacters_Crystals_AsCharacterLiteral() {
+    public void testLexer_Crystals_InvalidCharacters_Crystals_AsCharacterLiteral() {
         String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
                 "ç√∫˜µ≤≥÷¸˛Ç◊ı˜Â¯˘¿";
 
@@ -115,7 +115,7 @@ public class LexerTest_ConvertToCrystals_InvalidCharacters {
 
     @Test
     @Order(5)
-    public void invalidCharacters_AsBacktickQuotedIdentifiers() {
+    public void testLexer_Crystals_InvalidCharacters_AsBacktickQuotedIdentifiers() {
         String token1 = "`¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°`";
         String token3 = "`·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´`";
         String token5 = "`ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æ`";
@@ -154,7 +154,7 @@ public class LexerTest_ConvertToCrystals_InvalidCharacters {
 
     @Test
     @Order(6)
-    public void invalidCharacters_AsBacktickQuotedIdentifiers_MixedWithValidCharacters() {
+    public void testLexer_Crystals_InvalidCharacters_AsBacktickQuotedIdentifiers_MixedWithValidCharacters() {
         String token1 = "`abc ¡™£¢ def ∞§¶• ghi`";
         String token3 = "`·‚—± jkl œ∑´® mno †¥¨ˆ`";
         String token5 = "`ˇ123 Á¨ˆØ 456 ∏”’» 7890`";
@@ -193,7 +193,7 @@ public class LexerTest_ConvertToCrystals_InvalidCharacters {
 
     @Test
     @Order(7)
-    public void invalidCharacters_Crystals_SingleCharacterAsStringLiteral() {
+    public void testLexer_Crystals_InvalidCharacters_Crystals_SingleCharacterAsStringLiteral() {
         String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
                 "ç√∫˜µ≤≥÷¸˛Ç◊ı˜Â¯˘¿";
 
@@ -208,7 +208,7 @@ public class LexerTest_ConvertToCrystals_InvalidCharacters {
 
     @Test
     @Order(8)
-    public void invalidCharacters_AsStringLiterals() {
+    public void testLexer_Crystals_InvalidCharacters_AsStringLiterals() {
         String token1 = "``¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°``";
         String token3 = "``·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´``";
         String token5 = "``ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æ``";
@@ -247,7 +247,7 @@ public class LexerTest_ConvertToCrystals_InvalidCharacters {
 
     @Test
     @Order(9)
-    public void invalidCharacters_AsStringLiterals_MixedWithValidCharacters() {
+    public void testLexer_Crystals_InvalidCharacters_AsStringLiterals_MixedWithValidCharacters() {
         String token1 = "``abc ¡™£¢ def ∞§¶• ghi``";
         String token3 = "``·‚—± jkl œ∑´® mno †¥¨ˆ``";
         String token5 = "``ˇ123 Á¨ˆØ 456 ∏”’» 7890``";

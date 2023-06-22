@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.crystal;
+package com.atonementcrystals.dnr.vikari.lexer.crystals;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
@@ -8,7 +8,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCr
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.WhitespaceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.LeftSquareBracketCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.RightSquareBracketCrystal;
-import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -21,11 +20,11 @@ import static com.atonementcrystals.dnr.vikari.TestUtils.testCrystal;
 import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_ConvertToCrystals_BreakOperator {
+public class LexerTest_Crystals_BreakOperator {
 
     @Test
     @Order(1)
-    public void lexerTest_BreakOperator() {
+    public void testLexer_Crystals_BreakOperator() {
         String sourceString = "vv 2";
 
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 3);
@@ -40,7 +39,7 @@ public class LexerTest_ConvertToCrystals_BreakOperator {
      */
     @Test
     @Order(2)
-    public void lexerTest_BreakOperator_WithoutSpaces() {
+    public void testLexer_Crystals_BreakOperator_WithoutSpaces() {
         List<String> sourceStrings = List.of("vv2", "vv2a", "avv", "avv2", "avv2a", "a2vv2a");
         for (String sourceString : sourceStrings) {
             List<AtonementCrystal> statement = lexSingleStatement(sourceString, 1);
@@ -50,7 +49,7 @@ public class LexerTest_ConvertToCrystals_BreakOperator {
 
     @Test
     @Order(3)
-    public void lexerTest_BreakOperator_ArithmeticExpression() {
+    public void testLexer_Crystals_BreakOperator_ArithmeticExpression() {
         String sourceString = "vv 2 + 5";
 
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 7);
@@ -66,7 +65,7 @@ public class LexerTest_ConvertToCrystals_BreakOperator {
 
     @Test
     @Order(4)
-    public void lexerTest_BreakOperator_WithBrackets() {
+    public void testLexer_Crystals_BreakOperator_WithBrackets() {
         String sourceString = "vv [2]";
 
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 5);
@@ -80,7 +79,7 @@ public class LexerTest_ConvertToCrystals_BreakOperator {
 
     @Test
     @Order(5)
-    public void lexerTest_BreakOperator_ArithmeticExpressionWithBrackets() {
+    public void testLexer_Crystals_BreakOperator_ArithmeticExpressionWithBrackets() {
         String sourceString = "vv [2 + 5]";
 
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 9);
@@ -98,7 +97,7 @@ public class LexerTest_ConvertToCrystals_BreakOperator {
 
     @Test
     @Order(6)
-    public void lexerTest_BreakOperator_WithBrackets_NoSpaces() {
+    public void testLexer_Crystals_BreakOperator_WithBrackets_NoSpaces() {
         String sourceString = "vv[2]";
 
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 4);
@@ -111,7 +110,7 @@ public class LexerTest_ConvertToCrystals_BreakOperator {
 
     @Test
     @Order(7)
-    public void lexerTest_BreakOperator_ArithmeticExpressionWithBrackets_NoSpaces() {
+    public void testLexer_Crystals_BreakOperator_ArithmeticExpressionWithBrackets_NoSpaces() {
         String sourceString = "vv[2+5]";
 
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 6);

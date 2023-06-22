@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.crystal;
+package com.atonementcrystals.dnr.vikari.lexer.crystals;
 
 import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * types are used for when the results are passed to the parser.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_ConvertToCrystals_SyntaxErrors {
+public class LexerTest_Crystals_SyntaxErrors {
     private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test
@@ -1125,7 +1125,7 @@ public class LexerTest_ConvertToCrystals_SyntaxErrors {
 
     @Test
     @Order(11)
-    public void lexerTest_Crystals_SyntaxErrorCombos_multipleBacktickQuotations_andCaptureQuotation() {
+    public void testLexer_Crystals_SyntaxErrorCombos_multipleBacktickQuotations_andCaptureQuotation() {
         String sourceString = "a << `foo\n" +
                               "`z\tz` << a * 2\n" +
                               "bar:String << `  `\n" +
@@ -1510,7 +1510,7 @@ public class LexerTest_ConvertToCrystals_SyntaxErrors {
 
     @Test
     @Order(12)
-    public void lexerTest_Crystals_SyntaxErrorCombos_multipleErrorsOnSameLine_andCommentSuffix() {
+    public void testLexer_Crystals_SyntaxErrorCombos_multipleErrorsOnSameLine_andCommentSuffix() {
         String sourceString = "`z\tz` << `foo\n" +
                               "~:Unclosed comment.";
 
@@ -1627,7 +1627,7 @@ public class LexerTest_ConvertToCrystals_SyntaxErrors {
 
     @Test
     @Order(13)
-    public void lexerTest_Crystals_SyntaxErrors_tabIndentedCode() {
+    public void testLexer_Crystals_SyntaxErrors_tabIndentedCode() {
         String sourceString = "\t\t`z` << `foo\n" +
                               "\t\t~:Unclosed comment.";
 
@@ -1773,7 +1773,7 @@ public class LexerTest_ConvertToCrystals_SyntaxErrors {
 
     @Test
     @Order(14)
-    public void lexerTest_Crystals_SyntaxErrors_invalidIdentifier_LeadingDigit() {
+    public void testLexer_Crystals_SyntaxErrors_invalidIdentifier_LeadingDigit() {
         String sourceString = "3a";
 
         Lexer lexer = new Lexer();
@@ -1832,7 +1832,7 @@ public class LexerTest_ConvertToCrystals_SyntaxErrors {
      */
     @Test
     @Order(15)
-    public void lexerTest_Crystals_SyntaxErrors_invalidIdentifier_UnclosedBacktick() {
+    public void testLexer_Crystals_SyntaxErrors_invalidIdentifier_UnclosedBacktick() {
         String sourceString = "`b";
 
         Lexer lexer = new Lexer();
@@ -1880,7 +1880,7 @@ public class LexerTest_ConvertToCrystals_SyntaxErrors {
      */
     @Test
     @Order(16)
-    public void lexerTest_Crystals_SyntaxErrors_SingleBacktick() {
+    public void testLexer_Crystals_SyntaxErrors_SingleBacktick() {
         String sourceString = "`";
 
         Lexer lexer = new Lexer();

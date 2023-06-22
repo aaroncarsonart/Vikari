@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.crystal;
+package com.atonementcrystals.dnr.vikari.lexer.crystals;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigDecimalCrystal;
@@ -24,12 +24,12 @@ import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_ConvertToCrystals_Numbers {
+public class LexerTest_Crystals_Numbers {
     private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test
     @Order(1)
-    public void lexerTest_Numbers_Integer() {
+    public void testLexer_Crystals_Numbers_Integer() {
         String sourceString = "5";
 
         Lexer lexer = new Lexer();
@@ -68,7 +68,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(2)
-    public void lexerTest_Numbers_Long_LargeValue() {
+    public void testLexer_Crystals_Numbers_Long_LargeValue() {
         String sourceString = "4000000000";
 
         Lexer lexer = new Lexer();
@@ -107,7 +107,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(3)
-    public void lexerTest_Numbers_Long_WithSuffix1() {
+    public void testLexer_Crystals_Numbers_Long_WithSuffix1() {
         String sourceString = "22L";
 
         Lexer lexer = new Lexer();
@@ -146,7 +146,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(4)
-    public void lexerTest_Numbers_Long_WithSuffix2() {
+    public void testLexer_Crystals_Numbers_Long_WithSuffix2() {
         String sourceString = "47l";
 
         Lexer lexer = new Lexer();
@@ -185,7 +185,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(5)
-    public void lexerTest_Numbers_BigInteger_LargeValue() {
+    public void testLexer_Crystals_Numbers_BigInteger_LargeValue() {
         String sourceString = "10000000000000000000";
 
         Lexer lexer = new Lexer();
@@ -224,7 +224,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(6)
-    public void lexerTest_Numbers_BigInteger_WithSuffix1() {
+    public void testLexer_Crystals_Numbers_BigInteger_WithSuffix1() {
         String sourceString = "2B";
 
         Lexer lexer = new Lexer();
@@ -263,7 +263,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(7)
-    public void lexerTest_Numbers_BigInteger_WithSuffix2() {
+    public void testLexer_Crystals_Numbers_BigInteger_WithSuffix2() {
         String sourceString = "72b";
 
         Lexer lexer = new Lexer();
@@ -302,7 +302,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(8)
-    public void lexerTest_Numbers_Float_WithSuffix1() {
+    public void testLexer_Crystals_Numbers_Float_WithSuffix1() {
         String sourceString = "5.0F";
 
         Lexer lexer = new Lexer();
@@ -341,7 +341,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(9)
-    public void lexerTest_Numbers_Float_WithSuffix2() {
+    public void testLexer_Crystals_Numbers_Float_WithSuffix2() {
         String sourceString = "6.28f";
 
         Lexer lexer = new Lexer();
@@ -380,7 +380,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(10)
-    public void lexerTest_Numbers_Double() {
+    public void testLexer_Crystals_Numbers_Double() {
         String sourceString = "5.0";
 
         Lexer lexer = new Lexer();
@@ -419,7 +419,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(11)
-    public void lexerTest_Numbers_Double_WithSuffix1() {
+    public void testLexer_Crystals_Numbers_Double_WithSuffix1() {
         String sourceString = "5.0D";
 
         Lexer lexer = new Lexer();
@@ -458,7 +458,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(12)
-    public void lexerTest_Numbers_Double_WithSuffix2() {
+    public void testLexer_Crystals_Numbers_Double_WithSuffix2() {
         String sourceString = "3.14d";
 
         Lexer lexer = new Lexer();
@@ -497,7 +497,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(13)
-    public void lexerTest_Numbers_BigDecimal_WithSuffix1() {
+    public void testLexer_Crystals_Numbers_BigDecimal_WithSuffix1() {
         String sourceString = "5.0B";
 
         Lexer lexer = new Lexer();
@@ -536,7 +536,7 @@ public class LexerTest_ConvertToCrystals_Numbers {
 
     @Test
     @Order(14)
-    public void lexerTest_Numbers_BigDecimal_WithSuffix2() {
+    public void testLexer_Crystals_Numbers_BigDecimal_WithSuffix2() {
         String sourceString = "3.14b";
 
         Lexer lexer = new Lexer();

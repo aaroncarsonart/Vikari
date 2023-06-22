@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.stringanalysis;
+package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
@@ -20,12 +20,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test that single-backtick quoted identifiers (i.e. `foo`) are properly tokenized by the Lexer.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_Backticks {
+public class LexerTest_StringTokens_Backticks {
     private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test
     @Order(1)
-    public void testLexer_StringAnalysis_SingleBacktickQuotation_SingleCharacterIdentifer() {
+    public void testLexer_StringTokens_SingleBacktickQuotation_SingleCharacterIdentifer() {
         String sourceString = "`a` << 2";
 
         Lexer lexer = new Lexer();
@@ -48,7 +48,7 @@ public class LexerTest_Backticks {
 
     @Test
     @Order(2)
-    public void testLexer_StringAnalysis_SingleBacktickQuotation_MultiCharacterIdentifer() {
+    public void testLexer_StringTokens_SingleBacktickQuotation_MultiCharacterIdentifer() {
         String sourceString = "`foo` << *";
 
         Lexer lexer = new Lexer();
@@ -71,7 +71,7 @@ public class LexerTest_Backticks {
 
     @Test
     @Order(3)
-    public void testLexer_StringAnalysis_SingleBacktickQuotation_IdentiferContainingPunctuationSymbols() {
+    public void testLexer_StringTokens_SingleBacktickQuotation_IdentiferContainingPunctuationSymbols() {
         String sourceString = "`~\\*/~` << _";
 
         Lexer lexer = new Lexer();
@@ -94,7 +94,7 @@ public class LexerTest_Backticks {
 
     @Test
     @Order(4)
-    public void testLexer_StringAnalysis_SingleBacktickQuotation_IdentiferContainingMixOfSymbols() {
+    public void testLexer_StringTokens_SingleBacktickQuotation_IdentiferContainingMixOfSymbols() {
         String sourceString = "`~a.~*||_where::foo }{ ^^public ~\\\\.__.//~`:Integer << *";
 
         Lexer lexer = new Lexer();
@@ -117,7 +117,7 @@ public class LexerTest_Backticks {
 
     @Test
     @Order(5)
-    public void testLexer_StringAnalysis_SingleBacktickQuotation_IdentifierContainingNewline() {
+    public void testLexer_StringTokens_SingleBacktickQuotation_IdentifierContainingNewline() {
         String sourceString = "`foo\n`:Integer << *";
 
         Lexer lexer = new Lexer();
@@ -170,7 +170,7 @@ public class LexerTest_Backticks {
 
     @Test
     @Order(6)
-    public void testLexer_StringAnalysis_SingleBacktickQuotation_IdentifierMissingClosingBacktickQuote() {
+    public void testLexer_StringTokens_SingleBacktickQuotation_IdentifierMissingClosingBacktickQuote() {
         String sourceString = "foo:Integer << `bar";
 
         Lexer lexer = new Lexer();
@@ -206,7 +206,7 @@ public class LexerTest_Backticks {
 
     @Test
     @Order(7)
-    public void testLexer_StringAnalysis_SingleBacktickQuotation_MultipleQuotedIdentifiers() {
+    public void testLexer_StringTokens_SingleBacktickQuotation_MultipleQuotedIdentifiers() {
         String sourceString = "`foo`:Integer << `bar`";
 
         Lexer lexer = new Lexer();
@@ -233,7 +233,7 @@ public class LexerTest_Backticks {
 
     @Test
     @Order(8)
-    public void testLexer_StringAnalysis_SingleBacktickQuotation_BasicArithmetic() {
+    public void testLexer_StringTokens_SingleBacktickQuotation_BasicArithmetic() {
         String sourceString = "a << [`b` + 2] * `foo`";
 
         Lexer lexer = new Lexer();
@@ -268,7 +268,7 @@ public class LexerTest_Backticks {
 
     @Test
     @Order(9)
-    public void testLexer_StringAnalysis_SingleBacktickQuotation_ContainingSpaceWithNonSpaceCharacters() {
+    public void testLexer_StringTokens_SingleBacktickQuotation_ContainingSpaceWithNonSpaceCharacters() {
         String sourceString = "`foo bar`:Integer << 2";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
@@ -290,7 +290,7 @@ public class LexerTest_Backticks {
 
     @Test
     @Order(10)
-    public void testLexer_StringAnalysis_SingleBacktickQuotation_ContainingTabsShouldFail() {
+    public void testLexer_StringTokens_SingleBacktickQuotation_ContainingTabsShouldFail() {
         String sourceString = "`foo\tbar`:Integer << 2";
 
         Lexer lexer = new Lexer();
@@ -327,7 +327,7 @@ public class LexerTest_Backticks {
 
     @Test
     @Order(11)
-    public void testLexer_StringAnalysis_SingleBacktickQuotation_OnlyWhitespaceCharactersShouldFail() {
+    public void testLexer_StringTokens_SingleBacktickQuotation_OnlyWhitespaceCharactersShouldFail() {
         // ------------
         // single space
         // ------------
@@ -488,7 +488,7 @@ public class LexerTest_Backticks {
 
     @Test
     @Order(12)
-    public void testLexer_StringAnalysis_BacktickCharacterLiteral() {
+    public void testLexer_StringTokens_BacktickCharacterLiteral() {
         List<String> statement = lexSingleStatementAsTokens("`\\``", 1);
 
         testToken(statement.get(0), "`\\``");

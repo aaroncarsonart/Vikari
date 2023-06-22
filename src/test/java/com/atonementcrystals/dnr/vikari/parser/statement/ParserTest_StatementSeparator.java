@@ -67,7 +67,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(1)
-    public void testSingleTerminatedStatement() {
+    public void testParser_Statement_SingleTerminatedStatement() {
         String sourceString = "5 + 2,";
         List<Statement> parsedStatements = lexAndParse(sourceString);
 
@@ -84,7 +84,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(2)
-    public void testSingleTerminatedStatement_LeadingSpace() {
+    public void testParser_Statement_SingleTerminatedStatement_LeadingSpace() {
         String sourceString = "3 - 9 ,";
         List<Statement> parsedStatements = lexAndParse(sourceString);
 
@@ -101,7 +101,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(3)
-    public void testSingleTerminatedStatement_TrailingSpace() {
+    public void testParser_Statement_SingleTerminatedStatement_TrailingSpace() {
         String sourceString = "2 * 8, ";
         List<Statement> parsedStatements = lexAndParse(sourceString);
 
@@ -118,7 +118,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(4)
-    public void testSingleTerminatedStatement_LeadingAndTrailingSpace() {
+    public void testParser_Statement_SingleTerminatedStatement_LeadingAndTrailingSpace() {
         String sourceString = "22 / 7 , ";
         List<Statement> parsedStatements = lexAndParse(sourceString);
 
@@ -155,7 +155,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(5)
-    public void testTwoStatements_NoSpaces() {
+    public void testParser_Statement_TwoStatements_NoSpaces() {
         String sourceString = "3 - 9,22 / 7";
         List<Statement> parsedStatements = lexAndParse(sourceString);
         checkTwoArithmeticExpressionStatements(parsedStatements);
@@ -163,7 +163,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(6)
-    public void testTwoStatements_LeadingSpace() {
+    public void testParser_Statement_TwoStatements_LeadingSpace() {
         String sourceString = "3 - 9 ,22 / 7";
         List<Statement> parsedStatements = lexAndParse(sourceString);
         checkTwoArithmeticExpressionStatements(parsedStatements);
@@ -171,7 +171,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(7)
-    public void testTwoStatements_TrailingSpace() {
+    public void testParser_Statement_TwoStatements_TrailingSpace() {
         String sourceString = "3 - 9, 22 / 7";
         List<Statement> parsedStatements = lexAndParse(sourceString);
         checkTwoArithmeticExpressionStatements(parsedStatements);
@@ -179,7 +179,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(8)
-    public void testTwoStatements_LeadingAndTrailingSpaces() {
+    public void testParser_Statement_TwoStatements_LeadingAndTrailingSpaces() {
         String sourceString = "3 - 9 , 22 / 7";
         List<Statement> parsedStatements = lexAndParse(sourceString);
         checkTwoArithmeticExpressionStatements(parsedStatements);
@@ -187,7 +187,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(9)
-    public void testMultipleLiteralExpressionStatements() {
+    public void testParser_Statement_MultipleLiteralExpressionStatements() {
         String sourceString = "5,22,7";
         List<Statement> parsedStatements = lexAndParse(sourceString);
 
@@ -253,7 +253,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(10)
-    public void testMultipleExpressionStatements() {
+    public void testParser_Statement_MultipleExpressionStatements() {
         String sourceString = "5 + 2,3 - 9,2 * 8,22 / 7";
         List<Statement> parsedStatements = lexAndParse(sourceString);
         checkFourArithmeticExpressionStatements(parsedStatements);
@@ -261,7 +261,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(11)
-    public void testMultipleExpressionStatements_SeparateLines() {
+    public void testParser_Statement_MultipleExpressionStatements_SeparateLines() {
         String sourceString = "5 + 2,\n" +
                 "3 - 9,\n" +
                 "2 * 8,\n" +
@@ -272,7 +272,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(12)
-    public void testMultipleExpressionStatements_SeparateLines_LeadingSpaces() {
+    public void testParser_Statement_MultipleExpressionStatements_SeparateLines_LeadingSpaces() {
         String sourceString = "5 + 2 ,\n" +
                 "3 - 9 ,\n" +
                 "2 * 8 ,\n" +
@@ -283,7 +283,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(13)
-    public void testMultipleExpressionStatements_SeparateLines_TrailingSpaces() {
+    public void testParser_Statement_MultipleExpressionStatements_SeparateLines_TrailingSpaces() {
         String sourceString = "5 + 2, \n" +
                               "3 - 9, \n" +
                               "2 * 8, \n" +
@@ -294,7 +294,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(14)
-    public void testMultipleExpressionStatements_SeparateLines_LeadingAndTrailingSpaces() {
+    public void testParser_Statement_MultipleExpressionStatements_SeparateLines_LeadingAndTrailingSpaces() {
         String sourceString = "5 + 2 , \n" +
                               "3 - 9 , \n" +
                               "2 * 8 , \n" +
@@ -305,7 +305,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(15)
-    public void testMultipleExpressionStatements_TwoPerSeparateLine_NoSpaces() {
+    public void testParser_Statement_MultipleExpressionStatements_TwoPerSeparateLine_NoSpaces() {
         String sourceString = "5 + 2,3 - 9\n" +
                               "2 * 8,22 / 7";
         List<Statement> parsedStatements = lexAndParse(sourceString);
@@ -314,7 +314,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(16)
-    public void testMultipleExpressionStatements_TwoPerSeparateLine_LeadingSpaces() {
+    public void testParser_Statement_MultipleExpressionStatements_TwoPerSeparateLine_LeadingSpaces() {
         String sourceString = "5 + 2 ,3 - 9\n" +
                               "2 * 8 ,22 / 7";
         List<Statement> parsedStatements = lexAndParse(sourceString);
@@ -323,7 +323,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(17)
-    public void testMultipleExpressionStatements_TwoPerSeparateLine_TrailingSpaces() {
+    public void testParser_Statement_MultipleExpressionStatements_TwoPerSeparateLine_TrailingSpaces() {
         String sourceString = "5 + 2, 3 - 9\n" +
                               "2 * 8, 22 / 7";
         List<Statement> parsedStatements = lexAndParse(sourceString);
@@ -332,7 +332,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(18)
-    public void testMultipleExpressionStatements_TwoPerSeparateLine_LeadingAndTrailingSpaces() {
+    public void testParser_Statement_MultipleExpressionStatements_TwoPerSeparateLine_LeadingAndTrailingSpaces() {
         String sourceString = "5 + 2,3 - 9\n" +
                 "2 * 8,22 / 7";
         List<Statement> parsedStatements = lexAndParse(sourceString);
@@ -341,7 +341,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(19)
-    public void syntaxError_SingleStatement() {
+    public void testParser_Statement_syntaxError_SingleStatement() {
         String sourceString = "5 +,";
         List<SyntaxError> syntaxErrors = lexAndParse_ErrorCase(sourceString);
 
@@ -357,7 +357,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(20)
-    public void syntaxError_TwoStatements_SingleLine() {
+    public void testParser_Statement_syntaxError_TwoStatements_SingleLine() {
         String sourceString = "5 +,* 7,";
         List<SyntaxError> syntaxErrors = lexAndParse_ErrorCase(sourceString);
 
@@ -378,7 +378,7 @@ public class ParserTest_StatementSeparator {
 
     @Test
     @Order(21)
-    public void syntaxError_FourStatements_MultipleLines() {
+    public void testParser_Statement_syntaxError_FourStatements_MultipleLines() {
         String sourceString = "5 ++, * 7 *,\n"+
                               "22 -, / 3";
         List<SyntaxError> syntaxErrors = lexAndParse_ErrorCase(sourceString);

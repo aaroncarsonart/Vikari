@@ -89,14 +89,14 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(1)
-    public void testLeftAssignment_Basic() {
+    public void testTreeWalkInterpreter_LeftAssignment_Basic() {
         lexParseAndInterpret("foo,foo << 2");
         testVariable("foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, 2);
     }
 
     @Test
     @Order(2)
-    public void testLeftAssignment_WithTypeLabel() {
+    public void testTreeWalkInterpreter_LeftAssignment_WithTypeLabel() {
         String sourceString = "foo:Integer, foo << 3";
         lexParseAndInterpret(sourceString);
 
@@ -105,7 +105,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(3)
-    public void testLeftAssignment_WithTypeLabel_ReAssignment() {
+    public void testTreeWalkInterpreter_LeftAssignment_WithTypeLabel_ReAssignment() {
         String sourceString = "foo:Integer << 2, foo << 4";
         lexParseAndInterpret(sourceString);
 
@@ -114,7 +114,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(4)
-    public void testLeftAssignment_MultipleVariables_SingleLine() {
+    public void testTreeWalkInterpreter_LeftAssignment_MultipleVariables_SingleLine() {
         String sourceString = "foo, bar, baz, foo << 1, bar << 2, baz << 3";
         lexParseAndInterpret(sourceString);
 
@@ -125,7 +125,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(5)
-    public void testLeftAssignment_MultipleVariables_MultipleLines() {
+    public void testTreeWalkInterpreter_LeftAssignment_MultipleVariables_MultipleLines() {
         String sourceString = """
                 foo
                 bar
@@ -143,7 +143,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(6)
-    public void testLeftAssignment_MultipleVariables_SingleLine_WithTypeLabels() {
+    public void testTreeWalkInterpreter_LeftAssignment_MultipleVariables_SingleLine_WithTypeLabels() {
         String sourceString = "foo:Integer, bar:Integer, baz:Integer, foo << 1, bar << 2, baz << 3";
         lexParseAndInterpret(sourceString);
 
@@ -154,7 +154,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(7)
-    public void testLeftAssignment_MultipleVariables_MultipleLines_WithTypeLabels() {
+    public void testTreeWalkInterpreter_LeftAssignment_MultipleVariables_MultipleLines_WithTypeLabels() {
         String sourceString = """
                 foo:Integer
                 bar:Integer
@@ -172,7 +172,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(8)
-    public void testLeftAssignment_MultipleVariables_MultipleLines_WithTypeLabels_AndInitializerExpressions() {
+    public void testTreeWalkInterpreter_LeftAssignment_MultipleVariables_MultipleLines_WithTypeLabels_AndInitializerExpressions() {
         String sourceString = """
                 foo:Integer << 1
                 bar:Integer << 2
@@ -190,7 +190,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(9)
-    public void testLeftAssignment_AllNumericTypes() {
+    public void testTreeWalkInterpreter_LeftAssignment_AllNumericTypes() {
         String sourceString = """
                 a, b, c, d, e, f
                 a << 1
@@ -212,7 +212,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(10)
-    public void testLeftAssignment_AllNumericTypes_WithTypeLabels() {
+    public void testTreeWalkInterpreter_LeftAssignment_AllNumericTypes_WithTypeLabels() {
         String sourceString = """
                 a:Integer
                 b:Long
@@ -239,7 +239,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(11)
-    public void testLeftAssignment_NumericUpcasts() {
+    public void testTreeWalkInterpreter_LeftAssignment_NumericUpcasts() {
         String sourceString = """
                 long1:Long
                 bigInteger1:BigInteger
@@ -296,7 +296,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(12)
-    public void testLeftAssignment_NumericDowncasts() {
+    public void testTreeWalkInterpreter_LeftAssignment_NumericDowncasts() {
         String sourceString = """
                 integer1:Integer
                 integer2:Integer
@@ -351,7 +351,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(13)
-    public void testLeftAssignment_NumericDowncasts_TruncatedValues_Overflow() {
+    public void testTreeWalkInterpreter_LeftAssignment_NumericDowncasts_TruncatedValues_Overflow() {
         String sourceString = """
                 a:Integer
                 b:Integer
@@ -406,7 +406,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(14)
-    public void testLeftAssignment_NumericDowncasts_TruncatedValues_Underflow() {
+    public void testTreeWalkInterpreter_LeftAssignment_NumericDowncasts_TruncatedValues_Underflow() {
         String sourceString = """
                 a:Integer
                 b:Integer
@@ -461,7 +461,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(15)
-    public void testLeftAssignment_AssignmentToParentTypes() {
+    public void testTreeWalkInterpreter_LeftAssignment_AssignmentToParentTypes() {
         String sourceString = """
                 a, b:AtonementCrystal, c:Value, d:Number
                 a << 1
@@ -483,7 +483,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(16)
-    public void testRightAssignment_Basic() {
+    public void testTreeWalkInterpreter_RightAssignment_Basic() {
         lexParseAndInterpret("foo,2 >> foo");
         testVariable("foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, 2);
 
@@ -491,7 +491,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(17)
-    public void testRightAssignment_WithTypeLabel() {
+    public void testTreeWalkInterpreter_RightAssignment_WithTypeLabel() {
         String sourceString = "foo:Integer, 3 >> foo";
         lexParseAndInterpret(sourceString);
 
@@ -500,7 +500,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(18)
-    public void testRightAssignment_WithTypeLabel_ReAssignment() {
+    public void testTreeWalkInterpreter_RightAssignment_WithTypeLabel_ReAssignment() {
         String sourceString = "foo:Integer << 2, 4 >> foo";
         lexParseAndInterpret(sourceString);
 
@@ -509,7 +509,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(19)
-    public void testRightAssignment_MultipleVariables_SingleLine() {
+    public void testTreeWalkInterpreter_RightAssignment_MultipleVariables_SingleLine() {
         String sourceString = "foo, bar, baz, 1 >> foo, 2 >> bar, 3 >> baz";
         lexParseAndInterpret(sourceString);
 
@@ -520,7 +520,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(20)
-    public void testRightAssignment_MultipleVariables_MultipleLines() {
+    public void testTreeWalkInterpreter_RightAssignment_MultipleVariables_MultipleLines() {
         String sourceString = """
                 foo
                 bar
@@ -538,7 +538,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(21)
-    public void testRightAssignment_MultipleVariables_SingleLine_WithTypeLabels() {
+    public void testTreeWalkInterpreter_RightAssignment_MultipleVariables_SingleLine_WithTypeLabels() {
         String sourceString = "foo:Integer, bar:Integer, baz:Integer, 1 >> foo, 2 >> bar, 3 >> baz";
         lexParseAndInterpret(sourceString);
 
@@ -549,7 +549,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(22)
-    public void testRightAssignment_MultipleVariables_MultipleLines_WithTypeLabels() {
+    public void testTreeWalkInterpreter_RightAssignment_MultipleVariables_MultipleLines_WithTypeLabels() {
         String sourceString = """
                 foo:Integer
                 bar:Integer
@@ -567,7 +567,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(23)
-    public void testRightAssignment_MultipleVariables_MultipleLines_WithTypeLabels_AndInitializerExpressions() {
+    public void testTreeWalkInterpreter_RightAssignment_MultipleVariables_MultipleLines_WithTypeLabels_AndInitializerExpressions() {
         String sourceString = """
                 foo:Integer << 1
                 bar:Integer << 2
@@ -585,7 +585,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(24)
-    public void testRightAssignment_AllNumericTypes() {
+    public void testTreeWalkInterpreter_RightAssignment_AllNumericTypes() {
         String sourceString = """
                 a, b, c, d, e, f
                 1 >> a
@@ -607,7 +607,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(25)
-    public void testRightAssignment_AllNumericTypes_WithTypeLabels() {
+    public void testTreeWalkInterpreter_RightAssignment_AllNumericTypes_WithTypeLabels() {
         String sourceString = """
                 a:Integer
                 b:Long
@@ -634,7 +634,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(26)
-    public void testRightAssignment_NumericUpcasts() {
+    public void testTreeWalkInterpreter_RightAssignment_NumericUpcasts() {
         String sourceString = """
                 long1:Long
                 bigInteger1:BigInteger
@@ -691,7 +691,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(27)
-    public void testRightAssignment_NumericDowncasts() {
+    public void testTreeWalkInterpreter_RightAssignment_NumericDowncasts() {
         String sourceString = """
                 integer1:Integer
                 integer2:Integer
@@ -746,7 +746,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(28)
-    public void testRightAssignment_NumericDowncasts_TruncatedValues_Overflow() {
+    public void testTreeWalkInterpreter_RightAssignment_NumericDowncasts_TruncatedValues_Overflow() {
         String sourceString = """
                 a:Integer
                 b:Integer
@@ -801,7 +801,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(29)
-    public void testRightAssignment_NumericDowncasts_TruncatedValues_Underflow() {
+    public void testTreeWalkInterpreter_RightAssignment_NumericDowncasts_TruncatedValues_Underflow() {
         String sourceString = """
                 a:Integer
                 b:Integer
@@ -856,7 +856,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
 
     @Test
     @Order(30)
-    public void testRightAssignment_AssignmentToParentTypes() {
+    public void testTreeWalkInterpreter_RightAssignment_AssignmentToParentTypes() {
         String sourceString = """
                 a, b:AtonementCrystal, c:Value, d:Number
                 1 >> a

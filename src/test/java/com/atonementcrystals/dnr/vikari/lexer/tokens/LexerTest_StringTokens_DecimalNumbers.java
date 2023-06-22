@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.stringanalysis;
+package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import org.junit.jupiter.api.MethodOrderer;
@@ -14,11 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Test that decimal number literal values (i.e. "3.14") are properly tokenized by the Lexer.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_DecimalNumbers {
+public class LexerTest_StringTokens_DecimalNumbers {
 
     @Test
     @Order(1)
-    public void testLexer_StringAnalysis_DecimalNumbers_BasicAssignment() {
+    public void testLexer_StringTokens_DecimalNumbers_BasicAssignment() {
         String sourceString = "pi << 3.14";
 
         Lexer lexer = new Lexer();
@@ -41,7 +41,7 @@ public class LexerTest_DecimalNumbers {
 
     @Test
     @Order(2)
-    public void testLexer_StringAnalysis_DecimalNumbers_ComplexArithmetic() {
+    public void testLexer_StringTokens_DecimalNumbers_ComplexArithmetic() {
         String sourceString = "a << 6.999 - [5.2 / 9001.0]";
 
         Lexer lexer = new Lexer();
@@ -72,7 +72,7 @@ public class LexerTest_DecimalNumbers {
 
     @Test
     @Order(3)
-    public void testLexer_StringAnalysis_DecimalNumbers_AcrossMultipleLines() {
+    public void testLexer_StringTokens_DecimalNumbers_AcrossMultipleLines() {
         String sourceString = "foo << 3.14\n" +
                 ":foo + 6.28";
 

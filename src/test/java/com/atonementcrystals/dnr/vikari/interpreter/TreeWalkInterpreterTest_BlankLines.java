@@ -38,31 +38,31 @@ public class TreeWalkInterpreterTest_BlankLines {
 
     @Test
     @Order(1)
-    public void testEmptyStatement() {
+    public void testTreeWalkInterpreter_EmptyStatement() {
         testVikariStatements("");
     }
 
     @Test
     @Order(2)
-    public void testEmptyStatement_WithWhitespace() {
+    public void testTreeWalkInterpreter_EmptyStatement_WithWhitespace() {
         testVikariStatements("    \t\t    ");
     }
 
     @Test
     @Order(3)
-    public void testMultipleEmptyStatements() {
+    public void testTreeWalkInterpreter_MultipleEmptyStatements() {
         testVikariStatements("\n\n\n");
     }
 
     @Test
     @Order(4)
-    public void testMultipleEmptyStatements_WithWhitespace() {
+    public void testTreeWalkInterpreter_MultipleEmptyStatements_WithWhitespace() {
         testVikariStatements("    \n    \n\t\t\n\t\t");
     }
 
     @Test
     @Order(5)
-    public void testEmptyStatements_BetweenExpressionStatements() {
+    public void testTreeWalkInterpreter_EmptyStatements_BetweenExpressionStatements() {
         testVikariStatements("5 + 7\n" +
                              "\n" +
                              "-[22 / 7]");
@@ -70,7 +70,7 @@ public class TreeWalkInterpreterTest_BlankLines {
 
     @Test
     @Order(6)
-    public void testEmptyStatements_BetweenPrintStatements() {
+    public void testTreeWalkInterpreter_EmptyStatements_BetweenPrintStatements() {
         testVikariStatements(":7:\n" +
                              "\n" +
                              ":22:");
@@ -78,7 +78,7 @@ public class TreeWalkInterpreterTest_BlankLines {
 
     @Test
     @Order(7)
-    public void testEmptyStatements_Complex() {
+    public void testTreeWalkInterpreter_EmptyStatements_Complex() {
         String sourceString = ":22 + 2\n" +
                 "\n" +
                 "\n" +

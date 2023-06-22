@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.stringanalysis;
+package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import org.junit.jupiter.api.MethodOrderer;
@@ -11,11 +11,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_Whitespace {
+public class LexerTest_StringTokens_Whitespace {
 
     @Test
     @Order(1)
-    public void testLexer_StringAnalysis_Whitespace_CollapsionOfSpaces() {
+    public void testLexer_StringTokens_Whitespace_CollapsionOfSpaces() {
         String sourceString = "    a <<  *";
 
         Lexer lexer = new Lexer();
@@ -46,7 +46,7 @@ public class LexerTest_Whitespace {
 
     @Test
     @Order(2)
-    public void testLexer_StringAnalysis_Whitespace_CollapsionOfTabs() {
+    public void testLexer_StringTokens_Whitespace_CollapsionOfTabs() {
         // NOTE: Code should never be written this way.
         // But still, sequential tabs should collapse together!
         String sourceString = "\t\t\ta\t<<\t\t*";
@@ -79,7 +79,7 @@ public class LexerTest_Whitespace {
 
     @Test
     @Order(3)
-    public void testLexer_StringAnalysis_Whitespace_CollapsionOfTabsAndSpaces() {
+    public void testLexer_StringTokens_Whitespace_CollapsionOfTabsAndSpaces() {
         // NOTE: Code should never be written this way.
         // But still, arbitrary combinations of tabs
         // and spaces should collapse together!
@@ -131,7 +131,7 @@ public class LexerTest_Whitespace {
 
     @Test
     @Order(4)
-    public void testLexer_StringAnalysis_Whitespace_AtEndOfLine() {
+    public void testLexer_StringTokens_Whitespace_AtEndOfLine() {
         String sourceString = "a << *   ";
 
         Lexer lexer = new Lexer();

@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.stringanalysis;
+package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
@@ -11,11 +11,11 @@ import static com.atonementcrystals.dnr.vikari.TestUtils.location;
 import static com.atonementcrystals.dnr.vikari.TestUtils.testSyntaxError;
 import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.*;
 
-public class LexerTest_InvalidCharacters {
+public class LexerTest_StringTokens_InvalidCharacters {
 
     @Test
     @Order(1)
-    public void invalidCharacters_CheckAllValidCharacters() {
+    public void testLexer_StringTokens_InvalidCharacters_CheckAllValidCharacters() {
         String sourceString = "~!@#$%^&*()_+1234567890-=\tQWERTYUIOPASDFGHJKLZXCVBNM qwertyuiopasdfghjklzxcvbnm{}|[]" +
                 "\\:\";'<>?,./'`";
 
@@ -28,8 +28,8 @@ public class LexerTest_InvalidCharacters {
 
     @Test
     @Order(2)
-    public void invalidCharacters_SingleInvalidCharacters() {
-        String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
+    public void testLexer_StringTokens_InvalidCharacters_SingleInvalidCharacters() {
+        String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
                 "ç√∫˜µ≤≥÷¸˛Ç◊ı˜Â¯˘¿";
 
         for (int i = 0; i < invalidCharactersToTest.length(); i++) {
@@ -47,11 +47,11 @@ public class LexerTest_InvalidCharacters {
 
     @Test
     @Order(3)
-    public void invalidCharacters_SingleInvalidCharacter_BeforeSingleValidCharacter() {
+    public void testLexer_StringTokens_InvalidCharacters_SingleInvalidCharacter_BeforeSingleValidCharacter() {
         String validCharacters = "~!@#$%^&*()_+1234567890-=QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm{}|[]" +
                 "\\:\";'<>?,./`";
 
-        String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
+        String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
                 "ç√∫˜µ≤≥÷¸˛Ç◊ı˜Â¯˘¿";
 
         for (int i = 0; i < invalidCharactersToTest.length(); i++) {
@@ -83,11 +83,11 @@ public class LexerTest_InvalidCharacters {
 
     @Test
     @Order(4)
-    public void invalidCharacters_SingleInvalidCharacter_AfterSingleValidCharacter() {
+    public void testLexer_StringTokens_InvalidCharacters_SingleInvalidCharacter_AfterSingleValidCharacter() {
         String validCharacters = "~!@#$%^&*()_+1234567890-=QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm{}|[]" +
                 "\\:\";'<>?,./`";
 
-        String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
+        String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
                 "ç√∫˜µ≤≥÷¸˛Ç◊ı˜Â¯˘¿";
 
         for (int i = 0; i < invalidCharactersToTest.length(); i++) {
@@ -123,11 +123,11 @@ public class LexerTest_InvalidCharacters {
 
     @Test
     @Order(5)
-    public void invalidCharacters_SingleInvalidCharacter_BetweenTwoValidCharacters() {
+    public void testLexer_StringTokens_InvalidCharacters_SingleInvalidCharacter_BetweenTwoValidCharacters() {
         String validCharacters = "~!@#$%^&*()_+1234567890-=QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm{}|[]" +
                 "\\:\";'<>?,./`";
 
-        String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
+        String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
                 "ç√∫˜µ≤≥÷¸˛Ç◊ı˜Â¯˘¿";
 
         for (int i = 0; i < invalidCharactersToTest.length(); i++) {
@@ -162,11 +162,11 @@ public class LexerTest_InvalidCharacters {
 
     @Test
     @Order(6)
-    public void invalidCharacters_TwoInvalidCharactersAroundAValidCharacter() {
+    public void testLexer_StringTokens_InvalidCharacters_TwoInvalidCharactersAroundAValidCharacter() {
         String validCharacters = "~!@#$%^&*()_+1234567890-=QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm{}|[]" +
                 "\\:\";'<>?,./`";
 
-        String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
+        String invalidCharactersToTest = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈" +
                 "ç√∫˜µ≤≥÷¸˛Ç◊ı˜Â¯˘¿";
 
         for (int i = 0; i < invalidCharactersToTest.length() - 1; i++) {
@@ -206,8 +206,8 @@ public class LexerTest_InvalidCharacters {
 
     @Test
     @Order(7)
-    public void invalidCharacters_SingleLargeErrorToken() {
-        String sourceString = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈ç√∫˜µ≤≥÷¸˛Ç" +
+    public void testLexer_StringTokens_InvalidCharacters_SingleLargeErrorToken() {
+        String sourceString = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´‰ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æÅÍÎÏ˝ÓÔÒÚÆΩ≈ç√∫˜µ≤≥÷¸˛Ç" +
                 "◊ı˜Â¯˘¿";
 
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
@@ -220,11 +220,11 @@ public class LexerTest_InvalidCharacters {
 
     @Test
     @Order(8)
-    public void invalidCharacters_TestMultipleLargeTokens() {
+    public void testLexer_StringTokens_InvalidCharacters_TestMultipleLargeTokens() {
         String invalidToken1 = "¡™£¢∞§¶•ªº–≠⁄€‹›ﬁﬂ‡°";
         String invalidToken3 = "·‚—±œ∑´®†¥¨ˆøπ“‘«Œ„´";
         String invalidToken5 = "ˇÁ¨ˆØ∏”’»åß∂ƒ©˙∆˚¬…æ";
-        String invalidToken7 = "ÅÍÎÏ˝ÓÔÒÚÆΩ≈ç√";
+        String invalidToken7 = "ÅÍÎÏ˝ÓÔÒÚÆΩ≈ç√";
         String invalidToken9 = "∫˜µ≤≥÷¸˛Ç◊ı˜Â¯˘¿";
 
         String validToken2 = "\t";

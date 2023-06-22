@@ -243,7 +243,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(1)
-    public void testLeftAssignment_Basic() {
+    public void testParser_Expression_LeftAssignment_Basic() {
         List<Statement> statements = lexAndParse("foo,foo << 2");
 
         int expectedStatementCount = 2;
@@ -261,7 +261,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(2)
-    public void testLeftAssignment_WithTypeLabel() {
+    public void testParser_Expression_LeftAssignment_WithTypeLabel() {
         String sourceString = "foo:Integer, foo << 3";
         List<Statement> statements = lexAndParse(sourceString);
 
@@ -280,7 +280,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(3)
-    public void testLeftAssignment_WithTypeLabel_ReAssignment() {
+    public void testParser_Expression_LeftAssignment_WithTypeLabel_ReAssignment() {
         String sourceString = "foo:Integer << 2, foo << 4";
         List<Statement> statements = lexAndParse(sourceString);
 
@@ -299,7 +299,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(4)
-    public void testLeftAssignment_MultipleVariables_SingleLine() {
+    public void testParser_Expression_LeftAssignment_MultipleVariables_SingleLine() {
         String sourceString = "foo, bar, baz, foo << 1, bar << 2, baz << 3";
         List<Statement> statements = lexAndParse(sourceString);
 
@@ -320,7 +320,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(5)
-    public void testLeftAssignment_MultipleVariables_MultipleLines() {
+    public void testParser_Expression_LeftAssignment_MultipleVariables_MultipleLines() {
         String sourceString = """
                 foo
                 bar
@@ -348,7 +348,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(6)
-    public void testLeftAssignment_MultipleVariables_SingleLine_WithTypeLabels() {
+    public void testParser_Expression_LeftAssignment_MultipleVariables_SingleLine_WithTypeLabels() {
         String sourceString = "foo:Integer, bar:Integer, baz:Integer, foo << 1, bar << 2, baz << 3";
         List<Statement> statements = lexAndParse(sourceString);
 
@@ -369,7 +369,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(7)
-    public void testLeftAssignment_MultipleVariables_MultipleLines_WithTypeLabels() {
+    public void testParser_Expression_LeftAssignment_MultipleVariables_MultipleLines_WithTypeLabels() {
         String sourceString = """
                 foo:Integer
                 bar:Integer
@@ -397,7 +397,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(8)
-    public void testLeftAssignment_MultipleVariables_MultipleLines_WithTypeLabels_AndInitializerExpressions() {
+    public void testParser_Expression_LeftAssignment_MultipleVariables_MultipleLines_WithTypeLabels_AndInitializerExpressions() {
         String sourceString = """
                 foo:Integer << 1
                 bar:Integer << 2
@@ -425,7 +425,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(9)
-    public void testLeftAssignment_AllNumericTypes() {
+    public void testParser_Expression_LeftAssignment_AllNumericTypes() {
         String sourceString = """
                 a, b, c, d, e, f
                 a << 1
@@ -460,7 +460,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(10)
-    public void testLeftAssignment_AllNumericTypes_WithTypeLabels() {
+    public void testParser_Expression_LeftAssignment_AllNumericTypes_WithTypeLabels() {
         String sourceString = """
                 a:Integer
                 b:Long
@@ -500,7 +500,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(11)
-    public void testLeftAssignment_NumericUpcasts() {
+    public void testParser_Expression_LeftAssignment_NumericUpcasts() {
         String sourceString = """
                 long1:Long
                 bigInteger1:BigInteger
@@ -565,7 +565,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(12)
-    public void testLeftAssignment_NumericDowncasts() {
+    public void testParser_Expression_LeftAssignment_NumericDowncasts() {
         String sourceString = """
                 integer1:Integer
                 integer2:Integer
@@ -632,7 +632,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(13)
-    public void testLeftAssignment_AssignmentToParentTypes() {
+    public void testParser_Expression_LeftAssignment_AssignmentToParentTypes() {
         String sourceString = """
                 a, b:AtonementCrystal, c:Value, d:Number
                 a << 1
@@ -661,7 +661,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(14)
-    public void testLeftAssignment_ErrorCase_UnknownType() {
+    public void testParser_Expression_LeftAssignment_ErrorCase_UnknownType() {
         String sourceString = """
                 foo:Foo
                 bar:Bar
@@ -691,7 +691,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(15)
-    public void testLeftAssignment_SyntaxError_InvalidTypeAssignment() {
+    public void testParser_Expression_LeftAssignment_SyntaxError_InvalidTypeAssignment() {
         String sourceString = "foo:Type, foo << 2";
 
         int expectedErrorCount = 1;
@@ -718,7 +718,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(16)
-    public void testRightAssignment_Basic() {
+    public void testParser_Expression_RightAssignment_Basic() {
         List<Statement> statements = lexAndParse("foo,2 >> foo");
 
         int expectedStatementCount = 2;
@@ -736,7 +736,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(17)
-    public void testRightAssignment_WithTypeLabel() {
+    public void testParser_Expression_RightAssignment_WithTypeLabel() {
         String sourceString = "foo:Integer, 3 >> foo";
         List<Statement> statements = lexAndParse(sourceString);
 
@@ -756,7 +756,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(18)
-    public void testRightAssignment_WithTypeLabel_ReAssignment() {
+    public void testParser_Expression_RightAssignment_WithTypeLabel_ReAssignment() {
         String sourceString = "foo:Integer << 2, 4 >> foo";
         List<Statement> statements = lexAndParse(sourceString);
 
@@ -776,7 +776,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(19)
-    public void testRightAssignment_MultipleVariables_SingleLine() {
+    public void testParser_Expression_RightAssignment_MultipleVariables_SingleLine() {
         String sourceString = "foo, bar, baz, 1 >> foo, 2 >> bar, 3 >> baz";
         List<Statement> statements = lexAndParse(sourceString);
 
@@ -802,7 +802,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(20)
-    public void testRightAssignment_MultipleVariables_MultipleLines() {
+    public void testParser_Expression_RightAssignment_MultipleVariables_MultipleLines() {
         String sourceString = """
                 foo
                 bar
@@ -835,7 +835,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(21)
-    public void testRightAssignment_MultipleVariables_SingleLine_WithTypeLabels() {
+    public void testParser_Expression_RightAssignment_MultipleVariables_SingleLine_WithTypeLabels() {
         String sourceString = "foo:Integer, bar:Integer, baz:Integer, 1 >> foo, 2 >> bar, 3 >> baz";
         List<Statement> statements = lexAndParse(sourceString);
 
@@ -856,7 +856,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(22)
-    public void testRightAssignment_MultipleVariables_MultipleLines_WithTypeLabels() {
+    public void testParser_Expression_RightAssignment_MultipleVariables_MultipleLines_WithTypeLabels() {
         String sourceString = """
                 foo:Integer
                 bar:Integer
@@ -884,7 +884,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(23)
-    public void testRightAssignment_MultipleVariables_MultipleLines_WithTypeLabels_AndInitializerExpressions() {
+    public void testParser_Expression_RightAssignment_MultipleVariables_MultipleLines_WithTypeLabels_AndInitializerExpressions() {
         String sourceString = """
                 foo:Integer << 1
                 bar:Integer << 2
@@ -912,7 +912,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(24)
-    public void testRightAssignment_AllNumericTypes() {
+    public void testParser_Expression_RightAssignment_AllNumericTypes() {
         String sourceString = """
                 a, b, c, d, e, f
                 1 >> a
@@ -958,7 +958,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(25)
-    public void testRightAssignment_AllNumericTypes_WithTypeLabels() {
+    public void testParser_Expression_RightAssignment_AllNumericTypes_WithTypeLabels() {
         String sourceString = """
                 a:Integer
                 b:Long
@@ -1009,7 +1009,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(26)
-    public void testRightAssignment_NumericUpcasts() {
+    public void testParser_Expression_RightAssignment_NumericUpcasts() {
         String sourceString = """
                 long1:Long
                 bigInteger1:BigInteger
@@ -1102,7 +1102,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(27)
-    public void testRightAssignment_NumericDowncasts() {
+    public void testParser_Expression_RightAssignment_NumericDowncasts() {
         String sourceString = """
                 integer1:Integer
                 integer2:Integer
@@ -1198,7 +1198,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(28)
-    public void testRightAssignment_AssignmentToParentTypes() {
+    public void testParser_Expression_RightAssignment_AssignmentToParentTypes() {
         String sourceString = """
                 a, b:AtonementCrystal, c:Value, d:Number
                 1 >> a
@@ -1234,7 +1234,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(29)
-    public void testRightAssignment_ErrorCase_UnknownType() {
+    public void testParser_Expression_RightAssignment_ErrorCase_UnknownType() {
         String sourceString = """
                 foo:Foo
                 bar:Bar
@@ -1267,7 +1267,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(30)
-    public void testRightAssignment_SyntaxError_InvalidTypeAssignment() {
+    public void testParser_Expression_RightAssignment_SyntaxError_InvalidTypeAssignment() {
         String sourceString = "foo:Type, 2 >> foo";
 
         int expectedErrorCount = 1;
@@ -1295,7 +1295,7 @@ public class ParserTest_Assignment {
 
     @Test
     @Order(31)
-    public void testAssignment_SyntaxError_InvalidAssignmentTarget() {
+    public void testParser_Expression_Assignment_SyntaxError_InvalidAssignmentTarget() {
         String sourceString = "[5 + 2] << 7, 7 >> [5 + 2]";
 
         int expectedErrorCount = 2;

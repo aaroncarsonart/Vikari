@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.stringanalysis;
+package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import org.junit.jupiter.api.MethodOrderer;
@@ -15,11 +15,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Test that constant declarations (i.e. "{foo}") are properly tokenized by the Lexer.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_ConstantDeclarations {
+public class LexerTest_StringTokens_ConstantDeclarations {
 
     @Test
     @Order(1)
-    public void testLexer_StringAnalysis_ConstantDeclarations_BasicIdentifier() {
+    public void testLexer_StringTokens_ConstantDeclarations_BasicIdentifier() {
         String sourceString = "{foo}";
 
         Lexer lexer = new Lexer();
@@ -45,7 +45,7 @@ public class LexerTest_ConstantDeclarations {
 
     @Test
     @Order(2)
-    public void testLexer_StringAnalysis_ConstantDeclarations_BasicIdentifierAssignment() {
+    public void testLexer_StringTokens_ConstantDeclarations_BasicIdentifierAssignment() {
         String sourceString = "{foo}:Integer << 2";
 
         Lexer lexer = new Lexer();
@@ -71,7 +71,7 @@ public class LexerTest_ConstantDeclarations {
 
     @Test
     @Order(3)
-    public void testLexer_StringAnalysis_ConstantDeclarations_IdentifierContainingBackticks() {
+    public void testLexer_StringTokens_ConstantDeclarations_IdentifierContainingBackticks() {
         String sourceString = "{`An Identifier`}:Integer << 2";
 
         Lexer lexer = new Lexer();

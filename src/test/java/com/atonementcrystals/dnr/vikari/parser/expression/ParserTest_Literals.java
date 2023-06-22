@@ -26,7 +26,7 @@ public class ParserTest_Literals {
 
     @Test
     @Order(1)
-    public void testLiterals_Integer() {
+    public void testParser_Expression_Literals_Integer() {
         String sourceString = "2";
 
         Lexer lexer = new Lexer();
@@ -57,7 +57,7 @@ public class ParserTest_Literals {
 
     @Test
     @Order(2)
-    public void testLiterals_Long() {
+    public void testParser_Expression_Literals_Long() {
         String sourceString = "22L";
 
         Lexer lexer = new Lexer();
@@ -88,7 +88,7 @@ public class ParserTest_Literals {
 
     @Test
     @Order(3)
-    public void testLiterals_BigInteger() {
+    public void testParser_Expression_Literals_BigInteger() {
         String sourceString = "512B";
 
         Lexer lexer = new Lexer();
@@ -119,7 +119,7 @@ public class ParserTest_Literals {
 
     @Test
     @Order(4)
-    public void testLiterals_Float() {
+    public void testParser_Expression_Literals_Float() {
         String sourceString = "3.14F";
 
         Lexer lexer = new Lexer();
@@ -150,7 +150,7 @@ public class ParserTest_Literals {
 
     @Test
     @Order(5)
-    public void testLiterals_Double() {
+    public void testParser_Expression_Literals_Double() {
         String sourceString = "6.28D";
 
         Lexer lexer = new Lexer();
@@ -181,7 +181,7 @@ public class ParserTest_Literals {
 
     @Test
     @Order(6)
-    public void testLiterals_BigDecimal() {
+    public void testParser_Expression_Literals_BigDecimal() {
         String sourceString = "9.42B";
 
         Lexer lexer = new Lexer();

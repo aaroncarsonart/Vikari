@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.stringanalysis;
+package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import org.junit.jupiter.api.MethodOrderer;
@@ -11,11 +11,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_Arithmetic {
+public class LexerTest_StringTokens_Arithmetic {
 
     @Test
     @Order(1)
-    public void testLexer_StringAnalysis_Arithmetic_BasicArithmeticWithSquareBrackets() {
+    public void testLexer_StringTokens_Arithmetic_BasicArithmeticWithSquareBrackets() {
         String sourceString = "^^ 1.7 * -[3 + 4 / -2.4]";
 
         Lexer lexer = new Lexer();

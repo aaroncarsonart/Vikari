@@ -146,7 +146,7 @@ public class ParserTest_Variables {
      */
     @Test
     @Order(1)
-    public void testUndefinedVariableReference_LeadingWithVariable() {
+    public void testParser_Expression_UndefinedVariableReference_LeadingWithVariable() {
         String sourceString = "foo + 5";
 
         int expectedErrorCount = 1;
@@ -167,7 +167,7 @@ public class ParserTest_Variables {
 
     @Test
     @Order(2)
-    public void testUndefinedVariableReference_VariableAtEnd() {
+    public void testParser_Expression_UndefinedVariableReference_VariableAtEnd() {
         String sourceString = "5 + foo";
 
         int expectedErrorCount = 1;
@@ -213,7 +213,7 @@ public class ParserTest_Variables {
 
     @Test
     @Order(3)
-    public void testVariable_DeclarationThenPrimary() {
+    public void testParser_Expression_VariableExpressionThenPrimary() {
         String sourceString = "foo,foo";
 
         List<Statement> statements = lexAndParse(sourceString);
@@ -228,7 +228,7 @@ public class ParserTest_Variables {
 
     @Test
     @Order(4)
-    public void testVariable_ArithmeticExpressionTypeError() {
+    public void testParser_Expression_Variable_ArithmeticExpressionTypeError() {
         String sourceString = """
                 foo
                 foo + 5

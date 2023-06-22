@@ -29,7 +29,7 @@ public class ParserTest_Unary {
 
     @Test
     @Order(1)
-    public void testNegateGrouping() {
+    public void testParser_Expression_NegateGrouping() {
         String sourceString = "-[5 - 3]";
 
         Lexer lexer = new Lexer();

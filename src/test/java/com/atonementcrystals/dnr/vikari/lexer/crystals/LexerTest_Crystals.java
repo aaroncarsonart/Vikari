@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.crystal;
+package com.atonementcrystals.dnr.vikari.lexer.crystals;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.comment.CommentCrystal;
@@ -43,13 +43,13 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_ConvertToCrystals {
+public class LexerTest_Crystals {
 
     private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test
     @Order(1)
-    public void lexerTest_BasicDefaultIdentifiers() {
+    public void testLexer_Crystals_BasicDefaultIdentifiers() {
         // Enclosures can't be individually lexed.
         Set<TokenType> enclosureTokenTypes = EnumSet.of(
                 TokenType.COMMENT_PREFIX_CRYSTAL,
@@ -108,7 +108,7 @@ public class LexerTest_ConvertToCrystals {
      */
     @Test
     @Order(2)
-    public void lexerTest_Crystals_BasicAssignmentStatement() {
+    public void testLexer_Crystals_BasicAssignmentStatement() {
         String sourceString = "a << *";
 
         Lexer lexer = new Lexer();
@@ -179,7 +179,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(3)
-    public void lexerTest_Crystals_CommentPrefix() {
+    public void testLexer_Crystals_CommentPrefix() {
         String sourceString = "~:";
 
         Lexer lexer = new Lexer();
@@ -216,7 +216,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(4)
-    public void lexerTest_Crystals_SingleLineComment() {
+    public void testLexer_Crystals_SingleLineComment() {
         String sourceString = "~:This is a comment.:~";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
@@ -252,7 +252,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(5)
-    public void lexerTest_Crystals_TwoLineComment() {
+    public void testLexer_Crystals_TwoLineComment() {
         String sourceString = "~:This is a comment\n" +
                 "across two lines.:~";
         Lexer lexer = new Lexer();
@@ -325,7 +325,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(6)
-    public void lexerTest_Crystals_ThreeLineComment() {
+    public void testLexer_Crystals_ThreeLineComment() {
         String sourceString = "~:This is a comment\n" +
                 "across three lines\n" +
                 "without indentation.:~";
@@ -434,7 +434,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(7)
-    public void lexerTest_Crystals_CommentCrystalsOnSeparateLines() {
+    public void testLexer_Crystals_CommentCrystalsOnSeparateLines() {
         String sourceString = "~:\n" +
                 "This is a multi-line comment\n" +
                 "with the comment crystals on\n" +
@@ -608,7 +608,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(8)
-    public void lexerTest_Crystals_SingleLineStringLiteral() {
+    public void testLexer_Crystals_SingleLineStringLiteral() {
         String sourceString = "``This is a string literal.``";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
@@ -640,7 +640,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(9)
-    public void lexerTest_Crystals_TwoLineStringLiteral() {
+    public void testLexer_Crystals_TwoLineStringLiteral() {
         String sourceString = "``This is a string literal\n" +
                 "across two lines.``";
         Lexer lexer = new Lexer();
@@ -711,7 +711,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(10)
-    public void lexerTest_Crystals_ThreeLineStringLiteral() {
+    public void testLexer_Crystals_ThreeLineStringLiteral() {
         String sourceString = "``This is a string literal\n" +
                 "across three lines\n" +
                 "without indentation.``";
@@ -808,7 +808,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(11)
-    public void lexerTest_Crystals_MultiLineStringLiteral_WithOtherCrystals_BeforeAndAfter() {
+    public void testLexer_Crystals_MultiLineStringLiteral_WithOtherCrystals_BeforeAndAfter() {
         String sourceString = "foo << bar!(``This is a string literal\n" +
                 "across two lines.``|baz)";
         Lexer lexer = new Lexer();
@@ -983,7 +983,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(12)
-    public void lexerTest_Crystals_CaptureQuotations_EnclosingCode_SingleLine() {
+    public void testLexer_Crystals_CaptureQuotations_EnclosingCode_SingleLine() {
         String sourceString = "``a << *``";
         Lexer lexer = new Lexer();
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
@@ -1022,7 +1022,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(13)
-    public void lexerTest_Crystals_CaptureQuotations_EnclosingCode_OnSeparateLines_SingleLine() {
+    public void testLexer_Crystals_CaptureQuotations_EnclosingCode_OnSeparateLines_SingleLine() {
         String sourceString = "string << ``\n" +
                               "a << *\n" +
                               "`` + foo";
@@ -1252,7 +1252,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(14)
-    public void lexerTest_Crystals_CaptureQuotations_EnclosingCode_OnSeparateLines_MultipleLines() {
+    public void testLexer_Crystals_CaptureQuotations_EnclosingCode_OnSeparateLines_MultipleLines() {
         String sourceString = "``\n" +
                 "foo << 2 + [3 * -7]\n" +
                 "bar << foo - [5 / 9.0]\n" +
@@ -1421,7 +1421,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(15)
-    public void lexerTest_Crystals_ErrorCase_SingularBacktick() {
+    public void testLexer_Crystals_ErrorCase_SingularBacktick() {
         String sourceString = "`";
 
         Lexer lexer = new Lexer();
@@ -1458,7 +1458,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(16)
-    public void lexerTest_Crystals_TrueLiteral() {
+    public void testLexer_Crystals_TrueLiteral() {
         String sourceString = "true";
 
         Lexer lexer = new Lexer();
@@ -1498,7 +1498,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(17)
-    public void lexerTest_Crystals_FalseLiteral() {
+    public void testLexer_Crystals_FalseLiteral() {
         String sourceString = "false";
 
         Lexer lexer = new Lexer();
@@ -1541,7 +1541,7 @@ public class LexerTest_ConvertToCrystals {
      */
     @Test
     @Order(18)
-    public void lexerTest_Crystals_Modulus() {
+    public void testLexer_Crystals_Modulus() {
         String sourceString = "%";
 
         Lexer lexer = new Lexer();
@@ -1579,7 +1579,7 @@ public class LexerTest_ConvertToCrystals {
      */
     @Test
     @Order(19)
-    public void lexerTest_Crystals_Multiply() {
+    public void testLexer_Crystals_Multiply() {
         String sourceString = "*";
 
         Lexer lexer = new Lexer();
@@ -1617,7 +1617,7 @@ public class LexerTest_ConvertToCrystals {
      */
     @Test
     @Order(20)
-    public void lexerTest_Crystals_Subtract() {
+    public void testLexer_Crystals_Subtract() {
         String sourceString = "-";
 
         Lexer lexer = new Lexer();
@@ -1655,7 +1655,7 @@ public class LexerTest_ConvertToCrystals {
      */
     @Test
     @Order(21)
-    public void lexerTest_Crystals_Delete() {
+    public void testLexer_Crystals_Delete() {
         String sourceString = "~foo";
 
         Lexer lexer = new Lexer();
@@ -1693,7 +1693,7 @@ public class LexerTest_ConvertToCrystals {
      */
     @Test
     @Order(22)
-    public void lexerTest_Crystals_Add() {
+    public void testLexer_Crystals_Add() {
         String sourceString = "+";
 
         Lexer lexer = new Lexer();
@@ -1731,7 +1731,7 @@ public class LexerTest_ConvertToCrystals {
      */
     @Test
     @Order(23)
-    public void lexerTest_Crystals_SwordOfLengthOne() {
+    public void testLexer_Crystals_SwordOfLengthOne() {
         String sourceString = "_";
 
         Lexer lexer = new Lexer();
@@ -1774,7 +1774,7 @@ public class LexerTest_ConvertToCrystals {
      */
     @Test
     @Order(24)
-    public void lexerTest_Crystals_SwordOfLengthTwo() {
+    public void testLexer_Crystals_SwordOfLengthTwo() {
         String sourceString = "__";
 
         Lexer lexer = new Lexer();
@@ -1817,7 +1817,7 @@ public class LexerTest_ConvertToCrystals {
      */
     @Test
     @Order(25)
-    public void lexerTest_Crystals_SwordOfLengthThree() {
+    public void testLexer_Crystals_SwordOfLengthThree() {
         String sourceString = "___";
 
         Lexer lexer = new Lexer();
@@ -1857,7 +1857,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(26)
-    public void lexerTest_Crystals_TypeReferences_TypeLabel() {
+    public void testLexer_Crystals_TypeReferences_TypeLabel() {
         String sourceString = "int:Integer";
 
         Lexer lexer = new Lexer();
@@ -1922,7 +1922,7 @@ public class LexerTest_ConvertToCrystals {
 
     @Test
     @Order(27)
-    public void lexerTest_Crystals_TypeReferences_StaticFunctionCall() {
+    public void testLexer_Crystals_TypeReferences_StaticFunctionCall() {
         String sourceString = "Math::abs!(-1)";
 
         Lexer lexer = new Lexer();

@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.lexer.stringanalysis;
+package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import org.junit.jupiter.api.MethodOrderer;
@@ -11,11 +11,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_NegativeNumbers {
+public class LexerTest_StringTokens_NegativeNumbers {
 
     @Test
     @Order(1)
-    public void testLexer_StringAnalysis_NegativeNumbers_BasicNegativeInteger() {
+    public void testLexer_StringTokens_NegativeNumbers_BasicNegativeInteger() {
         String sourceString = "a << -2";
 
         Lexer lexer = new Lexer();
@@ -42,7 +42,7 @@ public class LexerTest_NegativeNumbers {
 
     @Test
     @Order(2)
-    public void testLexer_StringAnalysis_NegativeNumbers_BasicNegativeDecimal() {
+    public void testLexer_StringTokens_NegativeNumbers_BasicNegativeDecimal() {
         String sourceString = "negative_pi << -3.14";
 
         Lexer lexer = new Lexer();
@@ -69,7 +69,7 @@ public class LexerTest_NegativeNumbers {
 
     @Test
     @Order(3)
-    public void testLexer_StringAnalysis_NegativeNumbers_BasicNegatedIdentifier() {
+    public void testLexer_StringTokens_NegativeNumbers_BasicNegatedIdentifier() {
         String sourceString = "^^ -bar";
 
         Lexer lexer = new Lexer();
@@ -96,7 +96,7 @@ public class LexerTest_NegativeNumbers {
 
     @Test
     @Order(4)
-    public void testLexer_StringAnalysis_NegativeNumbers_BasicArithmetic() {
+    public void testLexer_StringTokens_NegativeNumbers_BasicArithmetic() {
         String sourceString = "^^ 1.7 * -[3 + 4 / -2.4]";
 
         Lexer lexer = new Lexer();

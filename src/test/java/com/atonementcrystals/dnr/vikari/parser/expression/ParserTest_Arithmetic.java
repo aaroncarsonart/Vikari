@@ -36,7 +36,7 @@ public class ParserTest_Arithmetic {
 
     @Test
     @Order(1)
-    public void testArithmeticOperators_Add() {
+    public void testParser_Expression_ArithmeticOperators_Add() {
         String sourceString = "2 + 7";
 
         Lexer lexer = new Lexer();
@@ -88,7 +88,7 @@ public class ParserTest_Arithmetic {
 
     @Test
     @Order(2)
-    public void testArithmeticOperators_Subtract() {
+    public void testParser_Expression_ArithmeticOperators_Subtract() {
         String sourceString = "3 - 8";
 
         Lexer lexer = new Lexer();
@@ -140,7 +140,7 @@ public class ParserTest_Arithmetic {
 
     @Test
     @Order(3)
-    public void testArithmeticOperators_Multiply() {
+    public void testParser_Expression_ArithmeticOperators_Multiply() {
         String sourceString = "4 * 9";
 
         Lexer lexer = new Lexer();
@@ -192,7 +192,7 @@ public class ParserTest_Arithmetic {
 
     @Test
     @Order(4)
-    public void testArithmeticOperators_LeftDivide() {
+    public void testParser_Expression_ArithmeticOperators_LeftDivide() {
         String sourceString = "5 / 10";
 
         Lexer lexer = new Lexer();
@@ -244,7 +244,7 @@ public class ParserTest_Arithmetic {
 
     @Test
     @Order(5)
-    public void testArithmeticOperators_RightDivide() {
+    public void testParser_Expression_ArithmeticOperators_RightDivide() {
         String sourceString = "6 \\ 11";
 
         Lexer lexer = new Lexer();
@@ -296,7 +296,7 @@ public class ParserTest_Arithmetic {
 
     @Test
     @Order(6)
-    public void testArithmeticOperators_AndGrouping_SingleLine() {
+    public void testParser_Expression_ArithmeticOperators_AndGrouping_SingleLine() {
         String sourceString = "2 + [7 - [22 / 3] * 8]";
 
         Lexer lexer = new Lexer();
@@ -414,7 +414,7 @@ public class ParserTest_Arithmetic {
 
     @Test
     @Order(7)
-    public void testArithmeticOperators_InvalidOperator() {
+    public void testParser_Expression_ArithmeticOperators_InvalidOperator() {
         String sourceString = "2 // 7";
 
         Lexer lexer = new Lexer();
@@ -436,7 +436,7 @@ public class ParserTest_Arithmetic {
 
     @Test
     @Order(8)
-    public void testArithmeticOperators_NoOperands() {
+    public void testParser_Expression_ArithmeticOperators_NoOperands() {
         String sourceString = "+";
 
         Lexer lexer = new Lexer();
@@ -458,7 +458,7 @@ public class ParserTest_Arithmetic {
 
     @Test
     @Order(9)
-    public void testArithmeticOperators_MissingLeftOperand() {
+    public void testParser_Expression_ArithmeticOperators_MissingLeftOperand() {
         String sourceString = "* 5";
 
         Lexer lexer = new Lexer();
@@ -480,7 +480,7 @@ public class ParserTest_Arithmetic {
 
     @Test
     @Order(10)
-    public void testArithmeticOperators_MissingRightOperand() {
+    public void testParser_Expression_ArithmeticOperators_MissingRightOperand() {
         String sourceString = "2 +";
 
         Lexer lexer = new Lexer();

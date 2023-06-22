@@ -202,7 +202,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(1)
-    public void testVariableDeclaration_Basic() {
+    public void testParser_Statement_VariableDeclaration_Basic() {
         String sourceString = "foo";
         List<Statement> statements = lexAndParse(sourceString);
 
@@ -215,7 +215,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(2)
-    public void testVariableDeclaration_WithTypeLabel() {
+    public void testParser_Statement_VariableDeclaration_WithTypeLabel() {
         String sourceString = "foo:Integer";
         List<Statement> statements = lexAndParse(sourceString);
 
@@ -228,7 +228,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(3)
-    public void testVariableDeclaration_WithAssignment() {
+    public void testParser_Statement_VariableDeclaration_WithAssignment() {
         String sourceString = "foo << 2";
         List<Statement> statements = lexAndParse(sourceString);
 
@@ -241,7 +241,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(4)
-    public void testVariableDeclaration_WithTypeLabel_AndAssignment() {
+    public void testParser_Statement_VariableDeclaration_WithTypeLabel_AndAssignment() {
         String sourceString = "foo:Integer << 2";
         List<Statement> statements = lexAndParse(sourceString);
 
@@ -289,7 +289,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(5)
-    public void testVariableDeclaration_MultipleDeclarations_SingleLine() {
+    public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SingleLine() {
         testThreeStatements("foo,bar,baz",
                 "foo", VikariType.ATONEMENT_CRYSTAL, null, COORDINATE_PAIR_ZERO_ZERO,
                 "bar", VikariType.ATONEMENT_CRYSTAL, null, new CoordinatePair(0, 4),
@@ -298,7 +298,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(6)
-    public void testVariableDeclaration_MultipleDeclarations_SeparateLines() {
+    public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SeparateLines() {
         testThreeStatements("foo\nbar\nbaz",
                 "foo", VikariType.ATONEMENT_CRYSTAL, null, COORDINATE_PAIR_ZERO_ZERO,
                 "bar", VikariType.ATONEMENT_CRYSTAL, null, new CoordinatePair(1, 0),
@@ -307,7 +307,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(7)
-    public void testVariableDeclaration_MultipleDeclarations_SingleLine_WithTypeLabels() {
+    public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SingleLine_WithTypeLabels() {
         testThreeStatements("foo:Integer,bar:Integer,baz:Integer",
                 "foo", VikariType.INTEGER, null, COORDINATE_PAIR_ZERO_ZERO,
                 "bar", VikariType.INTEGER, null, new CoordinatePair(0, 12),
@@ -316,7 +316,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(8)
-    public void testVariableDeclaration_MultipleDeclarations_SeparateLines_WithTypeLabels() {
+    public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SeparateLines_WithTypeLabels() {
         testThreeStatements("foo:Integer\nbar:Integer\nbaz:Integer",
                 "foo", VikariType.INTEGER, null, COORDINATE_PAIR_ZERO_ZERO,
                 "bar", VikariType.INTEGER, null, new CoordinatePair(1, 0),
@@ -325,7 +325,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(9)
-    public void testVariableDeclaration_MultipleDeclarations_SingleLine_WithInitializerExpressions() {
+    public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SingleLine_WithInitializerExpressions() {
         testThreeStatements("foo << 2, bar << 3, baz << 4",
                 "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 2,
                 "bar", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, new CoordinatePair(0, 10), 3,
@@ -334,7 +334,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(10)
-    public void testVariableDeclaration_MultipleDeclarations_SeparateLines_WithInitializerExpressions() {
+    public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SeparateLines_WithInitializerExpressions() {
         testThreeStatements("foo << 2\nbar << 3\nbaz << 4",
                 "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 2,
                 "bar", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, new CoordinatePair(1, 0), 3,
@@ -343,7 +343,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(11)
-    public void testVariableDeclaration_MultipleDeclarations_SingleLine_WithTypeLabels_AndInitializerExpressions() {
+    public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SingleLine_WithTypeLabels_AndInitializerExpressions() {
         testThreeStatements("foo:Integer << 2, bar:Integer << 3, baz:Integer << 4",
                 "foo", VikariType.INTEGER, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 2,
                 "bar", VikariType.INTEGER, VikariType.INTEGER, new CoordinatePair(0, 18), 3,
@@ -352,7 +352,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(12)
-    public void testVariableDeclaration_MultipleDeclarations_SeparateLines_WithTypeLabels_AndInitializerExpressions() {
+    public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SeparateLines_WithTypeLabels_AndInitializerExpressions() {
         testThreeStatements("foo:Integer << 2\nbar:Integer << 3\nbaz:Integer << 4",
                 "foo", VikariType.INTEGER, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 2,
                 "bar", VikariType.INTEGER, VikariType.INTEGER, new CoordinatePair(1, 0), 3,
@@ -361,7 +361,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(13)
-    public void testVariableDeclaration_AllNumericTypes() {
+    public void testParser_Statement_VariableDeclaration_AllNumericTypes() {
         String sourceString = """
                 a:Integer
                 b:Long
@@ -387,7 +387,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(14)
-    public void testVariableDeclaration_AllNumericTypes_WithInitializer() {
+    public void testParser_Statement_VariableDeclaration_AllNumericTypes_WithInitializer() {
         String sourceString = """
                 a:Integer << 1
                 b:Long << 2L
@@ -418,7 +418,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(15)
-    public void testVariableDeclaration_NumericUpcasts() {
+    public void testParser_Statement_VariableDeclaration_NumericUpcasts() {
         String sourceString = """
                 a:Long << 1
                 b:BigInteger << 2
@@ -462,7 +462,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(16)
-    public void testVariableDeclaration_NumericDowncasts() {
+    public void testParser_Statement_VariableDeclaration_NumericDowncasts() {
         String sourceString = """
                 a:Integer << 1L
                 b:Integer << 2B
@@ -508,7 +508,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(17)
-    public void testVariableDeclaration_AssignmentToParentTypes() {
+    public void testParser_Statement_VariableDeclaration_AssignmentToParentTypes() {
         String sourceString = """
                 a << 1
                 b:AtonementCrystal << 2
@@ -530,7 +530,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(18)
-    public void testVariableDeclaration_ErrorCase_DuplicateDeclaration_SameType() {
+    public void testParser_Statement_VariableDeclaration_ErrorCase_DuplicateDeclaration_SameType() {
         String sourceString = """
                 a:Integer << 1
                 a:Integer << 2
@@ -552,7 +552,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(19)
-    public void testVariableDeclaration_ErrorCase_UnknownType() {
+    public void testParser_Statement_VariableDeclaration_ErrorCase_UnknownType() {
         String sourceString = """
                 foo:Foo
                 bar:Bar
@@ -575,7 +575,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(20)
-    public void testVariableDeclaration_ErrorCase_UnknownType_WithAssignment() {
+    public void testParser_Statement_VariableDeclaration_ErrorCase_UnknownType_WithAssignment() {
         String sourceString = """
                 foo:Foo << 22
                 bar:Bar << 7L
@@ -598,7 +598,7 @@ public class ParserTest_VariableDeclarationStatements {
 
     @Test
     @Order(21)
-    public void testVariableDeclaration_SyntaxError_InvalidTypeAssignment() {
+    public void testParser_Statement_VariableDeclaration_SyntaxError_InvalidTypeAssignment() {
         String sourceString = "foo:Type << 2";
 
         int expectedErrorCount = 1;
