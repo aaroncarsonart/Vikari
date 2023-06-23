@@ -54,7 +54,7 @@ public class VikariProgram {
 
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
-        interpreter.setGetLineFunction(syntaxErrorReporter::getLine);
+        interpreter.setGetLineFunction(syntaxErrorReporter::getLineFromCache);
 
         replLexerResults = new ArrayList<>();
         replParserResults = new ArrayList<>();

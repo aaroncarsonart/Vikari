@@ -16,7 +16,6 @@ import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
 
-import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 
@@ -60,7 +59,7 @@ public class VikariREPL {
         syntaxErrorReporter = new SyntaxErrorReporter();
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
-        interpreter.setGetLineFunction(syntaxErrorReporter::getLine);
+        interpreter.setGetLineFunction(syntaxErrorReporter::getLineFromCache);
     }
 
     /**

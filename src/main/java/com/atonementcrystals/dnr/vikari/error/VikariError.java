@@ -19,6 +19,12 @@ public class VikariError {
         this.message = message;
     }
 
+    public VikariError(File file, CoordinatePair location, String message) {
+        this.file = file;
+        this.location = location;
+        this.message = message;
+    }
+
     public File getFile() {
         return file;
     }
@@ -29,6 +35,10 @@ public class VikariError {
 
     public String getLine() {
         return line;
+    }
+
+    public void setLine(String line) {
+        this.line = line;
     }
 
     public String getMessage() {

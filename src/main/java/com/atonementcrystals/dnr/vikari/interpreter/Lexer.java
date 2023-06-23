@@ -187,7 +187,7 @@ public class Lexer {
         this.reader = reader;
         statementsOfStringTokens = new ArrayList<>();
         stringTokens = new ArrayList<>();
-        lines = new ArrayList<>();
+        cacheLineData();
 
         line = readNextLine();
         lineLength = atEndOfFile() ? 0 : line.length();
@@ -303,8 +303,16 @@ public class Lexer {
                 advanceToNextLine();
             }
         }
-        cacheLineData();
         return statementsOfStringTokens;
+    }
+
+    private void cacheLineData() {
+        lines = new ArrayList<>();
+
+        if (syntaxErrorReporter == null) {
+            syntaxErrorReporter = new SyntaxErrorReporter();
+        }
+        syntaxErrorReporter.addLinesForFile(currentFile, lines);
     }
 
     private String readNextLine() {
@@ -351,13 +359,6 @@ public class Lexer {
         }
     }
 
-    private void cacheLineData() {
-        if (syntaxErrorReporter == null) {
-            syntaxErrorReporter = new SyntaxErrorReporter();
-        }
-        syntaxErrorReporter.addLinesForFile(currentFile, lines);
-    }
-
     private void token() {
         String nextToken = line.substring(startIndex, currentIndex);
         stringTokens.add(nextToken);
@@ -398,7 +399,6 @@ public class Lexer {
         // Cache values in case of a syntax error.
         int errorLineNumber = lineNumber;
         int errorStart = startIndex;
-        String errorLine = line;
 
         // Consume the string token(s).
         boolean consumedClosingToken = multilineToken(TokenType.CAPTURE_QUOTATION.getIdentifier());
@@ -406,7 +406,7 @@ public class Lexer {
         // Report if there was an error.
         if (!consumedClosingToken) {
             String errorMessage = "Missing closing capture quotation ``.";
-            reportError(errorMessage, errorLineNumber, errorStart, errorLine);
+            reportError(errorMessage, errorLineNumber, errorStart);
         }
     }
 
@@ -426,7 +426,7 @@ public class Lexer {
             currentIndex = closingBacktickIndex + 1;
         } else {
             currentIndex = line.length();
-            reportError("Missing closing backtick quotation `.", lineNumber, startIndex, line);
+            reportError("Missing closing backtick quotation `.", lineNumber, startIndex);
             missingClosingBacktick = true;
         }
 
@@ -443,11 +443,11 @@ public class Lexer {
             if (!isSpaceCharLiteral && Utils.isWhitespace(unquotedNextToken)) {
                 // Report an error if identifier contains only whitespace.
                 String errorMessage = "Backtick-quoted identifiers cannot contain only whitespace.";
-                reportError(errorMessage, lineNumber, startIndex + 1, line);
+                reportError(errorMessage, lineNumber, startIndex + 1);
             } else if (unquotedNextToken.contains("\t")) {
                 // Report an error if identifier contains a tab character.
                 String errorMessage = "Backtick-quoted identifiers cannot contain tabs.";
-                reportError(errorMessage, lineNumber, startIndex + 1, line);
+                reportError(errorMessage, lineNumber, startIndex + 1);
             }
         }
     }
@@ -456,7 +456,6 @@ public class Lexer {
         // Cache values in case of a syntax error.
         int errorLineNumber = lineNumber;
         int errorStart = startIndex;
-        String errorLine = line;
 
         // Consume the comment token(s).
         String commentPrefix = TokenType.COMMENT_PREFIX_CRYSTAL.getIdentifier();
@@ -466,7 +465,7 @@ public class Lexer {
         // Report if there was an error.
         if (!consumedClosingToken) {
             String errorMessage = "Missing comment suffix token `:~`.";
-            reportError(errorMessage, errorLineNumber, errorStart, errorLine);
+            reportError(errorMessage, errorLineNumber, errorStart);
         }
     }
 
@@ -538,7 +537,7 @@ public class Lexer {
     private void invalidCharactersToken() {
         boolean consumedToken = tryMatchRegex(invalidCharactersRegex);
         if (consumedToken) {
-            reportError(INVALID_CHARACTERS_ERROR_MESSAGE, lineNumber, startIndex, line);
+            reportError(INVALID_CHARACTERS_ERROR_MESSAGE, lineNumber, startIndex);
         } else {
             throw new Vikari_LexerException("Internal error. Invalid character '" + nextChar + "'" +
                     " not detected by regular expression.");
@@ -564,11 +563,10 @@ public class Lexer {
      * @param message The error message.
      * @param row The row number location for the error.
      * @param column The column number location for the error.
-     * @param lineForError The String of the line for which the error occurred.
      */
-    private void reportError(String message, int row, int column, String lineForError) {
+    private void reportError(String message, int row, int column) {
         CoordinatePair location = new CoordinatePair(row, column);
-        SyntaxError syntaxError = new SyntaxError(currentFile, location, lineForError, message);
+        SyntaxError syntaxError = new SyntaxError(currentFile, location, message);
         syntaxErrorReporter.add(syntaxError);
     }
 

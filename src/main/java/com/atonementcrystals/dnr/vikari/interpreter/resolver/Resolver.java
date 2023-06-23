@@ -33,16 +33,12 @@ public abstract class Resolver<T> implements Statement.Visitor<T>, Expression.Vi
         return resolutionErrors;
     }
 
-    public final void reportErrors(SyntaxErrorReporter syntaxErrorReporter, File file,
-                                   List<List<AtonementCrystal>> lexedStatements) {
+    public final void reportErrors(SyntaxErrorReporter syntaxErrorReporter, File file) {
         for (ResolverError resolutionError : resolutionErrors) {
             CoordinatePair location = resolutionError.getLocation();
-            int lineNumber = location.getRow();
-            List<AtonementCrystal> lexedStatement = lexedStatements.get(lineNumber);
-            String line = lexedStatement.stream().map(AtonementCrystal::getIdentifier).collect(Collectors.joining());
             String errorMessage = resolutionError.getErrorMessage();
 
-            SyntaxError syntaxError = new SyntaxError(file, location, line, errorMessage);
+            SyntaxError syntaxError = new SyntaxError(file, location, errorMessage);
             syntaxErrorReporter.add(syntaxError);
         }
     }

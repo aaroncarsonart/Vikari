@@ -61,6 +61,12 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         rootEnvironments = new HashMap<>();
     }
 
+    /**
+     * Set the function to get the line data for the current file in order to properly
+     * report RuntimeErrors in a helpful way to the end user.
+     * @param getLineFunction The function to fetch the line data with. It accepts a File
+     *                        and a line number, and returns a String.
+     */
     public void setGetLineFunction(BiFunction<File, Integer, String> getLineFunction) {
         this.getLineFunction = getLineFunction;
     }

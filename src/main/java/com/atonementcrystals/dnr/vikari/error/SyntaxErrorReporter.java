@@ -1,13 +1,11 @@
 package com.atonementcrystals.dnr.vikari.error;
 
-import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +26,15 @@ public class SyntaxErrorReporter {
     }
 
     public void add(SyntaxError syntaxError) {
+        setLineFromCache(syntaxError);
         this.syntaxErrors.add(syntaxError);
+    }
+
+    private void setLineFromCache(SyntaxError syntaxError) {
+        File file = syntaxError.getFile();
+        int lineNumber = syntaxError.getLocation().getRow();
+        String line = getLineFromCache(file, lineNumber);
+        syntaxError.setLine(line);
     }
 
     public boolean hasErrors() {
@@ -79,7 +85,7 @@ public class SyntaxErrorReporter {
         }
     }
 
-    public String getLine(File file, int lineNumber) {
+    public String getLineFromCache(File file, int lineNumber) {
         if (fileToLinesMap.containsKey(file)) {
             List<String> lines = fileToLinesMap.get(file);
             return lines.get(lineNumber);

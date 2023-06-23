@@ -153,7 +153,7 @@ public class ParserTest_Variables {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 4), sourceString, "Expected token(s) in " +
+        TestUtils.testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 4), sourceString, "Unexpected token(s) in " +
                 "variable declaration statement");
 
         int expectedStatementCount = 1;

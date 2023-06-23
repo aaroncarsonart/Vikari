@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Parses the output of the Lexer into an abstract syntax tree consisting of
@@ -132,7 +133,7 @@ public class Parser {
 
         // Visit the Resolvers.
         typeResolver.resolve(statements);
-        typeResolver.reportErrors(syntaxErrorReporter, file, this.lexedStatements);
+        typeResolver.reportErrors(syntaxErrorReporter, file);
 
         this.file = null;
         return statements;
@@ -178,8 +179,12 @@ public class Parser {
         } catch (Vikari_ParserException e) {
             synchronize();
 
-            String line = syntaxErrorReporter.getLine(file, statementNumber);
-            SyntaxErrorStatement syntaxErrorStatement = new SyntaxErrorStatement(line);
+            List<AtonementCrystal> lastVisitedLine = getLastVisitedLexedStatement();
+            String statementString = lastVisitedLine.stream()
+                    .map(AtonementCrystal::getIdentifier)
+                    .collect(Collectors.joining(""));
+
+            SyntaxErrorStatement syntaxErrorStatement = new SyntaxErrorStatement(statementString);
             syntaxErrorStatement.setLocation(new CoordinatePair(statementNumber, 0));
             return syntaxErrorStatement;
         }
@@ -686,9 +691,7 @@ public class Parser {
     }
 
     private Vikari_ParserException error(CoordinatePair location, String errorMessage) {
-        int lineNumber = location.getRow();
-        String line = syntaxErrorReporter.getLine(file, lineNumber);
-        SyntaxError syntaxError = new SyntaxError(file, location, line, errorMessage);
+        SyntaxError syntaxError = new SyntaxError(file, location, errorMessage);
         syntaxErrorReporter.add(syntaxError);
         return new Vikari_ParserException(errorMessage);
     }

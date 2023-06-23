@@ -27,7 +27,6 @@ public class InterpreterTest_Utils {
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
-        interpreter.setGetLineFunction(syntaxErrorReporter::getLine);
 
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
