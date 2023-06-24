@@ -1,8 +1,6 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.comment.CommentCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.comment.MultiLineCommentCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
@@ -23,7 +21,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.MultiplyOpera
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.BlankLineCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.WhitespaceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.quotation.CaptureQuotationCrystal;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.error.Vikari_IOException;
@@ -602,11 +599,8 @@ public class Lexer {
                 CoordinatePair tokenCoordinates = new CoordinatePair(statementNumber, column);
 
                 if (Utils.isWhitespace(stringToken)) {
-                    // TODO: Impose maximum limits on length of variable-length Vikari identifiers.
-                    // TODO: Impose maximum limits on indentation levels in Vikari.
-                    WhitespaceCrystal whitespaceCrystal = new WhitespaceCrystal(stringToken);
-                    whitespaceCrystal.setCoordinates(tokenCoordinates);
-                    statementOfCrystals.add(whitespaceCrystal);
+                    // All whitespace (besides indentation) is elided in the final output of the Lexer.
+                    // TODO: Produce IndentationCrystals for leading whitespace.
                     continue;
                 }
 
@@ -765,46 +759,27 @@ public class Lexer {
                 }
 
                 if (Utils.isSingleLineComment(stringToken)) {
-                    // TODO: Impose maximum limits on length of variable-length Vikari identifiers.
-                    CommentCrystal commentCrystal = new CommentCrystal(stringToken);
-                    String commentPrefix = TokenType.COMMENT_PREFIX_CRYSTAL.getIdentifier();
-                    String commentSuffix = TokenType.COMMENT_SUFFIX_CRYSTAL.getIdentifier();
-                    String contents = Utils.stripEnclosure(stringToken, commentPrefix, commentSuffix);
-                    commentCrystal.setComment(contents);
-                    commentCrystal.setCoordinates(tokenCoordinates);
-                    statementOfCrystals.add(commentCrystal);
+                    // Single-line comments are elided in the final output of the Lexer.
                     continue;
                 }
 
                 if (Utils.isStartOfComment(stringToken)) {
-                    // TODO: Impose maximum limits on length of variable-length Vikari identifiers.
-                    MultiLineCommentCrystal stringCrystal = new MultiLineCommentCrystal(stringToken);
-                    String commentPrefixOperator = TokenType.COMMENT_PREFIX_CRYSTAL.getIdentifier();
-                    String commentSuffixOperator = TokenType.COMMENT_SUFFIX_CRYSTAL.getIdentifier();
-                    String contents = stringToken.substring(commentPrefixOperator.length());
-                    stringCrystal.setComment(contents);
-                    stringCrystal.setCoordinates(tokenCoordinates);
-                    statementOfCrystals.add(stringCrystal);
-                    MultiLineCommentCrystal prevCommentCrystal = stringCrystal;
+                    // Multi-line comments are elided in the final output of the Lexer.
                     while (!Utils.isEndOfComment(stringToken) && statementNumber < statementsOfStringTokens.size() - 1) {
+                        if (statementOfCrystals.isEmpty()) {
+                            // TODO: Remove BlankLineCrystals from output of the Lexer.
+                            BlankLineCrystal blankLineCrystal = new BlankLineCrystal();
+                            blankLineCrystal.setCoordinates(new CoordinatePair(statementNumber, 0));
+                            statementOfCrystals.add(blankLineCrystal);
+                        }
+
                         statementNumber++;
                         tokenNumber = 0;
                         column = 0;
-                        tokenCoordinates = new CoordinatePair(statementNumber, column);
                         statementOfStringTokens = statementsOfStringTokens.get(statementNumber);
                         statementsOfCrystals.add(statementOfCrystals);
                         statementOfCrystals = new ArrayList<>();
                         stringToken = statementOfStringTokens.get(tokenNumber);
-                        MultiLineCommentCrystal nextCommentCrystal = new MultiLineCommentCrystal(stringToken);
-                        contents = stringToken;
-                        if (Utils.isEndOfComment(stringToken)) {
-                            contents = stringToken.substring(0, stringToken.length() - commentSuffixOperator.length());
-                        }
-                        nextCommentCrystal.setComment(contents);
-                        nextCommentCrystal.setCoordinates(tokenCoordinates);
-                        statementOfCrystals.add(nextCommentCrystal);
-                        prevCommentCrystal.setNext(nextCommentCrystal);
-                        prevCommentCrystal = nextCommentCrystal;
                     }
                     continue;
                 }
@@ -885,6 +860,7 @@ public class Lexer {
 
                 // Insert a blank line crystal as a placeholder to preserve the line numbers of the following statements.
                 if (stringToken.equals("")) {
+                    // TODO: Remove BlankLineCrystals from output of the Lexer.
                     BlankLineCrystal blankLineCrystal = new BlankLineCrystal();
                     blankLineCrystal.setCoordinates(tokenCoordinates);
                     statementOfCrystals.add(blankLineCrystal);
@@ -924,6 +900,15 @@ public class Lexer {
                     throw new Vikari_LexerException("Internal error. Description: \"" + e.getMessage() + "\"");
                 }
             }
+
+            // Ensure blank lines contain a single expected crystal to preserve the line number.
+            if (statementOfCrystals.isEmpty()) {
+                // TODO: Remove BlankLineCrystals from output of the Lexer.
+                BlankLineCrystal blankLineCrystal = new BlankLineCrystal();
+                blankLineCrystal.setCoordinates(new CoordinatePair(statementNumber, 0));
+                statementOfCrystals.add(blankLineCrystal);
+            }
+
             statementsOfCrystals.add(statementOfCrystals);
         }
 

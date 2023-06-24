@@ -8,7 +8,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.LeftAss
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.WhitespaceCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.BlankLineCrystal;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.Order;
@@ -31,7 +31,9 @@ public class LexerTest_Crystals_InvalidCharacters {
             String sourceString = String.valueOf(invalidCharactersToTest.charAt(i));
 
             SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-            lexSingleStatement(sourceString, 0, syntaxErrorReporter, 1);
+            List<AtonementCrystal> statement = lexSingleStatement(sourceString, 1, syntaxErrorReporter, 1);
+
+            testCrystal(statement.get(0), BlankLineCrystal.class, "", location(0, 0));
 
             List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
             testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Invalid characters.");
@@ -45,7 +47,9 @@ public class LexerTest_Crystals_InvalidCharacters {
                 "◊ı˜Â¯˘¿";
 
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        lexSingleStatement(sourceString, 0, syntaxErrorReporter, 1);
+        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 1, syntaxErrorReporter, 1);
+
+        testCrystal(statement.get(0), BlankLineCrystal.class, "", location(0, 0));
 
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Invalid characters.");
@@ -69,7 +73,7 @@ public class LexerTest_Crystals_InvalidCharacters {
                 validToken6, invalidToken7, validToken8, invalidToken9);
 
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        List<AtonementCrystal> crystals = lexSingleStatement(sourceString, 4, syntaxErrorReporter, 5);
+        List<AtonementCrystal> crystals = lexSingleStatement(sourceString, 2, syntaxErrorReporter, 5);
 
         int column1 = 0;
         int column2 = invalidToken1.length();
@@ -81,10 +85,8 @@ public class LexerTest_Crystals_InvalidCharacters {
         int column8 = column7 + invalidToken7.length();
         int column9 = column8 +   validToken8.length();
 
-        testCrystal(crystals.get(0), WhitespaceCrystal.class, validToken2, location(0, column2));
-        testCrystal(crystals.get(1), ReferenceCrystal.class, validToken4, location(0, column4));
-        testCrystal(crystals.get(2), WhitespaceCrystal.class, validToken6, location(0, column6));
-        testCrystal(crystals.get(3), DoubleCrystal.class, validToken8, location(0, column8));
+        testCrystal(crystals.get(0), ReferenceCrystal.class, validToken4, location(0, column4));
+        testCrystal(crystals.get(1), DoubleCrystal.class, validToken8, location(0, column8));
 
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         String expectedErrorMessage = "Invalid characters.";

@@ -24,7 +24,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.RangeOperat
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionSeparatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.StatementSeparatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.WhitespaceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.LeftSquareBracketCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.RightSquareBracketCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
@@ -59,32 +58,41 @@ import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.*;
 public class LexerTest_Crystals_NegationOperator {
 
     private void testUnaryOperatorExpression(String sourceString, TokenType unaryOperator) {
-        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 3);
+        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 2);
 
         Class<? extends AtonementCrystal> operatorClass = unaryOperator.getJavaType();
         String operatorIdentifier = unaryOperator.getIdentifier();
         int operatorLength = operatorIdentifier.length();
 
         testCrystal(statement.get(0), operatorClass, operatorIdentifier, location(0, 0));
-        testCrystal(statement.get(1), WhitespaceCrystal.class, " ", location(0, operatorLength));
-        testCrystal(statement.get(2), IntegerCrystal.class, "-5", location(0, operatorLength + 2));
+        testCrystal(statement.get(1), IntegerCrystal.class, "-5", location(0, operatorLength + 2));
     }
 
     private void testBinaryOperatorExpression(String sourceString, TokenType binaryOperator) {
-        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 5);
+        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 3);
 
         Class<? extends AtonementCrystal> operatorClass = binaryOperator.getJavaType();
         String operatorIdentifier = binaryOperator.getIdentifier();
         int operatorLength = operatorIdentifier.length();
 
         testCrystal(statement.get(0), ReferenceCrystal.class, "foo", location(0, 0));
-        testCrystal(statement.get(1), WhitespaceCrystal.class, " ", location(0, 3));
-        testCrystal(statement.get(2), operatorClass, operatorIdentifier, location(0, 4));
-        testCrystal(statement.get(3), WhitespaceCrystal.class, " ", location(0, 4 + operatorLength));
-        testCrystal(statement.get(4), IntegerCrystal.class, "-5", location(0, 4 + operatorLength + 2));
+        testCrystal(statement.get(1), operatorClass, operatorIdentifier, location(0, 4));
+        testCrystal(statement.get(2), IntegerCrystal.class, "-5", location(0, 4 + operatorLength + 2));
     }
 
     private void testAssignmentOperatorExpression(String sourceString, TokenType assignmentOperator) {
+        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 3);
+
+        Class<? extends AtonementCrystal> operatorClass = assignmentOperator.getJavaType();
+        String operatorIdentifier = assignmentOperator.getIdentifier();
+        int operatorLength = operatorIdentifier.length();
+
+        testCrystal(statement.get(0), ReferenceCrystal.class, "foo", location(0, 0));
+        testCrystal(statement.get(1), operatorClass, operatorIdentifier, location(0, 4));
+        testCrystal(statement.get(2), IntegerCrystal.class, "-5", location(0, 4 + operatorLength + 2));
+    }
+
+    private void testLogicalOperatorExpression(String sourceString, TokenType assignmentOperator) {
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 5);
 
         Class<? extends AtonementCrystal> operatorClass = assignmentOperator.getJavaType();
@@ -92,28 +100,10 @@ public class LexerTest_Crystals_NegationOperator {
         int operatorLength = operatorIdentifier.length();
 
         testCrystal(statement.get(0), ReferenceCrystal.class, "foo", location(0, 0));
-        testCrystal(statement.get(1), WhitespaceCrystal.class, " ", location(0, 3));
-        testCrystal(statement.get(2), operatorClass, operatorIdentifier, location(0, 4));
-        testCrystal(statement.get(3), WhitespaceCrystal.class, " ", location(0, 4 + operatorLength));
-        testCrystal(statement.get(4), IntegerCrystal.class, "-5", location(0, 4 + operatorLength + 2));
-    }
-
-    private void testLogicalOperatorExpression(String sourceString, TokenType assignmentOperator) {
-        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 9);
-
-        Class<? extends AtonementCrystal> operatorClass = assignmentOperator.getJavaType();
-        String operatorIdentifier = assignmentOperator.getIdentifier();
-        int operatorLength = operatorIdentifier.length();
-
-        testCrystal(statement.get(0), ReferenceCrystal.class, "foo", location(0, 0));
-        testCrystal(statement.get(1), WhitespaceCrystal.class, " ", location(0, 3));
-        testCrystal(statement.get(2), operatorClass, operatorIdentifier, location(0, 4));
-        testCrystal(statement.get(3), WhitespaceCrystal.class, " ", location(0, 4 + operatorLength));
-        testCrystal(statement.get(4), IntegerCrystal.class, "-5", location(0, 4 + operatorLength + 2));
-        testCrystal(statement.get(5), WhitespaceCrystal.class, " ", location(0, 4 + operatorLength + 3));
-        testCrystal(statement.get(6), EqualsOperatorCrystal.class, "=", location(0, 4 + operatorLength + 4));
-        testCrystal(statement.get(7), WhitespaceCrystal.class, " ", location(0, 4 + operatorLength + 5));
-        testCrystal(statement.get(8), ReferenceCrystal.class, "bar", location(0, 4 + operatorLength + 6));
+        testCrystal(statement.get(1), operatorClass, operatorIdentifier, location(0, 4));
+        testCrystal(statement.get(2), IntegerCrystal.class, "-5", location(0, 4 + operatorLength + 2));
+        testCrystal(statement.get(3), EqualsOperatorCrystal.class, "=", location(0, 4 + operatorLength + 4));
+        testCrystal(statement.get(4), ReferenceCrystal.class, "bar", location(0, 4 + operatorLength + 6));
     }
 
     @Test
@@ -180,20 +170,16 @@ public class LexerTest_Crystals_NegationOperator {
     @Test
     @Order(6)
     public void testLexer_Crystals_NegationOperator_AfterRegionSeparator() {
-        List<AtonementCrystal> statement = lexSingleStatement("?? [true] :: _; -5", 12);
+        List<AtonementCrystal> statement = lexSingleStatement("?? [true] :: _; -5", 8);
 
         testCrystal(statement.get(0), ConditionalBranchCrystal.class, "??", location(0, 0));
-        testCrystal(statement.get(1), WhitespaceCrystal.class, " ", location(0, 2));
-        testCrystal(statement.get(2), LeftSquareBracketCrystal.class, "[", location(0, 3));
-        testCrystal(statement.get(3), BooleanLiteralCrystal.class, "true", location(0, 4));
-        testCrystal(statement.get(4), RightSquareBracketCrystal.class, "]", location(0, 8));
-        testCrystal(statement.get(5), WhitespaceCrystal.class, " ", location(0, 9));
-        testCrystal(statement.get(6), RegionOperatorCrystal.class, "::", location(0, 10));
-        testCrystal(statement.get(7), WhitespaceCrystal.class, " ", location(0, 12));
-        testCrystal(statement.get(8), SwordCrystal.class, "_", location(0, 13));
-        testCrystal(statement.get(9), RegionSeparatorCrystal.class, ";", location(0, 14));
-        testCrystal(statement.get(10), WhitespaceCrystal.class, " ", location(0, 15));
-        testCrystal(statement.get(11), IntegerCrystal.class, "-5", location(0, 17));
+        testCrystal(statement.get(1), LeftSquareBracketCrystal.class, "[", location(0, 3));
+        testCrystal(statement.get(2), BooleanLiteralCrystal.class, "true", location(0, 4));
+        testCrystal(statement.get(3), RightSquareBracketCrystal.class, "]", location(0, 8));
+        testCrystal(statement.get(4), RegionOperatorCrystal.class, "::", location(0, 10));
+        testCrystal(statement.get(5), SwordCrystal.class, "_", location(0, 13));
+        testCrystal(statement.get(6), RegionSeparatorCrystal.class, ";", location(0, 14));
+        testCrystal(statement.get(7), IntegerCrystal.class, "-5", location(0, 17));
     }
 
     @Test
@@ -286,14 +272,12 @@ public class LexerTest_Crystals_NegationOperator {
     @Test
     @Order(15)
     public void testLexer_Crystals_NegationOperator_AfterLogicalNotOperator() {
-        List<AtonementCrystal> statement = lexSingleStatement("'-5 = bar", 6);
+        List<AtonementCrystal> statement = lexSingleStatement("'-5 = bar", 4);
 
         testCrystal(statement.get(0), LogicalNotOperatorCrystal.class, "'", location(0, 0));
         testCrystal(statement.get(1), IntegerCrystal.class, "-5", location(0, 2));
-        testCrystal(statement.get(2), WhitespaceCrystal.class, " ", location(0, 3));
-        testCrystal(statement.get(3), EqualsOperatorCrystal.class, "=", location(0, 4));
-        testCrystal(statement.get(4), WhitespaceCrystal.class, " ", location(0, 5));
-        testCrystal(statement.get(5), ReferenceCrystal.class, "bar", location(0, 6));
+        testCrystal(statement.get(2), EqualsOperatorCrystal.class, "=", location(0, 4));
+        testCrystal(statement.get(3), ReferenceCrystal.class, "bar", location(0, 6));
     }
 
     @Test
@@ -310,33 +294,26 @@ public class LexerTest_Crystals_NegationOperator {
     @Test
     @Order(17)
     public void testLexer_Crystals_NegationOperator_AfterLeftFeatherFallOperator() {
-        List<AtonementCrystal> statement = lexSingleStatement("\\\\ -5 / 0 //", 9);
+        List<AtonementCrystal> statement = lexSingleStatement("\\\\ -5 / 0 //", 5);
 
         testCrystal(statement.get(0), LeftFeatherFallCrystal.class, "\\\\", location(0, 0));
-        testCrystal(statement.get(1), WhitespaceCrystal.class, " ", location(0, 2));
-        testCrystal(statement.get(2), IntegerCrystal.class, "-5", location(0, 4));
-        testCrystal(statement.get(3), WhitespaceCrystal.class, " ", location(0, 5));
-        testCrystal(statement.get(4), LeftDivideOperatorCrystal.class, "/", location(0, 6));
-        testCrystal(statement.get(5), WhitespaceCrystal.class, " ", location(0, 7));
-        testCrystal(statement.get(6), IntegerCrystal.class, "0", location(0, 8));
-        testCrystal(statement.get(7), WhitespaceCrystal.class, " ", location(0, 9));
-        testCrystal(statement.get(8), RightFeatherFallCrystal.class, "//", location(0, 10));
+        testCrystal(statement.get(1), IntegerCrystal.class, "-5", location(0, 4));
+        testCrystal(statement.get(2), LeftDivideOperatorCrystal.class, "/", location(0, 6));
+        testCrystal(statement.get(3), IntegerCrystal.class, "0", location(0, 8));
+        testCrystal(statement.get(4), RightFeatherFallCrystal.class, "//", location(0, 10));
     }
 
     @Test
     @Order(18)
     public void testLexer_Crystals_NegationOperator_AfterRightFeatherFallOperator() {
-        List<AtonementCrystal> statement = lexSingleStatement("\\\\ dangerous!() // -5", 10);
+        List<AtonementCrystal> statement = lexSingleStatement("\\\\ dangerous!() // -5", 7);
 
         testCrystal(statement.get(0), LeftFeatherFallCrystal.class, "\\\\", location(0, 0));
-        testCrystal(statement.get(1), WhitespaceCrystal.class, " ", location(0, 2));
-        testCrystal(statement.get(2), ReferenceCrystal.class, "dangerous", location(0, 3));
-        testCrystal(statement.get(3), FunctionCallOperatorCrystal.class, "!", location(0, 12));
-        testCrystal(statement.get(4), LeftParenthesisCrystal.class, "(", location(0, 13));
-        testCrystal(statement.get(5), RightParenthesisCrystal.class, ")", location(0, 14));
-        testCrystal(statement.get(6), WhitespaceCrystal.class, " ", location(0, 15));
-        testCrystal(statement.get(7), RightFeatherFallCrystal.class, "//", location(0, 16));
-        testCrystal(statement.get(8), WhitespaceCrystal.class, " ", location(0, 18));
-        testCrystal(statement.get(9), IntegerCrystal.class, "-5", location(0, 20));
+        testCrystal(statement.get(1), ReferenceCrystal.class, "dangerous", location(0, 3));
+        testCrystal(statement.get(2), FunctionCallOperatorCrystal.class, "!", location(0, 12));
+        testCrystal(statement.get(3), LeftParenthesisCrystal.class, "(", location(0, 13));
+        testCrystal(statement.get(4), RightParenthesisCrystal.class, ")", location(0, 14));
+        testCrystal(statement.get(5), RightFeatherFallCrystal.class, "//", location(0, 16));
+        testCrystal(statement.get(6), IntegerCrystal.class, "-5", location(0, 20));
     }
 }
