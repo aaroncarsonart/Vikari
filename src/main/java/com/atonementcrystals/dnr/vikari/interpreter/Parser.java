@@ -24,7 +24,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.PrintStatementOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.NegateCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.WhitespaceCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.UnaryExpression;
@@ -457,12 +456,7 @@ public class Parser {
         if (currentLine.size() == 1 && currentLine.get(0) instanceof BlankLineCrystal) {
             return true;
         }
-        for (AtonementCrystal crystal : currentLine) {
-            if (!(crystal instanceof WhitespaceCrystal)) {
-                return false;
-            }
-        }
-        return true;
+        return false;
     }
 
     public Statement blankStatement() {
@@ -529,15 +523,6 @@ public class Parser {
 
             if (!isAtEnd(position) && !isAtEndOfStatement(position)) {
                 current = currentLine.get(position);
-
-                // Advance past all whitespace that is not indentation.
-                if (position > 0 && current instanceof WhitespaceCrystal) {
-                    position++;
-
-                    if (!isAtEnd(position) && !isAtEndOfStatement(position)) {
-                        current = currentLine.get(position);
-                    }
-                }
             }
         }
         return current;
@@ -547,11 +532,6 @@ public class Parser {
         AtonementCrystal previous = peek();
         if (!isAtEnd()) {
             tokenNumber++;
-
-            // Advance past all whitespace that is not indentation.
-            if (tokenNumber > 0 && check(WhitespaceCrystal.class)) {
-                advance();
-            }
         }
         return previous;
     }
@@ -629,11 +609,8 @@ public class Parser {
     }
 
     private AtonementCrystal previous() {
-        // Walk backwards to the first non-whitespace crystal.
         TokenPosition position = new TokenPosition(lineNumber, tokenNumber);
-        do {
-            position = backup(position);
-        } while (isAtEnd(position) || get(position) instanceof WhitespaceCrystal);
+        position = backup(position);
 
         int lineNumber = position.getLineNumber();
         int tokenNumber = position.getTokenNumber();
