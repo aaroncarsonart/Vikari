@@ -20,7 +20,6 @@ import com.atonementcrystals.dnr.vikari.core.expression.PrintExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.RightAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.UnaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.VariableExpression;
-import com.atonementcrystals.dnr.vikari.core.statement.BlankStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.PrintStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.SyntaxErrorStatement;
@@ -222,12 +221,6 @@ public class TypeResolver extends Resolver<TypeCrystal> {
 
     @Override
     public TypeCrystal visit(SyntaxErrorStatement stmt) {
-        // Ignore as this contains no expressions or crystals to resolve.
-        return null;
-    }
-
-    @Override
-    public TypeCrystal visit(BlankStatement stmt) {
         // Ignore as this contains no expressions or crystals to resolve.
         return null;
     }

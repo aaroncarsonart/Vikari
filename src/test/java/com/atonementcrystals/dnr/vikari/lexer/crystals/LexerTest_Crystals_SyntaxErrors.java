@@ -2,7 +2,6 @@ package com.atonementcrystals.dnr.vikari.lexer.crystals;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.BlankLineCrystal;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
@@ -36,9 +35,7 @@ public class LexerTest_Crystals_SyntaxErrors {
         String sourceString = "~:";
 
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 1, syntaxErrorReporter, 1);
-
-        testCrystal(statement.get(0), BlankLineCrystal.class, "", location(0, 0));
+        lex(sourceString, 0, syntaxErrorReporter, 1);
     }
 
     @Test
@@ -165,9 +162,7 @@ public class LexerTest_Crystals_SyntaxErrors {
         String sourceString = "~:`a` is approximately: [pi * 100].";
 
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 1, syntaxErrorReporter, 1);
-
-        testCrystal(statement.get(0), BlankLineCrystal.class, "", location(0, 0));
+        lex(sourceString, 0, syntaxErrorReporter, 1);
     }
 
     @Test
@@ -177,10 +172,7 @@ public class LexerTest_Crystals_SyntaxErrors {
                               "However, I forgot to close this comment!";
 
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        List<List<AtonementCrystal>> statements = lex(sourceString, 2, syntaxErrorReporter, 1, crystalCounts(1, 1));
-
-        testCrystal(statements.get(0).get(0), BlankLineCrystal.class, "", location(0, 0));
-        testCrystal(statements.get(1).get(0), BlankLineCrystal.class, "", location(1, 0));
+        lex(sourceString, 0, syntaxErrorReporter, 1);
     }
 
     @Test
@@ -252,13 +244,11 @@ public class LexerTest_Crystals_SyntaxErrors {
                               "~:Unclosed comment.";
 
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        List<List<AtonementCrystal>> statements = lex(sourceString, 2, errorReporter, 3, crystalCounts(3, 1));
+        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 3, errorReporter, 3);
 
-        testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "`z\tz`", location(0, 0));
-        testCrystal(statements.get(0).get(1), LeftAssignmentOperatorCrystal.class, "<<", location(0, 6));
-        testCrystal(statements.get(0).get(2), ReferenceCrystal.class, "`foo", location(0, 9));
-
-        testCrystal(statements.get(1).get(0), BlankLineCrystal.class, "", location(1, 0));
+        testCrystal(statement.get(0), ReferenceCrystal.class, "`z\tz`", location(0, 0));
+        testCrystal(statement.get(1), LeftAssignmentOperatorCrystal.class, "<<", location(0, 6));
+        testCrystal(statement.get(2), ReferenceCrystal.class, "`foo", location(0, 9));
     }
 
     /**
@@ -271,13 +261,11 @@ public class LexerTest_Crystals_SyntaxErrors {
                               "\t\t~:Unclosed comment.";
 
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        List<List<AtonementCrystal>> statements = lex(sourceString, 2, errorReporter, 2, crystalCounts(3, 1));
+        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 3, errorReporter, 2);
 
-        testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "`z`", location(0, 2));
-        testCrystal(statements.get(0).get(1), LeftAssignmentOperatorCrystal.class, "<<", location(0, 6));
-        testCrystal(statements.get(0).get(2), ReferenceCrystal.class, "`foo", location(0, 9));
-
-        testCrystal(statements.get(1).get(0), BlankLineCrystal.class, "", location(1, 0));
+        testCrystal(statement.get(0), ReferenceCrystal.class, "`z`", location(0, 2));
+        testCrystal(statement.get(1), LeftAssignmentOperatorCrystal.class, "<<", location(0, 6));
+        testCrystal(statement.get(2), ReferenceCrystal.class, "`foo", location(0, 9));
     }
 
     // ----------------------------------------------------------------------------

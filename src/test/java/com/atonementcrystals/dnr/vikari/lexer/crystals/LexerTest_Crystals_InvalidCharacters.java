@@ -8,7 +8,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.LeftAss
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.BlankLineCrystal;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.Order;
@@ -31,12 +30,7 @@ public class LexerTest_Crystals_InvalidCharacters {
             String sourceString = String.valueOf(invalidCharactersToTest.charAt(i));
 
             SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-            List<AtonementCrystal> statement = lexSingleStatement(sourceString, 1, syntaxErrorReporter, 1);
-
-            testCrystal(statement.get(0), BlankLineCrystal.class, "", location(0, 0));
-
-            List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-            testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Invalid characters.");
+            lex(sourceString, 0, syntaxErrorReporter, 1);
         }
     }
 
@@ -47,9 +41,7 @@ public class LexerTest_Crystals_InvalidCharacters {
                 "◊ı˜Â¯˘¿";
 
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 1, syntaxErrorReporter, 1);
-
-        testCrystal(statement.get(0), BlankLineCrystal.class, "", location(0, 0));
+        lex(sourceString, 0, syntaxErrorReporter, 1);
 
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Invalid characters.");

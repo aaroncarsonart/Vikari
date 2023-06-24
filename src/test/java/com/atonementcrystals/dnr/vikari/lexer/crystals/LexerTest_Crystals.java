@@ -7,7 +7,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCry
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.FunctionCallOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.BlankLineCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.ListElementSeparatorCrystal;
@@ -81,7 +80,7 @@ public class LexerTest_Crystals {
         String sourceString = "~:";
 
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        lexSingleStatement(sourceString, 1, errorReporter, 1);
+        lex(sourceString, 0, errorReporter, 1);
 
         List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 0), "~:", "comment suffix");
@@ -91,9 +90,7 @@ public class LexerTest_Crystals {
     @Order(4)
     public void testLexer_Crystals_SingleLineComment() {
         String sourceString = "~:This is a comment.:~";
-        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 1);
-
-        testCrystal(statement.get(0), BlankLineCrystal.class, "", location(0, 0));
+        lex(sourceString, 0);
     }
 
     @Test
@@ -102,10 +99,7 @@ public class LexerTest_Crystals {
         String sourceString = "~:This is a comment\n" +
                 "across two lines.:~";
 
-        List<List<AtonementCrystal>> statements = lex(sourceString, 2, crystalCounts(1, 1));
-
-        testCrystal(statements.get(0).get(0), BlankLineCrystal.class, "", location(0, 0));
-        testCrystal(statements.get(1).get(0), BlankLineCrystal.class, "", location(1, 0));
+        lex(sourceString, 0);
     }
 
     @Test
@@ -115,11 +109,7 @@ public class LexerTest_Crystals {
                 "across three lines\n" +
                 "without indentation.:~";
 
-        List<List<AtonementCrystal>> statements = lex(sourceString, 3, crystalCounts(1, 1, 1));
-
-        testCrystal(statements.get(0).get(0), BlankLineCrystal.class, "", location(0, 0));
-        testCrystal(statements.get(1).get(0), BlankLineCrystal.class, "", location(1, 0));
-        testCrystal(statements.get(2).get(0), BlankLineCrystal.class, "", location(2, 0));
+        lex(sourceString, 0);
     }
 
     @Test
@@ -131,13 +121,7 @@ public class LexerTest_Crystals {
                 "separate lines from its contents.\n" +
                 ":~";
 
-        List<List<AtonementCrystal>> statements = lex(sourceString, 5, crystalCounts(1, 1, 1, 1, 1));
-
-        testCrystal(statements.get(0).get(0), BlankLineCrystal.class, "", location(0, 0));
-        testCrystal(statements.get(1).get(0), BlankLineCrystal.class, "", location(1, 0));
-        testCrystal(statements.get(2).get(0), BlankLineCrystal.class, "", location(2, 0));
-        testCrystal(statements.get(3).get(0), BlankLineCrystal.class, "", location(3, 0));
-        testCrystal(statements.get(4).get(0), BlankLineCrystal.class, "", location(4, 0));
+        lex(sourceString, 0);
     }
 
     @Test

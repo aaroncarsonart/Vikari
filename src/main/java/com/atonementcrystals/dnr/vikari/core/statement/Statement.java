@@ -18,7 +18,6 @@ public abstract class Statement {
         S visit(PrintStatement stmt);
         S visit(ExpressionStatement stmt);
         S visit(SyntaxErrorStatement stmt);
-        S visit(BlankStatement stmt);
         S visit(VariableDeclarationStatement stmt);
     }
 

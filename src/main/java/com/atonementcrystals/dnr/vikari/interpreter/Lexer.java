@@ -20,7 +20,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.ModulusOperat
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.BlankLineCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.quotation.CaptureQuotationCrystal;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.error.Vikari_IOException;
@@ -599,7 +598,7 @@ public class Lexer {
                 CoordinatePair tokenCoordinates = new CoordinatePair(statementNumber, column);
 
                 if (Utils.isWhitespace(stringToken)) {
-                    // All whitespace (besides indentation) is elided in the final output of the Lexer.
+                    // All whitespace (besides indentation) is omitted in the final output of the Lexer.
                     // TODO: Produce IndentationCrystals for leading whitespace.
                     continue;
                 }
@@ -759,26 +758,17 @@ public class Lexer {
                 }
 
                 if (Utils.isSingleLineComment(stringToken)) {
-                    // Single-line comments are elided in the final output of the Lexer.
+                    // Single-line comments are omitted in the final output of the Lexer.
                     continue;
                 }
 
                 if (Utils.isStartOfComment(stringToken)) {
-                    // Multi-line comments are elided in the final output of the Lexer.
+                    // Multi-line comments are omitted in the final output of the Lexer.
                     while (!Utils.isEndOfComment(stringToken) && statementNumber < statementsOfStringTokens.size() - 1) {
-                        if (statementOfCrystals.isEmpty()) {
-                            // TODO: Remove BlankLineCrystals from output of the Lexer.
-                            BlankLineCrystal blankLineCrystal = new BlankLineCrystal();
-                            blankLineCrystal.setCoordinates(new CoordinatePair(statementNumber, 0));
-                            statementOfCrystals.add(blankLineCrystal);
-                        }
-
                         statementNumber++;
                         tokenNumber = 0;
                         column = 0;
                         statementOfStringTokens = statementsOfStringTokens.get(statementNumber);
-                        statementsOfCrystals.add(statementOfCrystals);
-                        statementOfCrystals = new ArrayList<>();
                         stringToken = statementOfStringTokens.get(tokenNumber);
                     }
                     continue;
@@ -858,12 +848,8 @@ public class Lexer {
                     continue;
                 }
 
-                // Insert a blank line crystal as a placeholder to preserve the line numbers of the following statements.
+                // Blank lines are ignored in the output of the Lexer.
                 if (stringToken.equals("")) {
-                    // TODO: Remove BlankLineCrystals from output of the Lexer.
-                    BlankLineCrystal blankLineCrystal = new BlankLineCrystal();
-                    blankLineCrystal.setCoordinates(tokenCoordinates);
-                    statementOfCrystals.add(blankLineCrystal);
                     continue;
                 }
 
@@ -902,14 +888,9 @@ public class Lexer {
             }
 
             // Ensure blank lines contain a single expected crystal to preserve the line number.
-            if (statementOfCrystals.isEmpty()) {
-                // TODO: Remove BlankLineCrystals from output of the Lexer.
-                BlankLineCrystal blankLineCrystal = new BlankLineCrystal();
-                blankLineCrystal.setCoordinates(new CoordinatePair(statementNumber, 0));
-                statementOfCrystals.add(blankLineCrystal);
+            if (!statementOfCrystals.isEmpty()) {
+                statementsOfCrystals.add(statementOfCrystals);
             }
-
-            statementsOfCrystals.add(statementOfCrystals);
         }
 
         return statementsOfCrystals;

@@ -8,14 +8,12 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.RightAssignmentOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.BlankLineCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.PrintExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.RightAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.VariableExpression;
-import com.atonementcrystals.dnr.vikari.core.statement.BlankStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.PrintStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.core.statement.SyntaxErrorStatement;
@@ -61,7 +59,6 @@ public class Parser {
 
     private int lineCount;
     private int lastLineLength;
-    private int statementNumber;
 
     private List<AtonementCrystal> currentLine;
 
@@ -122,10 +119,7 @@ public class Parser {
             currentLine = this.lexedStatements.get(lineNumber);
             do {
                 Statement statement = statement();
-                if (!(statement instanceof BlankStatement)) {
-                    statementNumber = statement.getLocation().getRow();
-                    statements.add(statement);
-                }
+                statements.add(statement);
             } while (!isAtEndOfStatement());
             advanceToNextLine();
         }
@@ -171,20 +165,19 @@ public class Parser {
             if (check(TokenType.TYPE_LABEL)) {
                 return printStatement();
             }
-            if (blank()) {
-                return blankStatement();
-            }
             return expressionStatement();
         } catch (Vikari_ParserException e) {
             synchronize();
 
-            List<AtonementCrystal> lastVisitedLine = getLastVisitedLexedStatement();
-            String statementString = lastVisitedLine.stream()
+            List<AtonementCrystal> lexedStatement = getLastVisitedLexedStatement();
+            String statementString = lexedStatement.stream()
                     .map(AtonementCrystal::getIdentifier)
                     .collect(Collectors.joining(""));
 
+            CoordinatePair statementLocation = lexedStatement.get(0).getCoordinates();
+
             SyntaxErrorStatement syntaxErrorStatement = new SyntaxErrorStatement(statementString);
-            syntaxErrorStatement.setLocation(new CoordinatePair(statementNumber, 0));
+            syntaxErrorStatement.setLocation(statementLocation);
             return syntaxErrorStatement;
         }
     }
@@ -200,9 +193,7 @@ public class Parser {
             }
 
             // Parse as a variable declaration for the error case.
-            if (lookAhead(1) instanceof TypeLabelOperatorCrystal) {
-                return true;
-            }
+            return lookAhead(1) instanceof TypeLabelOperatorCrystal;
         }
         return false;
     }
@@ -444,27 +435,6 @@ public class Parser {
         throw error(errorCrystal, "Expected expression.");
     }
 
-    /**
-     * Check if the current line is blank, meaning it is empty or only contains whitespace.
-     * Blank lines are elided entirely in the output of the Parser.
-     * @return True if the current line is blank, else false.
-     */
-    public boolean blank() {
-        if (currentLine.isEmpty()) {
-            return true;
-        }
-        if (currentLine.size() == 1 && currentLine.get(0) instanceof BlankLineCrystal) {
-            return true;
-        }
-        return false;
-    }
-
-    public Statement blankStatement() {
-        CoordinatePair location = new CoordinatePair(lineNumber, 0);
-        advanceToEndOfLine();
-        return new BlankStatement(location);
-    }
-
     public boolean isAtEndOfStatement(int tokenNumber) {
         if (tokenNumber >= currentLine.size()) {
             return true;
@@ -554,10 +524,8 @@ public class Parser {
         tokenNumber = 0;
         if (isAtEnd()) {
             currentLine = null;
-            statementNumber = lexedStatements.size() - 1;
         } else {
             currentLine = lexedStatements.get(lineNumber);
-            statementNumber++;
         }
     }
 
@@ -693,7 +661,6 @@ public class Parser {
         tokenNumber = 0;
         lineCount = 0;
         lastLineLength = 0;
-        statementNumber = 0;
         currentLine = null;
         rootEnvironment = null;
         currentEnvironment = null;
