@@ -71,10 +71,10 @@ public class Lexer {
      * If a negation operator preceding a number literal follows one of these tokens,
      * the operator should be collapsed together with the number literal.
      */
-    private static final HashSet<String> COLLAPSE_NEGATION_OPERATOR_TOKENS = Stream.of(
+    private static final HashSet<Class<? extends AtonementCrystal>> COLLAPSE_NEGATION_OPERATOR_CLASSES = Stream.of(
                     TokenType.RETURN, TokenType.BREAK, TokenType.CONTINUE, TokenType.LEFT_SQUARE_BRACKET,
                     TokenType.STATEMENT_SEPARATOR, TokenType.REGION_SEPARATOR, TokenType.LEFT_PARENTHESIS,
-                    TokenType.LIST_ELEMENT_SEPARATOR, TokenType.RANGE, TokenType.PRINT_STATEMENT,
+                    TokenType.LIST_ELEMENT_SEPARATOR, TokenType.RANGE, TokenType.TYPE_LABEL,
                     TokenType.INDEX_OPERATOR, TokenType.COPY_CONSTRUCTOR, TokenType.MODULUS, TokenType.MULTIPLY,
                     TokenType.SUBTRACT, TokenType.LEFT_ASSIGNMENT, TokenType.LEFT_ADD_ASSIGNMENT,
                     TokenType.LEFT_SUBTRACT_ASSIGNMENT, TokenType.LEFT_DIVIDE_ASSIGNMENT,
@@ -88,7 +88,7 @@ public class Lexer {
                     TokenType.GREATER_THAN, TokenType.GREATER_THAN_OR_EQUALS, TokenType.LESS_THAN_OR_EQUALS,
                     TokenType.KEY_VALUE_PAIR, TokenType.ITERATION_ELEMENT, TokenType.INSTANCE_OF,
                     TokenType.CATCH_ALL, TokenType.LEFT_FEATHER_FALL, TokenType.RIGHT_FEATHER_FALL)
-            .map(TokenType::getIdentifier)
+            .map(TokenType::getJavaType)
             .collect(Collectors.toCollection(HashSet::new));
 
     private SyntaxErrorReporter syntaxErrorReporter;
@@ -613,44 +613,34 @@ public class Lexer {
                     continue;
                 }
 
-                // NOTE: This check must happen before number tokens are processed.
                 if (TokenType.SUBTRACT.getIdentifier().equals(stringToken)) {
-                    // Check if a negation operator needs to be collapsed into a following number token.
+                    // handle all as SUBTRACT at first.
+                    SubtractOperatorCrystal subtractCrystal = new SubtractOperatorCrystal();
+                    subtractCrystal.setCoordinates(tokenCoordinates);
+                    statementOfCrystals.add(subtractCrystal);
+                    continue;
+                }
 
-                    // TODO: Move negation operator collapsion to a second pass after the entire line has been processed
-                    //       in this method once whitespace and comments have been elided from the Lexer output in a
-                    //       future commit.
+                // Collapse a negation operator onto the number token, if necessary and appropriate.
+                CoordinatePair negationOperatorLocation = null;
+                if (isNumberToken(stringToken) && !statementOfCrystals.isEmpty()) {
+                    int crystalCount = statementOfCrystals.size();
+                    AtonementCrystal maybeNegationOperator = statementOfCrystals.get(crystalCount - 1);
 
-                    int followingTokenNumber = getNextNonWhitespaceTokenNumber(statementOfStringTokens, tokenNumber);
-                    String followingToken = null;
-
-                    if (followingTokenNumber != -1) {
-                        followingToken = statementOfStringTokens.get(followingTokenNumber);
-                    }
-
-                    boolean isCollapsedNegationOperator = false;
-                    if (followingToken != null && isNumberToken(followingToken)) {
-                        // Check if the previous token implies this is a negation operator to be collapsed.
-                        String previousToken = getPreviousNonWhitespaceToken(statementOfStringTokens, tokenNumber);
-
-                        // The null case means this is the first token in a statement, and so collapsion is allowed.
-                        if (previousToken == null || COLLAPSE_NEGATION_OPERATOR_TOKENS.contains(previousToken)) {
-                            // Combine the negation operator with the number token. This will then be handled correctly
-                            // as a single token when number tokens are processed later on in this same method.
-                            stringToken += followingToken;
-                            column += getTokenWidths(statementOfStringTokens, tokenNumber, followingTokenNumber);
-                            tokenCoordinates = new CoordinatePair(statementNumber, column);
-                            tokenNumber = followingTokenNumber;
-                            isCollapsedNegationOperator = true;
+                    if (maybeNegationOperator instanceof SubtractOperatorCrystal) {
+                        AtonementCrystal previousCrystal = null;
+                        if (crystalCount >= 2) {
+                            previousCrystal = statementOfCrystals.get(crystalCount - 2);
                         }
-                    }
+                        if (previousCrystal == null || COLLAPSE_NEGATION_OPERATOR_CLASSES.contains(previousCrystal.getClass())) {
+                            // Remove the negation operator crystal from the list of crystals.
+                            statementOfCrystals.remove(crystalCount - 1);
+                            negationOperatorLocation = maybeNegationOperator.getCoordinates();
 
-                    if (!isCollapsedNegationOperator) {
-                        // handle all as SUBTRACT at first.
-                        SubtractOperatorCrystal subtractCrystal = new SubtractOperatorCrystal();
-                        subtractCrystal.setCoordinates(tokenCoordinates);
-                        statementOfCrystals.add(subtractCrystal);
-                        continue;
+                            // Concatenate the operator to the number token.
+                            String negationOperatorToken = TokenType.NEGATE.getIdentifier();
+                            stringToken = negationOperatorToken + stringToken;
+                        }
                     }
                 }
 
@@ -658,9 +648,9 @@ public class Lexer {
 
                 // Handle integer number literals.
                 if (Utils.isIntegerNumber(stringToken)) {
-
                     IntegerCrystal numberCrystal = new IntegerCrystal(stringToken, stringToken);
                     numberCrystal.setCoordinates(tokenCoordinates);
+                    numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
                     statementOfCrystals.add(numberCrystal);
                     continue;
                 } else if (Utils.isLongIntegerNumber(stringToken)) {
@@ -670,6 +660,7 @@ public class Lexer {
                     }
                     LongCrystal numberCrystal = new LongCrystal(stringToken, numericValue);
                     numberCrystal.setCoordinates(tokenCoordinates);
+                    numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
                     statementOfCrystals.add(numberCrystal);
                     continue;
                 } else if (Utils.isBigIntegerNumber(stringToken)) {
@@ -679,6 +670,7 @@ public class Lexer {
                     }
                     BigIntegerCrystal numberCrystal = new BigIntegerCrystal(stringToken, numericValue);
                     numberCrystal.setCoordinates(tokenCoordinates);
+                    numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
                     statementOfCrystals.add(numberCrystal);
                     continue;
                 }
@@ -690,11 +682,13 @@ public class Lexer {
                     // Double is checked first so unspecified decimal literals, aka 1.2, default to a Double type.
                     DoubleCrystal numberCrystal = new DoubleCrystal(stringToken, stringToken);
                     numberCrystal.setCoordinates(tokenCoordinates);
+                    numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
                     statementOfCrystals.add(numberCrystal);
                     continue;
                 } else if (Utils.isFloatNumber(stringToken)) {
                     FloatCrystal numberCrystal = new FloatCrystal(stringToken, stringToken);
                     numberCrystal.setCoordinates(tokenCoordinates);
+                    numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
                     statementOfCrystals.add(numberCrystal);
                     continue;
                 } else if (Utils.isBigDecimalNumber(stringToken)) {
@@ -705,6 +699,7 @@ public class Lexer {
                     BigDecimal bigDecimal = new BigDecimal(numericValue, Arithmetic.getMathContext());
                     BigDecimalCrystal numberCrystal = new BigDecimalCrystal(stringToken, bigDecimal);
                     numberCrystal.setCoordinates(tokenCoordinates);
+                    numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
                     statementOfCrystals.add(numberCrystal);
                     continue;
                 }
