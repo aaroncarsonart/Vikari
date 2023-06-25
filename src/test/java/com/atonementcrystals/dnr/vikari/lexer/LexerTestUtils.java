@@ -1,6 +1,7 @@
 package com.atonementcrystals.dnr.vikari.lexer;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 
@@ -64,6 +65,55 @@ public class LexerTestUtils {
 
     public static void testToken(String token, String expectedIdentifier) {
         assertEquals(expectedIdentifier, token, "Unexpected String token value.");
+    }
+
+    public enum CommentTokenType {
+        SINGLE_LINE, START, MIDDLE, END;
+    }
+
+    public static void testComment(String commentToken, int expectedLength, CommentTokenType commentTokenType) {
+        int actualLength = commentToken.length();
+        assertEquals(expectedLength, actualLength, "Unexpected length of comment token.");
+
+        String openingToken = TokenType.COMMENT_PREFIX_CRYSTAL.getIdentifier();
+        String closingToken = TokenType.COMMENT_SUFFIX_CRYSTAL.getIdentifier();
+
+        int min;
+        int max;
+
+        switch (commentTokenType) {
+            case SINGLE_LINE:
+                assertTrue(commentToken.startsWith(openingToken));
+                assertTrue(commentToken.endsWith(closingToken));
+                assertTrue(commentToken.length() >= 4, "A single-line comment must be at least length 4.");
+
+                min = openingToken.length();
+                max = commentToken.length() - closingToken.length();
+                break;
+            case START:
+                assertTrue(commentToken.startsWith(openingToken));
+                min = openingToken.length();
+                max = commentToken.length();
+                break;
+            case MIDDLE:
+                min = 0;
+                max = commentToken.length();
+                break;
+            case END:
+                assertTrue(commentToken.endsWith(closingToken));
+                min = 0;
+                max = commentToken.length() - closingToken.length();
+                break;
+            default:
+                throw new IllegalStateException("Unhandled CommentTokenType enum value: " + commentTokenType.name());
+        }
+
+        char expectedCharacter = '-';
+        for (int i = min; i < max; i++) {
+            char actualCharacter = commentToken.charAt(i);
+            assertEquals(expectedCharacter, actualCharacter, "Expected comment token to be lexed as all dashes " +
+                    "between opening and closing tokens.");
+        }
     }
 
     /**

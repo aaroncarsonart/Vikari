@@ -43,6 +43,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -61,6 +62,7 @@ public class Lexer {
     /** This pattern is intentionally missing the opening backtick to match after it has been consumed. */
     private static final String BACKTICK_CHARACTER_LITERAL_PATTERN = "\\``";
     private static final String INVALID_CHARACTERS_ERROR_MESSAGE = "Invalid characters.";
+    private static final String DASH_CHARACTER_STRING = "-";
 
     private static final Pattern whitespaceRegex = Pattern.compile("^[ \t]+");
     private static final Pattern numberRegex = Pattern.compile("^\\d+(?:\\.\\d+)?(?i)[LFDB]?");
@@ -102,9 +104,9 @@ public class Lexer {
     private int lineLength;
     private char nextChar;
 
-    List<String> lines;
-    List<String> stringTokens;
-    List<List<String>> statementsOfStringTokens;
+    private List<String> lines;
+    private List<String> stringTokens;
+    private List<List<String>> statementsOfStringTokens;
 
     public void setSyntaxErrorReporter(SyntaxErrorReporter syntaxErrorReporter) {
         this.syntaxErrorReporter = syntaxErrorReporter;
@@ -183,7 +185,7 @@ public class Lexer {
         this.reader = reader;
         statementsOfStringTokens = new ArrayList<>();
         stringTokens = new ArrayList<>();
-        cacheLineData();
+        prepareLineDataCache();
 
         line = readNextLine();
         lineLength = atEndOfFile() ? 0 : line.length();
@@ -302,13 +304,11 @@ public class Lexer {
         return statementsOfStringTokens;
     }
 
-    private void cacheLineData() {
-        lines = new ArrayList<>();
-
+    private void prepareLineDataCache() {
         if (syntaxErrorReporter == null) {
             syntaxErrorReporter = new SyntaxErrorReporter();
         }
-        syntaxErrorReporter.addLinesForFile(currentFile, lines);
+        lines = syntaxErrorReporter.getLineCacheFor(currentFile);
     }
 
     private String readNextLine() {
@@ -449,19 +449,13 @@ public class Lexer {
     }
 
     private void comment() {
-        // Cache values in case of a syntax error.
-        int errorLineNumber = lineNumber;
-        int errorStart = startIndex;
-
         // Consume the comment token(s).
-        String commentPrefix = TokenType.COMMENT_PREFIX_CRYSTAL.getIdentifier();
-        String commentSuffix = TokenType.COMMENT_SUFFIX_CRYSTAL.getIdentifier();
-        boolean consumedClosingToken = multilineToken(commentPrefix, commentSuffix);
+        Stack<CoordinatePair> unclosedOpeningTokens = multilineNestableCommentToken();
 
-        // Report if there was an error.
-        if (!consumedClosingToken) {
-            String errorMessage = "Missing comment suffix token `:~`.";
-            reportError(errorMessage, errorLineNumber, errorStart);
+        // Report if there were any errors.
+        for (int i = 0; i < unclosedOpeningTokens.size(); i++) {
+            CoordinatePair location = unclosedOpeningTokens.get(i);
+            reportError("Missing comment suffix token `:~`.", location);
         }
     }
 
@@ -471,19 +465,7 @@ public class Lexer {
      * @return True if the closing token was reached, else false.
      */
     private boolean multilineToken(String closingToken) {
-        return multilineToken(null, closingToken);
-    }
-
-    /**
-     * Consumes characters until either the closing token or the end of file is reached.
-     * @param openingToken The String which started this multi-line token. (Not used until nesting is supported.)
-     * @param closingToken The string which ends this multi-line token.
-     * @return True if the closing token was reached, else false.
-     */
-    private boolean multilineToken(String openingToken, String closingToken) {
         advance();
-
-        // TODO: Allow for nesting of comments if openingToken != null. (In a future commit.)
 
         do {
             int indexOfClosingToken = line.indexOf(closingToken, currentIndex);
@@ -512,6 +494,117 @@ public class Lexer {
 
         // closingToken was not encountered. This is a syntax error.
         return false;
+    }
+
+    private Stack<CoordinatePair> multilineNestableCommentToken() {
+        String openingToken = TokenType.COMMENT_PREFIX_CRYSTAL.getIdentifier();
+        String closingToken = TokenType.COMMENT_SUFFIX_CRYSTAL.getIdentifier();
+
+        advance();
+
+        Stack<CoordinatePair> unclosedOpeningTokens = new Stack<>();
+        unclosedOpeningTokens.push(new CoordinatePair(lineNumber, startIndex));
+
+        boolean firstToken = true;
+
+        do {
+            int nextOpeningTokenIndex = line.indexOf(openingToken, currentIndex);
+            int nextClosingTokenIndex = line.indexOf(closingToken, currentIndex);
+            int nextMatch = nextMultilineNestableTokenIndex(nextOpeningTokenIndex, nextClosingTokenIndex);
+
+            // No tokens matched. Consume the rest of the line, and advance.
+            if (nextMatch == -1) {
+                currentIndex = lineLength;
+
+                if (firstToken) {
+                    openingCommentToken();
+                    firstToken = false;
+                } else {
+                    middleCommentToken();
+                }
+
+                advanceToNextLine();
+                continue;
+            }
+
+            currentIndex = nextMatch;
+           if (nextOpeningTokenIndex == currentIndex) {
+                currentIndex += openingToken.length();
+                if (!Utils.isEscapedByBackslash(line, nextMatch)) {
+                    unclosedOpeningTokens.push(new CoordinatePair(lineNumber, nextMatch));
+                }
+            } else {
+                currentIndex += closingToken.length();
+                if (!Utils.isEscapedByBackslash(line, nextMatch)) {
+                    unclosedOpeningTokens.pop();
+                }
+            }
+
+            // Reached end of all nestable tokens. Consume the final token, and end.
+            if (unclosedOpeningTokens.isEmpty()) {
+                if (firstToken) {
+                    singleLineCommentToken();
+                } else {
+                    closingCommentToken();
+                }
+                break;
+            }
+        } while (!atEndOfFile());
+
+        // Return all unclosed opening token locations for syntax error reporting purposes.
+        return unclosedOpeningTokens;
+    }
+
+    private int nextMultilineNestableTokenIndex(int openingTokenIndex, int closingTokenIndex) {
+        if (openingTokenIndex == -1 && closingTokenIndex == -1) return -1;
+        else if (openingTokenIndex == -1) return closingTokenIndex;
+        else if (closingTokenIndex == -1) return openingTokenIndex;
+        return Math.min(openingTokenIndex, closingTokenIndex);
+    }
+
+
+    // Comments are nestable. All characters between the opening and
+    // closing tokens are lexed as dashes so the nestable comment tokens
+    // don't interfere with detecting the end of a multi-line comment.
+
+    private void singleLineCommentToken() {
+        String openingToken = TokenType.COMMENT_PREFIX_CRYSTAL.getIdentifier();
+        String closingToken = TokenType.COMMENT_SUFFIX_CRYSTAL.getIdentifier();
+
+        int tokenLength = currentIndex - startIndex;
+        int dashCount = tokenLength - openingToken.length() - closingToken.length();
+        String dashes = DASH_CHARACTER_STRING.repeat(dashCount);
+
+        String nextToken = openingToken + dashes + closingToken;
+        stringTokens.add(nextToken);
+    }
+
+    private void openingCommentToken() {
+        String openingToken = TokenType.COMMENT_PREFIX_CRYSTAL.getIdentifier();
+
+        int tokenLength = currentIndex - startIndex;
+        int dashCount = tokenLength - openingToken.length();
+        String dashes = DASH_CHARACTER_STRING.repeat(dashCount);
+
+        String nextToken = openingToken + dashes;
+        stringTokens.add(nextToken);
+    }
+
+    private void middleCommentToken() {
+        int tokenLength = currentIndex - startIndex;
+        String nextToken = DASH_CHARACTER_STRING.repeat(tokenLength);
+        stringTokens.add(nextToken);
+    }
+
+    private void closingCommentToken() {
+        String closingToken = TokenType.COMMENT_SUFFIX_CRYSTAL.getIdentifier();
+
+        int tokenLength = currentIndex - startIndex;
+        int dashCount = tokenLength - closingToken.length();
+        String dashes = DASH_CHARACTER_STRING.repeat(dashCount);
+
+        String nextToken = dashes + closingToken;
+        stringTokens.add(nextToken);
     }
 
     private void whitespaceToken() {
@@ -562,6 +655,15 @@ public class Lexer {
      */
     private void reportError(String message, int row, int column) {
         CoordinatePair location = new CoordinatePair(row, column);
+        reportError(message, location);
+    }
+
+    /**
+     * Report a SyntaxError.
+     * @param message The error message.
+     * @param location The location of the error.
+     */
+    private void reportError(String message, CoordinatePair location) {
         SyntaxError syntaxError = new SyntaxError(currentFile, location, message);
         syntaxErrorReporter.add(syntaxError);
     }

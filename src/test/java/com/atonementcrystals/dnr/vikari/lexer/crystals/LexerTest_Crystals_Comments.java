@@ -19,7 +19,7 @@ import static com.atonementcrystals.dnr.vikari.TestUtils.testCrystal;
 import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.lexSingleStatement;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LexerTest_Comments {
+public class LexerTest_Crystals_Comments {
 
     private void lexVariableDeclarationWithComment(String sourceString, int col1, int col2, int col3, int col4, int col5) {
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 5);

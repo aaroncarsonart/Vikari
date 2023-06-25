@@ -76,13 +76,8 @@ public class SyntaxErrorReporter {
         syntaxErrors.clear();
     }
 
-    public void addLinesForFile(File file, List<String> lines) {
-        if (fileToLinesMap.containsKey(file)) {
-            List<String> existingLines = fileToLinesMap.get(file);
-            existingLines.addAll(lines);
-        } else {
-            fileToLinesMap.put(file, lines);
-        }
+    public List<String> getLineCacheFor(File file) {
+        return fileToLinesMap.computeIfAbsent(file, f -> new ArrayList<>());
     }
 
     public String getLineFromCache(File file, int lineNumber) {
