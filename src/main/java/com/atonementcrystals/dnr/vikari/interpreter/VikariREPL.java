@@ -8,6 +8,7 @@ import com.atonementcrystals.dnr.vikari.error.RuntimeError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.error.Vikari_RuntimeException;
+import com.atonementcrystals.dnr.vikari.interpreter.jline.VikariJLineParser;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +16,7 @@ import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
+import org.jline.reader.impl.completer.NullCompleter;
 
 import java.util.Formatter;
 import java.util.List;
@@ -26,6 +28,7 @@ public class VikariREPL {
     private static final Logger log = LogManager.getLogger(VikariREPL.class);
 
     private static final String REPL_PROMPT = "vikari> ";
+    private static final String REPL_SECONDARY_PROMPT = "......> ";
     private static final String REPL_COMMAND_PREFIX = "!";
     private static final String NEWLINE = "\n";
     private static final char SPACE = ' ';
@@ -43,7 +46,7 @@ public class VikariREPL {
      * Instantiate a new VikariRepl instance.
      */
     public VikariREPL() {
-       init();
+        init();
     }
 
     private void init() {
@@ -69,7 +72,7 @@ public class VikariREPL {
     public enum ReplCommand {
         NONE, HELP, VERBOSE, CLEAR, EXIT, QUIT;
 
-        private String nameLowerCase;
+        private final String nameLowerCase;
 
         ReplCommand() {
             nameLowerCase = name().toLowerCase();
@@ -86,7 +89,7 @@ public class VikariREPL {
     public void start() {
         log.trace("start()");
         exit = false;
-        userInput = LineReaderBuilder.builder().build();
+        userInput = buildLineReader();
 
         // Begin REPL loop.
         while (!exit) {
@@ -109,6 +112,18 @@ public class VikariREPL {
     }
 
     /**
+     * @return A fully-initialized LineReader for the REPL.
+     */
+    private LineReader buildLineReader() {
+        return LineReaderBuilder.builder()
+                .parser(new VikariJLineParser())
+                .completer(NullCompleter.INSTANCE)
+                .option(LineReader.Option.DISABLE_EVENT_EXPANSION, true)
+                .variable(LineReader.SECONDARY_PROMPT_PATTERN, REPL_SECONDARY_PROMPT)
+                .build();
+    }
+
+    /**
      * Execute one iteration of the REPL loop body on the next line of user input.
      * @param nextLineOfUserInput The string to lex, parse, and interpret as Vikari code,
      *                            or else to read as a REPL command if it begins with !.
@@ -128,6 +143,9 @@ public class VikariREPL {
             return;
         }
 
+        int lexerLineNumber = lexer.getLineNumber();
+        int parserLineNumber = parser.getLineNumber();
+
         // Lex and parse as Vikari code statement(s).
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(nextLineOfUserInput);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
@@ -135,7 +153,13 @@ public class VikariREPL {
         // Report syntax errors, if any.
         if (syntaxErrorReporter.hasErrors()) {
             reportSyntaxErrors(nextLineOfUserInput);
+
+            // Clear any previous erroneous state.
             syntaxErrorReporter.clear();
+            lexer.resetTo(lexerLineNumber);
+            parser.resetTo(parserLineNumber);
+            undefineNewVariablesDeclared(parsedStatements);
+
             return;
         }
 
@@ -152,18 +176,6 @@ public class VikariREPL {
         catch (Vikari_RuntimeException e) {
             reportRuntimeError(e);
         }
-    }
-
-    private void reportVariableDeclaration(VariableDeclarationStatement statement, AtonementCrystal result) {
-        AtonementCrystal declaredVariable = statement.getDeclaredVariable();
-        String declaredVariableIdentifier = declaredVariable.getIdentifier();
-        String initializedValue;
-        if (result == null) {
-            initializedValue = declaredVariable.getStringRepresentation();
-        } else {
-            initializedValue = result.getStringRepresentation();
-        }
-        System.out.printf("%s = %s\n", declaredVariableIdentifier, initializedValue);
     }
 
     /**
@@ -193,21 +205,27 @@ public class VikariREPL {
         log.trace("executeReplCommand({})", replCommand);
 
         switch (replCommand) {
-            case HELP:
-                printHelp();
-                break;
-            case CLEAR:
-                clearReplState();
-                break;
-            case VERBOSE:
-                toggleVerbose();
-                break;
-            case EXIT:
-            case QUIT:
-                exitReplMode();
-                break;
-            default:
-                throw new IllegalStateException("Unsupported REPL command: " + replCommand.name());
+            case HELP -> printHelp();
+            case CLEAR -> clearReplState();
+            case VERBOSE -> toggleVerbose();
+            case EXIT, QUIT -> exitReplMode();
+            default -> throw new IllegalStateException("Unsupported REPL command: " + replCommand.name());
+        }
+    }
+
+    /**
+     * Undefine all new variables declared in the given statements.
+     * @param statements The statements to undefine new variable declarations for.
+     */
+    private void undefineNewVariablesDeclared(List<Statement> statements) {
+        for (Statement statement : statements) {
+            if (statement instanceof VariableDeclarationStatement variableDeclarationStatement) {
+                String identifier = variableDeclarationStatement.getDeclaredVariable().getIdentifier();
+                AtonementField environment = variableDeclarationStatement.getEnvironment();
+                if (environment.isDefined(identifier)) {
+                    environment.undefine(identifier);
+                }
+            }
         }
     }
 
@@ -263,12 +281,18 @@ public class VikariREPL {
             return;
         }
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        if (syntaxErrors.size() == 1 && !line.contains(NEWLINE)) {
+        if (syntaxErrors.size() == 1 && (!line.contains(NEWLINE) || errorAtEnd(syntaxErrors.get(0)))) {
             SyntaxError syntaxError = syntaxErrors.get(0);
             reportSingleSyntaxError(syntaxError);
         } else {
             reportMultipleSyntaxErrors(syntaxErrors);
         }
+    }
+
+    private boolean errorAtEnd(SyntaxError syntaxError) {
+        int lastLineNumber = lexer.getLineNumber() - 1;
+        int errorLineNumber = syntaxError.getLocation().getRow();
+        return lastLineNumber == errorLineNumber;
     }
 
     /**
@@ -314,8 +338,7 @@ public class VikariREPL {
     private void reportMultipleSyntaxErrors(List<SyntaxError> syntaxErrors) {
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < syntaxErrors.size(); i++) {
-            SyntaxError syntaxError = syntaxErrors.get(i);
+        for (SyntaxError syntaxError : syntaxErrors) {
             String errorReport = syntaxError.getErrorReport();
             sb.append(errorReport);
             sb.append(NEWLINE);
@@ -323,7 +346,7 @@ public class VikariREPL {
         }
 
         String fullErrorReport = sb.toString();
-        System.out.println(fullErrorReport);
+        System.out.print(fullErrorReport);
 
         // Print equivalent output as REPL in logs.
         log.debug("\n{}", fullErrorReport);

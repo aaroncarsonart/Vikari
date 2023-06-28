@@ -34,7 +34,7 @@ class VikariREPLTest {
      * @param expectedOutput The string to test. A trailing newline may be omitted.
      */
     private void testOutput(String expectedOutput) {
-        if (!expectedOutput.endsWith("\n"))  {
+        if (!expectedOutput.isEmpty() && !expectedOutput.endsWith("\n"))  {
             expectedOutput += "\n";
         }
         assertEquals(expectedOutput, testOut.toString(), "Unexpected REPL output.");
@@ -178,7 +178,7 @@ class VikariREPLTest {
     public void testPrintStatement() {
         // Empty PrintStatement
         repl.lexParseAndInterpret(":");
-        testOutput("");
+        testOutput("\n");
 
         // With newline
         repl.lexParseAndInterpret(":2:4:6:");
@@ -258,5 +258,152 @@ class VikariREPLTest {
 
         repl.lexParseAndInterpret("foo:Double << 4D");
         testOutput("foo:Double = 4.0");
+    }
+
+    @Test
+    @Order(12)
+    public void testComment() {
+        repl.lexParseAndInterpret("~:Comment.:~");
+        testOutput("");
+    }
+
+    @Test
+    @Order(13)
+    public void testComment_WithStatement() {
+        repl.lexParseAndInterpret("~:Comment.:~ 5 + 3");
+        testOutput("8");
+    }
+
+    @Test
+    @Order(14)
+    public void testMultiLineComment() {
+        repl.lexParseAndInterpret("~:Multi-line\ncomment.:~");
+        testOutput("");
+    }
+
+    @Test
+    @Order(15)
+    public void testMultiLineComment_WithStatement() {
+        repl.lexParseAndInterpret(" 5 + ~:Multi-line\ncomment.:~ 3");
+        testOutput("8");
+    }
+
+    @Test
+    @Order(16)
+    public void testSyntaxError_Basic() {
+        repl.lexParseAndInterpret("+5");
+        String expectedErrorReport = """
+                    ^
+            Expected expression.\n""";
+        testOutput(expectedErrorReport);
+    }
+
+    @Test
+    @Order(17)
+    public void testSyntaxError_MultipleErrorsOnSameLine() {
+        repl.lexParseAndInterpret("2 + foo -");
+        String expectedErrorReport = """
+            <repl>:1:5:
+                2 + foo -
+                    ^
+                Undefined variable reference.
+
+            <repl>:1:9:
+                2 + foo -
+                        ^
+                Expected expression.\n\n""";
+        testOutput(expectedErrorReport);
+    }
+
+    @Test
+    @Order(18)
+    public void testSyntaxError_MultiLineStatement_ErrorOnFirstLine() {
+        repl.lexParseAndInterpret("5 + ~:\n:~");
+        String expectedErrorReport = """
+            <repl>:1:3:
+                5 + ~:
+                  ^
+                Expected expression.\n\n""";
+        testOutput(expectedErrorReport);
+    }
+
+    @Test
+    @Order(19)
+    public void testSyntaxError_MultiLineStatement_ErrorOnMiddleLine() {
+        repl.lexParseAndInterpret("~:\n:~ 5 + ~:\n:~");
+        String expectedErrorReport = """
+            <repl>:2:6:
+                :~ 5 + ~:
+                     ^
+                Expected expression.\n\n""";
+        testOutput(expectedErrorReport);
+    }
+
+    @Test
+    @Order(20)
+    public void testSyntaxError_MultiLineStatement_ErrorOnLastLine() {
+        repl.lexParseAndInterpret("~:\n:~ ~:\n:~ 5 +");
+        String expectedErrorReport = """
+                         ^
+            Expected expression.\n""";
+        testOutput(expectedErrorReport);
+    }
+
+    @Test
+    @Order(21)
+    public void testSyntaxError_MultiLineStatement_ErrorsOnLineAfterFirst() {
+        repl.lexParseAndInterpret("5 - 2");
+        testOutput("3");
+
+        repl.lexParseAndInterpret("2 + foo ~:\n:~ * 4 -");
+        String expectedErrorReport = """
+            <repl>:2:5:
+                2 + foo ~:
+                    ^
+                Undefined variable reference.
+
+            <repl>:3:8:
+                :~ * 4 -
+                       ^
+                Expected expression.\n\n""";
+        testOutput(expectedErrorReport);
+    }
+
+    @Test
+    @Order(22)
+    public void testSyntaxError_MultipleErrors_AfterMultiLineStatementWithErrors() {
+        repl.lexParseAndInterpret("+5 ~:\n:~");
+        String expectedErrorReport = """
+            <repl>:1:1:
+                +5 ~:
+                ^
+                Expected expression.\n\n""";
+        testOutput(expectedErrorReport);
+
+        repl.lexParseAndInterpret("2 + foo -");
+        expectedErrorReport = """
+            <repl>:1:5:
+                2 + foo -
+                    ^
+                Undefined variable reference.
+
+            <repl>:1:9:
+                2 + foo -
+                        ^
+                Expected expression.\n\n""";
+        testOutput(expectedErrorReport);
+    }
+
+    @Test
+    @Order(23)
+    public void testSyntaxError_VariableDeclarationWithExtraTokens_TestThatVariableCanBeRedefined() {
+        repl.lexParseAndInterpret("foo -");
+        String expectedErrorReport = """
+                        ^
+            Unexpected token(s) in variable declaration statement.\n""";
+        testOutput(expectedErrorReport);
+
+        repl.lexParseAndInterpret("foo");
+        testOutput("foo:AtonementCrystal = {0}");
     }
 }

@@ -130,6 +130,16 @@ public class AtonementField {
         }
     }
 
+    public void undefine(String identifier) {
+        AtonementField fieldWithDefinition = getFieldWithDefinition(identifier);
+        boolean isDefined = fieldWithDefinition != null;
+        if (isDefined) {
+            fieldWithDefinition.fieldMembers.remove(identifier);
+        } else {
+            throw undefinedFieldMemberError();
+        }
+    }
+
     /**
      * Assign a new value to an existing crystal definition. Throws an error
      * if the crystal has not already been defined in the field hierarchy.

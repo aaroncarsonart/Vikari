@@ -90,6 +90,17 @@ public class Parser {
         return rootEnvironment;
     }
 
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    public void resetTo(int lineNumber) {
+        this.lineNumber = lineNumber;
+        for (int i = lexedStatements.size() - 1; i >= lineNumber; i--) {
+            lexedStatements.remove(i);
+        }
+    }
+
     public List<Statement> parse(File file, List<List<AtonementCrystal>> lexedStatements) {
         log.trace("parse({})", file == null ? "null" : "\"" + file + "\"");
         this.file = file;
@@ -246,6 +257,7 @@ public class Parser {
         String identifierToDefine = variableToDefine.getIdentifier();
         try {
             currentEnvironment.define(identifierToDefine, variableToDefine);
+            declarationStatement.setEnvironment(currentEnvironment);
         } catch (Vikari_FieldMemberExistsException e) {
             error(variableToDefine, "Variable is already defined.");
         }

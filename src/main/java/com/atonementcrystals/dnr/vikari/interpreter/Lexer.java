@@ -108,8 +108,14 @@ public class Lexer {
     private List<String> stringTokens;
     private List<List<String>> statementsOfStringTokens;
 
+    private int startLineNumber;
+
     public void setSyntaxErrorReporter(SyntaxErrorReporter syntaxErrorReporter) {
         this.syntaxErrorReporter = syntaxErrorReporter;
+    }
+
+    public int getLineNumber() {
+        return lineNumber;
     }
 
     /**
@@ -189,6 +195,7 @@ public class Lexer {
 
         line = readNextLine();
         lineLength = atEndOfFile() ? 0 : line.length();
+        startLineNumber = lineNumber;
 
         while (!atEndOfFile()) {
 
@@ -309,6 +316,13 @@ public class Lexer {
             syntaxErrorReporter = new SyntaxErrorReporter();
         }
         lines = syntaxErrorReporter.getLineCacheFor(currentFile);
+    }
+
+    public void resetTo(int lineNumber) {
+        this.lineNumber = lineNumber;
+        for (int i = lines.size() - 1; i >= lineNumber; i--) {
+            lines.remove(i);
+        }
     }
 
     private String readNextLine() {
@@ -697,7 +711,8 @@ public class Lexer {
                     column += previousToken.length();
                 }
 
-                CoordinatePair tokenCoordinates = new CoordinatePair(statementNumber, column);
+                int row = startLineNumber + statementNumber;
+                CoordinatePair tokenCoordinates = new CoordinatePair(row, column);
 
                 if (Utils.isWhitespace(stringToken)) {
                     // All whitespace (besides indentation) is omitted in the final output of the Lexer.
@@ -835,7 +850,8 @@ public class Lexer {
                         statementNumber++;
                         tokenNumber = 0;
                         column = 0;
-                        tokenCoordinates = new CoordinatePair(statementNumber, column);
+                        row = startLineNumber + statementNumber;
+                        tokenCoordinates = new CoordinatePair(row, column);
                         statementOfStringTokens = statementsOfStringTokens.get(statementNumber);
                         statementsOfCrystals.add(statementOfCrystals);
                         statementOfCrystals = new ArrayList<>();
