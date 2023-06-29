@@ -224,7 +224,8 @@ public enum TokenType {
             TokenType.LINE_CONTINUATION,
             TokenType.PRINT_STATEMENT,
             // special cases
-            TokenType.SWORD);
+            TokenType.SWORD,
+            TokenType.THROW);
 
     /**
      * This is the set of all TokenTypes to be handled by the Lexer.

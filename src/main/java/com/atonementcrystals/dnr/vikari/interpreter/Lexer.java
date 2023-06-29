@@ -4,6 +4,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.keyword.error.ThrowCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.StringLiteralCrystal;
@@ -70,6 +71,15 @@ public class Lexer {
     private static final Pattern invalidCharactersRegex = Pattern.compile("^[^\t -~]+");
 
     /**
+     * If a negation operator preceding another negation operator follows one of these tokens,
+     * the operators should be collapsed together into a single ThrowCrystal.
+     */
+    private static final HashSet<Class<? extends AtonementCrystal>> COLLAPSE_THROW_CRYSTAL_CLASSES = Stream.of(
+                    TokenType.STATEMENT_SEPARATOR, TokenType.REGION_SEPARATOR, TokenType.REGION_OPERATOR)
+            .map(TokenType::getJavaType)
+            .collect(Collectors.toCollection(HashSet::new));
+
+    /**
      * If a negation operator preceding a number literal follows one of these tokens,
      * the operator should be collapsed together with the number literal.
      */
@@ -109,6 +119,10 @@ public class Lexer {
     private List<List<String>> statementsOfStringTokens;
 
     private int startLineNumber;
+
+    public static HashSet<Class<? extends AtonementCrystal>> getCollapseNegationOperatorClasses() {
+        return COLLAPSE_NEGATION_OPERATOR_CLASSES;
+    }
 
     public void setSyntaxErrorReporter(SyntaxErrorReporter syntaxErrorReporter) {
         this.syntaxErrorReporter = syntaxErrorReporter;
@@ -232,7 +246,7 @@ public class Lexer {
                         break;
 
                     case '-':
-                        tryMatchAndGetToken("<<", ">>", "-", ">");
+                        tryMatchAndGetToken("<<", ">>", ">");
                         break;
 
                     case '.':
@@ -731,14 +745,34 @@ public class Lexer {
                 }
 
                 if (TokenType.SUBTRACT.getIdentifier().equals(stringToken)) {
-                    // handle all as SUBTRACT at first.
+                    // Check if two sequential "-" tokens should be collapsed into a single ThrowCrystal.
+                    String nextToken = null;
+                    if (tokenNumber + 1 < statementOfStringTokens.size()) {
+                        nextToken = statementOfStringTokens.get(tokenNumber + 1);
+                    }
+                    if (TokenType.SUBTRACT.getIdentifier().equals(nextToken)) {
+                        AtonementCrystal prevCrystal = null;
+                        if (!statementOfCrystals.isEmpty()) {
+                            prevCrystal = statementOfCrystals.get(statementOfCrystals.size() - 1);
+                        }
+                        if (statementOfCrystals.isEmpty() || COLLAPSE_THROW_CRYSTAL_CLASSES.contains(prevCrystal.getClass())) {
+                            ThrowCrystal throwCrystal = new ThrowCrystal();
+                            throwCrystal.setCoordinates(tokenCoordinates);
+                            statementOfCrystals.add(throwCrystal);
+                            tokenNumber++;
+                            column++;
+                            continue;
+                        }
+                    }
+
+                    // Otherwise, handle all as SUBTRACT at first.
                     SubtractOperatorCrystal subtractCrystal = new SubtractOperatorCrystal();
                     subtractCrystal.setCoordinates(tokenCoordinates);
                     statementOfCrystals.add(subtractCrystal);
                     continue;
                 }
 
-                // Collapse a negation operator onto the number token, if necessary and appropriate.
+                // Collapse a negation operator onto a following number token, if necessary and appropriate.
                 CoordinatePair negationOperatorLocation = null;
                 if (isNumberToken(stringToken) && !statementOfCrystals.isEmpty()) {
                     int crystalCount = statementOfCrystals.size();
