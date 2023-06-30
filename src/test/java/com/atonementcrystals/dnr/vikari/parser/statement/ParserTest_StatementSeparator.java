@@ -22,6 +22,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 
+import static com.atonementcrystals.dnr.vikari.TestUtils.location;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -350,7 +351,7 @@ public class ParserTest_StatementSeparator {
         assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
 
         SyntaxError error1 = syntaxErrors.get(0);
-        CoordinatePair expectedLocation = new CoordinatePair(0, 2);
+        CoordinatePair expectedLocation = location(0, 2);
         String expectedLine = sourceString;
         TestUtils.testSyntaxError(error1, expectedLocation, expectedLine, "Expected expression.");
     }
@@ -366,12 +367,12 @@ public class ParserTest_StatementSeparator {
         assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
 
         SyntaxError error1 = syntaxErrors.get(0);
-        CoordinatePair expectedLocation = new CoordinatePair(0, 2);
+        CoordinatePair expectedLocation = location(0, 2);
         String expectedLine = sourceString;
         TestUtils.testSyntaxError(error1, expectedLocation, expectedLine, "Expected expression.");
 
         SyntaxError error2 = syntaxErrors.get(1);
-        expectedLocation = new CoordinatePair(0, 4);
+        expectedLocation = location(0, 4);
         expectedLine = sourceString;
         TestUtils.testSyntaxError(error2, expectedLocation, expectedLine, "Expected expression.");
     }
@@ -388,22 +389,22 @@ public class ParserTest_StatementSeparator {
         assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
 
         SyntaxError error1 = syntaxErrors.get(0);
-        CoordinatePair expectedLocation = new CoordinatePair(0, 2);
+        CoordinatePair expectedLocation = location(0, 2);
         String expectedLine = "5 ++, * 7 *,";
         TestUtils.testSyntaxError(error1, expectedLocation, expectedLine, "Expected expression.");
 
         SyntaxError error2 = syntaxErrors.get(1);
-        expectedLocation = new CoordinatePair(0, 6);
+        expectedLocation = location(0, 6);
         expectedLine = "5 ++, * 7 *,";
         TestUtils.testSyntaxError(error2, expectedLocation, expectedLine, "Expected expression.");
 
         SyntaxError error3 = syntaxErrors.get(2);
-        expectedLocation = new CoordinatePair(1, 3);
+        expectedLocation = location(1, 3);
         expectedLine = "22 -, / 3";
         TestUtils.testSyntaxError(error3, expectedLocation, expectedLine, "Expected expression.");
 
         SyntaxError error4 = syntaxErrors.get(3);
-        expectedLocation = new CoordinatePair(1, 6);
+        expectedLocation = location(1, 6);
         expectedLine = "22 -, / 3";
         TestUtils.testSyntaxError(error4, expectedLocation, expectedLine, "Expected expression.");
     }

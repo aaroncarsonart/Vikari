@@ -28,6 +28,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 
+import static com.atonementcrystals.dnr.vikari.TestUtils.location;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -153,7 +154,7 @@ public class ParserTest_Variables {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 4), sourceString, "Unexpected token(s) in " +
+        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), sourceString, "Unexpected token(s) in " +
                 "variable declaration statement");
 
         int expectedStatementCount = 1;
@@ -174,7 +175,7 @@ public class ParserTest_Variables {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 4), sourceString, "Undefined variable reference.");
+        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), sourceString, "Undefined variable reference.");
 
         int expectedStatementCount = 1;
         int actualStatementCount = statements.size();
@@ -222,8 +223,8 @@ public class ParserTest_Variables {
         int actualStatementCount = statements.size();
         assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
 
-        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, null, new CoordinatePair(0, 0));
-        testVariableExpression(statements.get(1), "foo", VikariType.ATONEMENT_CRYSTAL, null, new CoordinatePair(0, 4));
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, null, location(0, 0));
+        testVariableExpression(statements.get(1), "foo", VikariType.ATONEMENT_CRYSTAL, null, location(0, 4));
     }
 
     @Test
@@ -239,9 +240,9 @@ public class ParserTest_Variables {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), new CoordinatePair(1, 0), "foo + 5", "Arithmetic " +
+        TestUtils.testSyntaxError(syntaxErrors.get(0), location(1, 0), "foo + 5", "Arithmetic " +
                 "expression expects a Number for operands.");
-        TestUtils.testSyntaxError(syntaxErrors.get(1), new CoordinatePair(2, 4), "5 + foo", "Arithmetic " +
+        TestUtils.testSyntaxError(syntaxErrors.get(1), location(2, 4), "5 + foo", "Arithmetic " +
                 "expression expects a Number for operands.");
 
         int expectedStatementCount = 3;
@@ -249,7 +250,7 @@ public class ParserTest_Variables {
         assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
 
         // declaration
-        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, null, new CoordinatePair(0, 0));
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, null, location(0, 0));
 
         // arithmetic expressions
 

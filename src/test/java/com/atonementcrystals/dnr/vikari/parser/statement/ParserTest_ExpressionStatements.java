@@ -26,11 +26,11 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.List;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
+import static com.atonementcrystals.dnr.vikari.TestUtils.location;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ParserTest_ExpressionStatements {
-    private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test
     @Order(1)
@@ -60,7 +60,7 @@ public class ParserTest_ExpressionStatements {
         assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
         ExpressionStatement expressionStatement = (ExpressionStatement) statement;
 
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair expectedLocation = location(0, 0);
         CoordinatePair actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -82,7 +82,7 @@ public class ParserTest_ExpressionStatements {
         assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
         ExpressionStatement expressionStatement2 = (ExpressionStatement) statement;
 
-        expectedLocation = new CoordinatePair(1, 0);
+        expectedLocation = location(1, 0);
         actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -127,7 +127,7 @@ public class ParserTest_ExpressionStatements {
         assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
         ExpressionStatement expressionStatement = (ExpressionStatement) statement;
 
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair expectedLocation = location(0, 0);
         CoordinatePair actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -167,7 +167,7 @@ public class ParserTest_ExpressionStatements {
         assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
         expressionStatement = (ExpressionStatement) statement;
 
-        expectedLocation = new CoordinatePair(1, 0);
+        expectedLocation = location(1, 0);
         actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -232,7 +232,7 @@ public class ParserTest_ExpressionStatements {
         assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
         ExpressionStatement expressionStatement = (ExpressionStatement) statement;
 
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair expectedLocation = location(0, 0);
         CoordinatePair actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -247,7 +247,7 @@ public class ParserTest_ExpressionStatements {
         assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
         expressionStatement = (ExpressionStatement) statement;
 
-        expectedLocation = new CoordinatePair(1, 0);
+        expectedLocation = location(1, 0);
         actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -262,7 +262,7 @@ public class ParserTest_ExpressionStatements {
         assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
         expressionStatement = (ExpressionStatement) statement;
 
-        expectedLocation = new CoordinatePair(2, 0);
+        expectedLocation = location(2, 0);
         actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -290,7 +290,7 @@ public class ParserTest_ExpressionStatements {
         assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
         expressionStatement = (ExpressionStatement) statement;
 
-        expectedLocation = new CoordinatePair(3, 0);
+        expectedLocation = location(3, 0);
         actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 

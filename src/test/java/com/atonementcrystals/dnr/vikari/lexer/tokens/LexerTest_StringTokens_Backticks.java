@@ -2,7 +2,6 @@ package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
-import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;

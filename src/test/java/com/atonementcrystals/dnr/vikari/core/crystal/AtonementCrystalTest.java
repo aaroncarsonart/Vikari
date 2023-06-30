@@ -1,13 +1,12 @@
 package com.atonementcrystals.dnr.vikari.core.crystal;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
-import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
-import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import static com.atonementcrystals.dnr.vikari.TestUtils.location;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -18,7 +17,7 @@ class AtonementCrystalTest {
     public void testCopy() {
         AtonementCrystal crystal1 = new AtonementCrystal("foo");
         crystal1.setType(VikariType.INTEGER);
-        crystal1.setCoordinates(new CoordinatePair(0, 0));
+        crystal1.setCoordinates(location(0, 0));
         AtonementCrystal crystal2 = crystal1.copy();
 
         assertEquals(crystal1.getIdentifier(), crystal2.getIdentifier(), "Expected identifiers to be equivalent.");

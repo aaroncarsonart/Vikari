@@ -14,7 +14,6 @@ import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
-import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -22,8 +21,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 
-import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
-import static com.atonementcrystals.dnr.vikari.TestUtils.testSyntaxError;
+import static com.atonementcrystals.dnr.vikari.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -156,7 +154,7 @@ public class ParserTest_Grouping {
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1
-        testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 6), sourceString, "Expected expression.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 6), sourceString, "Expected expression.");
     }
 
     @Test
@@ -183,7 +181,7 @@ public class ParserTest_Grouping {
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1
-        testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 7), sourceString, "Expected `]` after expression.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 7), sourceString, "Expected `]` after expression.");
     }
 
     @Test
@@ -210,7 +208,7 @@ public class ParserTest_Grouping {
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1
-        testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 6), sourceString, "Expected `]` after expression.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 6), sourceString, "Expected `]` after expression.");
     }
 
     @Test
@@ -237,7 +235,7 @@ public class ParserTest_Grouping {
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1
-        testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 1), sourceString, "Expected expression.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Expected expression.");
     }
 
     @Test
@@ -265,7 +263,7 @@ public class ParserTest_Grouping {
             assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
             // Syntax Error 1
-            testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 0), sourceString, "Expected expression.");
+            testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Expected expression.");
         }
     }
 
@@ -294,10 +292,10 @@ public class ParserTest_Grouping {
         assertEquals(2, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1
-        testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 5), "3 - 2]", "Expected expression.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 5), "3 - 2]", "Expected expression.");
 
         // Syntax Error 2
-        testSyntaxError(syntaxErrors.get(1), new CoordinatePair(1, 5), "3 - 2]", "Expected expression.");
+        testSyntaxError(syntaxErrors.get(1), location(1, 5), "3 - 2]", "Expected expression.");
     }
 
     @Test
@@ -325,9 +323,9 @@ public class ParserTest_Grouping {
         assertEquals(2, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1
-        testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 6), "[3 - 2", "Expected `]` after expression.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 6), "[3 - 2", "Expected `]` after expression.");
 
         // Syntax Error 2
-        testSyntaxError(syntaxErrors.get(1), new CoordinatePair(1, 6), "[3 - 2", "Expected `]` after expression.");
+        testSyntaxError(syntaxErrors.get(1), location(1, 6), "[3 - 2", "Expected `]` after expression.");
     }
 }

@@ -23,12 +23,12 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 
+import static com.atonementcrystals.dnr.vikari.TestUtils.location;
 import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ParserTest_PrintStatements {
-    private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test
     @Order(1)
@@ -56,7 +56,7 @@ public class ParserTest_PrintStatements {
         assertEquals(PrintStatement.class, statement.getClass(), "Unexpected statement type.");
         PrintStatement printStatement = (PrintStatement) statement;
 
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair expectedLocation = location(0, 0);
         CoordinatePair actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -96,7 +96,7 @@ public class ParserTest_PrintStatements {
         assertEquals(PrintStatement.class, statement.getClass(), "Unexpected statement type.");
         PrintStatement printStatement = (PrintStatement) statement;
 
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair expectedLocation = location(0, 0);
         CoordinatePair actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -139,7 +139,7 @@ public class ParserTest_PrintStatements {
         assertEquals(PrintStatement.class, statement.getClass(), "Unexpected statement type.");
         PrintStatement printStatement = (PrintStatement) statement;
 
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair expectedLocation = location(0, 0);
         CoordinatePair actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -187,7 +187,7 @@ public class ParserTest_PrintStatements {
         assertEquals(PrintStatement.class, statement.getClass(), "Unexpected statement type.");
         PrintStatement printStatement = (PrintStatement) statement;
 
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair expectedLocation = location(0, 0);
         CoordinatePair actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -233,7 +233,7 @@ public class ParserTest_PrintStatements {
         assertEquals(PrintStatement.class, statement.getClass(), "Unexpected statement type.");
         PrintStatement printStatement = (PrintStatement) statement;
 
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair expectedLocation = location(0, 0);
         CoordinatePair actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -279,7 +279,7 @@ public class ParserTest_PrintStatements {
         assertEquals(PrintStatement.class, statement.getClass(), "Unexpected statement type.");
         PrintStatement printStatement = (PrintStatement) statement;
 
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair expectedLocation = location(0, 0);
         CoordinatePair actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -329,7 +329,7 @@ public class ParserTest_PrintStatements {
         assertEquals(PrintStatement.class, statement.getClass(), "Unexpected statement type.");
         PrintStatement printStatement = (PrintStatement) statement;
 
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
+        CoordinatePair expectedLocation = location(0, 0);
         CoordinatePair actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -360,7 +360,7 @@ public class ParserTest_PrintStatements {
         assertEquals(PrintStatement.class, statement.getClass(), "Unexpected statement type.");
         printStatement = (PrintStatement) statement;
 
-        expectedLocation = new CoordinatePair(1, 0);
+        expectedLocation = location(1, 0);
         actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -390,7 +390,7 @@ public class ParserTest_PrintStatements {
         assertEquals(PrintStatement.class, statement.getClass(), "Unexpected statement type.");
         printStatement = (PrintStatement) statement;
 
-        expectedLocation = new CoordinatePair(2, 0);
+        expectedLocation = location(2, 0);
         actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 
@@ -421,7 +421,7 @@ public class ParserTest_PrintStatements {
         assertEquals(PrintStatement.class, statement.getClass(), "Unexpected statement type.");
         printStatement = (PrintStatement) statement;
 
-        expectedLocation = new CoordinatePair(3, 0);
+        expectedLocation = location(3, 0);
         actualLocation = statement.getLocation();
         assertEquals(expectedLocation, actualLocation, "Unexpected coordinates for statement.");
 

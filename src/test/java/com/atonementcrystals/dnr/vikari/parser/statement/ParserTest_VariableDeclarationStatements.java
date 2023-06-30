@@ -28,11 +28,11 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.List;
 
+import static com.atonementcrystals.dnr.vikari.TestUtils.location;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ParserTest_VariableDeclarationStatements {
-    private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
     private final AtonementField globalAtonementField = VikariProgram.initGlobalAtonementField();
     private AtonementField rootEnvironment;
     SyntaxErrorReporter syntaxErrorReporter;
@@ -210,7 +210,7 @@ public class ParserTest_VariableDeclarationStatements {
         int actualSize = statements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, null, COORDINATE_PAIR_ZERO_ZERO);
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, null, location(0, 0));
     }
 
     @Test
@@ -223,7 +223,7 @@ public class ParserTest_VariableDeclarationStatements {
         int actualSize = statements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        testDeclaration(statements.get(0), "foo", VikariType.INTEGER, null, COORDINATE_PAIR_ZERO_ZERO);
+        testDeclaration(statements.get(0), "foo", VikariType.INTEGER, null, location(0, 0));
     }
 
     @Test
@@ -236,7 +236,7 @@ public class ParserTest_VariableDeclarationStatements {
         int actualSize = statements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 2);
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, location(0, 0), 2);
     }
 
     @Test
@@ -249,7 +249,7 @@ public class ParserTest_VariableDeclarationStatements {
         int actualSize = statements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        testDeclaration(statements.get(0), "foo", VikariType.INTEGER, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 2);
+        testDeclaration(statements.get(0), "foo", VikariType.INTEGER, VikariType.INTEGER, location(0, 0), 2);
     }
 
     public void testThreeStatements(String sourceString,
@@ -291,72 +291,72 @@ public class ParserTest_VariableDeclarationStatements {
     @Order(5)
     public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SingleLine() {
         testThreeStatements("foo,bar,baz",
-                "foo", VikariType.ATONEMENT_CRYSTAL, null, COORDINATE_PAIR_ZERO_ZERO,
-                "bar", VikariType.ATONEMENT_CRYSTAL, null, new CoordinatePair(0, 4),
-                "baz", VikariType.ATONEMENT_CRYSTAL, null, new CoordinatePair(0, 8));
+                "foo", VikariType.ATONEMENT_CRYSTAL, null, location(0, 0),
+                "bar", VikariType.ATONEMENT_CRYSTAL, null, location(0, 4),
+                "baz", VikariType.ATONEMENT_CRYSTAL, null, location(0, 8));
     }
 
     @Test
     @Order(6)
     public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SeparateLines() {
         testThreeStatements("foo\nbar\nbaz",
-                "foo", VikariType.ATONEMENT_CRYSTAL, null, COORDINATE_PAIR_ZERO_ZERO,
-                "bar", VikariType.ATONEMENT_CRYSTAL, null, new CoordinatePair(1, 0),
-                "baz", VikariType.ATONEMENT_CRYSTAL, null, new CoordinatePair(2, 0));
+                "foo", VikariType.ATONEMENT_CRYSTAL, null, location(0, 0),
+                "bar", VikariType.ATONEMENT_CRYSTAL, null, location(1, 0),
+                "baz", VikariType.ATONEMENT_CRYSTAL, null, location(2, 0));
     }
 
     @Test
     @Order(7)
     public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SingleLine_WithTypeLabels() {
         testThreeStatements("foo:Integer,bar:Integer,baz:Integer",
-                "foo", VikariType.INTEGER, null, COORDINATE_PAIR_ZERO_ZERO,
-                "bar", VikariType.INTEGER, null, new CoordinatePair(0, 12),
-                "baz", VikariType.INTEGER, null, new CoordinatePair(0, 24));
+                "foo", VikariType.INTEGER, null, location(0, 0),
+                "bar", VikariType.INTEGER, null, location(0, 12),
+                "baz", VikariType.INTEGER, null, location(0, 24));
     }
 
     @Test
     @Order(8)
     public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SeparateLines_WithTypeLabels() {
         testThreeStatements("foo:Integer\nbar:Integer\nbaz:Integer",
-                "foo", VikariType.INTEGER, null, COORDINATE_PAIR_ZERO_ZERO,
-                "bar", VikariType.INTEGER, null, new CoordinatePair(1, 0),
-                "baz", VikariType.INTEGER, null, new CoordinatePair(2, 0));
+                "foo", VikariType.INTEGER, null, location(0, 0),
+                "bar", VikariType.INTEGER, null, location(1, 0),
+                "baz", VikariType.INTEGER, null, location(2, 0));
     }
 
     @Test
     @Order(9)
     public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SingleLine_WithInitializerExpressions() {
         testThreeStatements("foo << 2, bar << 3, baz << 4",
-                "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 2,
-                "bar", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, new CoordinatePair(0, 10), 3,
-                "baz", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, new CoordinatePair(0, 20), 4);
+                "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, location(0, 0), 2,
+                "bar", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, location(0, 10), 3,
+                "baz", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, location(0, 20), 4);
     }
 
     @Test
     @Order(10)
     public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SeparateLines_WithInitializerExpressions() {
         testThreeStatements("foo << 2\nbar << 3\nbaz << 4",
-                "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 2,
-                "bar", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, new CoordinatePair(1, 0), 3,
-                "baz", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, new CoordinatePair(2, 0), 4);
+                "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, location(0, 0), 2,
+                "bar", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, location(1, 0), 3,
+                "baz", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, location(2, 0), 4);
     }
 
     @Test
     @Order(11)
     public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SingleLine_WithTypeLabels_AndInitializerExpressions() {
         testThreeStatements("foo:Integer << 2, bar:Integer << 3, baz:Integer << 4",
-                "foo", VikariType.INTEGER, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 2,
-                "bar", VikariType.INTEGER, VikariType.INTEGER, new CoordinatePair(0, 18), 3,
-                "baz", VikariType.INTEGER, VikariType.INTEGER, new CoordinatePair(0, 36), 4);
+                "foo", VikariType.INTEGER, VikariType.INTEGER, location(0, 0), 2,
+                "bar", VikariType.INTEGER, VikariType.INTEGER, location(0, 18), 3,
+                "baz", VikariType.INTEGER, VikariType.INTEGER, location(0, 36), 4);
     }
 
     @Test
     @Order(12)
     public void testParser_Statement_VariableDeclaration_MultipleDeclarations_SeparateLines_WithTypeLabels_AndInitializerExpressions() {
         testThreeStatements("foo:Integer << 2\nbar:Integer << 3\nbaz:Integer << 4",
-                "foo", VikariType.INTEGER, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 2,
-                "bar", VikariType.INTEGER, VikariType.INTEGER, new CoordinatePair(1, 0), 3,
-                "baz", VikariType.INTEGER, VikariType.INTEGER, new CoordinatePair(2, 0), 4);
+                "foo", VikariType.INTEGER, VikariType.INTEGER, location(0, 0), 2,
+                "bar", VikariType.INTEGER, VikariType.INTEGER, location(1, 0), 3,
+                "baz", VikariType.INTEGER, VikariType.INTEGER, location(2, 0), 4);
     }
 
     @Test
@@ -377,12 +377,12 @@ public class ParserTest_VariableDeclarationStatements {
         int actualSize = statements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        testDeclaration(statements.get(0), "a", VikariType.INTEGER, null, COORDINATE_PAIR_ZERO_ZERO);
-        testDeclaration(statements.get(1), "b", VikariType.LONG, null, new CoordinatePair(1, 0));
-        testDeclaration(statements.get(2), "c", VikariType.BIG_INTEGER, null, new CoordinatePair(2, 0));
-        testDeclaration(statements.get(3), "d", VikariType.FLOAT, null, new CoordinatePair(3, 0));
-        testDeclaration(statements.get(4), "e", VikariType.DOUBLE, null, new CoordinatePair(4, 0));
-        testDeclaration(statements.get(5), "f", VikariType.BIG_DECIMAL, null, new CoordinatePair(5, 0));
+        testDeclaration(statements.get(0), "a", VikariType.INTEGER, null, location(0, 0));
+        testDeclaration(statements.get(1), "b", VikariType.LONG, null, location(1, 0));
+        testDeclaration(statements.get(2), "c", VikariType.BIG_INTEGER, null, location(2, 0));
+        testDeclaration(statements.get(3), "d", VikariType.FLOAT, null, location(3, 0));
+        testDeclaration(statements.get(4), "e", VikariType.DOUBLE, null, location(4, 0));
+        testDeclaration(statements.get(5), "f", VikariType.BIG_DECIMAL, null, location(5, 0));
     }
 
     @Test
@@ -406,13 +406,13 @@ public class ParserTest_VariableDeclarationStatements {
         BigInteger bigInteger = new BigInteger("3");
         BigDecimal bigDecimal = new BigDecimal("6.0", Arithmetic.getMathContext());
 
-        testDeclaration(statements.get(0), "a", VikariType.INTEGER, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 1);
-        testDeclaration(statements.get(1), "b", VikariType.LONG, VikariType.LONG, new CoordinatePair(1, 0), 2L);
-        testDeclaration(statements.get(2), "c", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, new CoordinatePair(2, 0),
+        testDeclaration(statements.get(0), "a", VikariType.INTEGER, VikariType.INTEGER, location(0, 0), 1);
+        testDeclaration(statements.get(1), "b", VikariType.LONG, VikariType.LONG, location(1, 0), 2L);
+        testDeclaration(statements.get(2), "c", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, location(2, 0),
                 bigInteger);
-        testDeclaration(statements.get(3), "d", VikariType.FLOAT, VikariType.FLOAT, new CoordinatePair(3, 0), 4.0F);
-        testDeclaration(statements.get(4), "e", VikariType.DOUBLE, VikariType.DOUBLE, new CoordinatePair(4, 0), 5.0D);
-        testDeclaration(statements.get(5), "f", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new CoordinatePair(5, 0),
+        testDeclaration(statements.get(3), "d", VikariType.FLOAT, VikariType.FLOAT, location(3, 0), 4.0F);
+        testDeclaration(statements.get(4), "e", VikariType.DOUBLE, VikariType.DOUBLE, location(4, 0), 5.0D);
+        testDeclaration(statements.get(5), "f", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, location(5, 0),
                 bigDecimal);
     }
 
@@ -443,21 +443,21 @@ public class ParserTest_VariableDeclarationStatements {
         int actualSize = statements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        testDeclaration(statements.get(0), "a", VikariType.LONG, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 1);
-        testDeclaration(statements.get(1), "b", VikariType.BIG_INTEGER, VikariType.INTEGER, new CoordinatePair(1, 0), 2);
-        testDeclaration(statements.get(2), "c", VikariType.BIG_INTEGER, VikariType.LONG, new CoordinatePair(2, 0), 3L);
-        testDeclaration(statements.get(3), "d", VikariType.FLOAT, VikariType.INTEGER, new CoordinatePair(3, 0), 4);
-        testDeclaration(statements.get(4), "e", VikariType.FLOAT, VikariType.LONG, new CoordinatePair(4, 0), 5L);
-        testDeclaration(statements.get(5), "f", VikariType.FLOAT, VikariType.BIG_INTEGER, new CoordinatePair(5, 0), new BigInteger("6"));
-        testDeclaration(statements.get(6), "g", VikariType.DOUBLE, VikariType.INTEGER, new CoordinatePair(6, 0), 7);
-        testDeclaration(statements.get(7), "h", VikariType.DOUBLE, VikariType.LONG, new CoordinatePair(7, 0), 8L);
-        testDeclaration(statements.get(8), "i", VikariType.DOUBLE, VikariType.BIG_INTEGER, new CoordinatePair(8, 0), new BigInteger("9"));
-        testDeclaration(statements.get(9), "j", VikariType.DOUBLE, VikariType.FLOAT, new CoordinatePair(9, 0), 10.0F);
-        testDeclaration(statements.get(10), "k", VikariType.BIG_DECIMAL, VikariType.INTEGER, new CoordinatePair(10, 0), 11);
-        testDeclaration(statements.get(11), "l", VikariType.BIG_DECIMAL, VikariType.LONG, new CoordinatePair(11, 0), 12L);
-        testDeclaration(statements.get(12), "m", VikariType.BIG_DECIMAL, VikariType.BIG_INTEGER, new CoordinatePair(12, 0), new BigInteger("13"));
-        testDeclaration(statements.get(13), "n", VikariType.BIG_DECIMAL, VikariType.FLOAT, new CoordinatePair(13, 0), 14.0F);
-        testDeclaration(statements.get(14), "o", VikariType.BIG_DECIMAL, VikariType.DOUBLE, new CoordinatePair(14, 0), 15.0D);
+        testDeclaration(statements.get(0), "a", VikariType.LONG, VikariType.INTEGER, location(0, 0), 1);
+        testDeclaration(statements.get(1), "b", VikariType.BIG_INTEGER, VikariType.INTEGER, location(1, 0), 2);
+        testDeclaration(statements.get(2), "c", VikariType.BIG_INTEGER, VikariType.LONG, location(2, 0), 3L);
+        testDeclaration(statements.get(3), "d", VikariType.FLOAT, VikariType.INTEGER, location(3, 0), 4);
+        testDeclaration(statements.get(4), "e", VikariType.FLOAT, VikariType.LONG, location(4, 0), 5L);
+        testDeclaration(statements.get(5), "f", VikariType.FLOAT, VikariType.BIG_INTEGER, location(5, 0), new BigInteger("6"));
+        testDeclaration(statements.get(6), "g", VikariType.DOUBLE, VikariType.INTEGER, location(6, 0), 7);
+        testDeclaration(statements.get(7), "h", VikariType.DOUBLE, VikariType.LONG, location(7, 0), 8L);
+        testDeclaration(statements.get(8), "i", VikariType.DOUBLE, VikariType.BIG_INTEGER, location(8, 0), new BigInteger("9"));
+        testDeclaration(statements.get(9), "j", VikariType.DOUBLE, VikariType.FLOAT, location(9, 0), 10.0F);
+        testDeclaration(statements.get(10), "k", VikariType.BIG_DECIMAL, VikariType.INTEGER, location(10, 0), 11);
+        testDeclaration(statements.get(11), "l", VikariType.BIG_DECIMAL, VikariType.LONG, location(11, 0), 12L);
+        testDeclaration(statements.get(12), "m", VikariType.BIG_DECIMAL, VikariType.BIG_INTEGER, location(12, 0), new BigInteger("13"));
+        testDeclaration(statements.get(13), "n", VikariType.BIG_DECIMAL, VikariType.FLOAT, location(13, 0), 14.0F);
+        testDeclaration(statements.get(14), "o", VikariType.BIG_DECIMAL, VikariType.DOUBLE, location(14, 0), 15.0D);
     }
 
     @Test
@@ -489,21 +489,21 @@ public class ParserTest_VariableDeclarationStatements {
 
         MathContext mathContext = Arithmetic.getMathContext();
 
-        testDeclaration(statements.get(0), "a", VikariType.INTEGER, VikariType.LONG, COORDINATE_PAIR_ZERO_ZERO, 1L);
-        testDeclaration(statements.get(1), "b", VikariType.INTEGER, VikariType.BIG_INTEGER, new CoordinatePair(1, 0), new BigInteger("2"));
-        testDeclaration(statements.get(2), "c", VikariType.INTEGER, VikariType.FLOAT, new CoordinatePair(2, 0), 3.0F);
-        testDeclaration(statements.get(3), "d", VikariType.INTEGER, VikariType.DOUBLE, new CoordinatePair(3, 0), 4.0D);
-        testDeclaration(statements.get(4), "e", VikariType.INTEGER, VikariType.BIG_DECIMAL, new CoordinatePair(4, 0), new BigDecimal("5.0", mathContext));
-        testDeclaration(statements.get(5), "f", VikariType.LONG, VikariType.BIG_INTEGER, new CoordinatePair(5, 0), new BigInteger("6"));
-        testDeclaration(statements.get(6), "g", VikariType.LONG, VikariType.FLOAT, new CoordinatePair(6, 0), 7.0F);
-        testDeclaration(statements.get(7), "h", VikariType.LONG, VikariType.DOUBLE, new CoordinatePair(7, 0), 8.0D);
-        testDeclaration(statements.get(8), "i", VikariType.LONG, VikariType.BIG_DECIMAL, new CoordinatePair(8, 0), new BigDecimal("9.0", mathContext));
-        testDeclaration(statements.get(9), "j", VikariType.BIG_INTEGER, VikariType.FLOAT, new CoordinatePair(9, 0), 10.0F);
-        testDeclaration(statements.get(10), "k", VikariType.BIG_INTEGER, VikariType.DOUBLE, new CoordinatePair(10, 0), 11.0D);
-        testDeclaration(statements.get(11), "l", VikariType.BIG_INTEGER, VikariType.BIG_DECIMAL, new CoordinatePair(11, 0), new BigDecimal("12.0", mathContext));
-        testDeclaration(statements.get(12), "m", VikariType.FLOAT, VikariType.DOUBLE, new CoordinatePair(12, 0), 13.0D);
-        testDeclaration(statements.get(13), "n", VikariType.FLOAT, VikariType.BIG_DECIMAL, new CoordinatePair(13, 0), new BigDecimal("14.0", mathContext));
-        testDeclaration(statements.get(14), "o", VikariType.DOUBLE, VikariType.BIG_DECIMAL, new CoordinatePair(14, 0), new BigDecimal("15.0", mathContext));
+        testDeclaration(statements.get(0), "a", VikariType.INTEGER, VikariType.LONG, location(0, 0), 1L);
+        testDeclaration(statements.get(1), "b", VikariType.INTEGER, VikariType.BIG_INTEGER, location(1, 0), new BigInteger("2"));
+        testDeclaration(statements.get(2), "c", VikariType.INTEGER, VikariType.FLOAT, location(2, 0), 3.0F);
+        testDeclaration(statements.get(3), "d", VikariType.INTEGER, VikariType.DOUBLE, location(3, 0), 4.0D);
+        testDeclaration(statements.get(4), "e", VikariType.INTEGER, VikariType.BIG_DECIMAL, location(4, 0), new BigDecimal("5.0", mathContext));
+        testDeclaration(statements.get(5), "f", VikariType.LONG, VikariType.BIG_INTEGER, location(5, 0), new BigInteger("6"));
+        testDeclaration(statements.get(6), "g", VikariType.LONG, VikariType.FLOAT, location(6, 0), 7.0F);
+        testDeclaration(statements.get(7), "h", VikariType.LONG, VikariType.DOUBLE, location(7, 0), 8.0D);
+        testDeclaration(statements.get(8), "i", VikariType.LONG, VikariType.BIG_DECIMAL, location(8, 0), new BigDecimal("9.0", mathContext));
+        testDeclaration(statements.get(9), "j", VikariType.BIG_INTEGER, VikariType.FLOAT, location(9, 0), 10.0F);
+        testDeclaration(statements.get(10), "k", VikariType.BIG_INTEGER, VikariType.DOUBLE, location(10, 0), 11.0D);
+        testDeclaration(statements.get(11), "l", VikariType.BIG_INTEGER, VikariType.BIG_DECIMAL, location(11, 0), new BigDecimal("12.0", mathContext));
+        testDeclaration(statements.get(12), "m", VikariType.FLOAT, VikariType.DOUBLE, location(12, 0), 13.0D);
+        testDeclaration(statements.get(13), "n", VikariType.FLOAT, VikariType.BIG_DECIMAL, location(13, 0), new BigDecimal("14.0", mathContext));
+        testDeclaration(statements.get(14), "o", VikariType.DOUBLE, VikariType.BIG_DECIMAL, location(14, 0), new BigDecimal("15.0", mathContext));
     }
 
     @Test
@@ -522,10 +522,10 @@ public class ParserTest_VariableDeclarationStatements {
         int actualSize = statements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        testDeclaration(statements.get(0), "a", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 1);
-        testDeclaration(statements.get(1), "b", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, new CoordinatePair(1, 0), 2);
-        testDeclaration(statements.get(2), "c", VikariType.VALUE, VikariType.INTEGER, new CoordinatePair(2, 0), 3);
-        testDeclaration(statements.get(3), "d", VikariType.NUMBER, VikariType.INTEGER, new CoordinatePair(3, 0), 4);
+        testDeclaration(statements.get(0), "a", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, location(0, 0), 1);
+        testDeclaration(statements.get(1), "b", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, location(1, 0), 2);
+        testDeclaration(statements.get(2), "c", VikariType.VALUE, VikariType.INTEGER, location(2, 0), 3);
+        testDeclaration(statements.get(3), "d", VikariType.NUMBER, VikariType.INTEGER, location(3, 0), 4);
     }
 
     @Test
@@ -540,14 +540,14 @@ public class ParserTest_VariableDeclarationStatements {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), new CoordinatePair(1, 0), "a:Integer << 2", "Variable is already defined.");
+        TestUtils.testSyntaxError(syntaxErrors.get(0), location(1, 0), "a:Integer << 2", "Variable is already defined.");
 
         int expectedSize = 2;
         int actualSize = statements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        testDeclaration(statements.get(0), "a", VikariType.INTEGER, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 1);
-        testDeclaration_DuplicateError(statements.get(1), "a", VikariType.INTEGER, VikariType.INTEGER, new CoordinatePair(1, 0), 2);
+        testDeclaration(statements.get(0), "a", VikariType.INTEGER, VikariType.INTEGER, location(0, 0), 1);
+        testDeclaration_DuplicateError(statements.get(1), "a", VikariType.INTEGER, VikariType.INTEGER, location(1, 0), 2);
     }
 
     @Test
@@ -562,15 +562,15 @@ public class ParserTest_VariableDeclarationStatements {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 4), "foo:Foo", "Unknown Type.");
-        TestUtils.testSyntaxError(syntaxErrors.get(1), new CoordinatePair(1, 4), "bar:Bar", "Unknown Type.");
+        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), "foo:Foo", "Unknown Type.");
+        TestUtils.testSyntaxError(syntaxErrors.get(1), location(1, 4), "bar:Bar", "Unknown Type.");
 
         int expectedSize = 2;
         int actualSize = statements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, null, COORDINATE_PAIR_ZERO_ZERO);
-        testDeclaration(statements.get(1), "bar", VikariType.ATONEMENT_CRYSTAL, null, new CoordinatePair(1, 0));
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, null, location(0, 0));
+        testDeclaration(statements.get(1), "bar", VikariType.ATONEMENT_CRYSTAL, null, location(1, 0));
     }
 
     @Test
@@ -585,15 +585,15 @@ public class ParserTest_VariableDeclarationStatements {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), new CoordinatePair(0, 4), "foo:Foo << 22", "Unknown Type.");
-        TestUtils.testSyntaxError(syntaxErrors.get(1), new CoordinatePair(1, 4), "bar:Bar << 7L", "Unknown Type.");
+        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), "foo:Foo << 22", "Unknown Type.");
+        TestUtils.testSyntaxError(syntaxErrors.get(1), location(1, 4), "bar:Bar << 7L", "Unknown Type.");
 
         int expectedSize = 2;
         int actualSize = statements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 22);
-        testDeclaration(statements.get(1), "bar", VikariType.ATONEMENT_CRYSTAL, VikariType.LONG, new CoordinatePair(1, 0), 7L);
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, location(0, 0), 22);
+        testDeclaration(statements.get(1), "bar", VikariType.ATONEMENT_CRYSTAL, VikariType.LONG, location(1, 0), 7L);
     }
 
     @Test
@@ -605,14 +605,14 @@ public class ParserTest_VariableDeclarationStatements {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), COORDINATE_PAIR_ZERO_ZERO, "foo:Type << 2", "Variable with " +
+        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 0), "foo:Type << 2", "Variable with " +
                 "type Type cannot be assigned a value of type Integer.");
 
         int expectedSize = 1;
         int actualSize = statements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        testDeclaration_TypeError(statements.get(0), "foo", VikariType.TYPE, VikariType.INTEGER, COORDINATE_PAIR_ZERO_ZERO, 2);
+        testDeclaration_TypeError(statements.get(0), "foo", VikariType.TYPE, VikariType.INTEGER, location(0, 0), 2);
     }
 
     // TODO: Test initializing declared variables with previously declared variables.
