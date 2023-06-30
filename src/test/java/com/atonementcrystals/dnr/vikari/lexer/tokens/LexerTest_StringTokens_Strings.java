@@ -1,70 +1,42 @@
 package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
-import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
-import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.File;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static com.atonementcrystals.dnr.vikari.TestUtils.location;
+import static com.atonementcrystals.dnr.vikari.TestUtils.testSyntaxError;
+import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.*;
 
 /**
  * Test that string literal identifiers (i.e. ``foo``) are properly tokenized by the Lexer.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_StringTokens_Strings {
-    private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test
     @Order(1)
     public void testLexer_StringTokens_CaptureQuotations_BasicStringLiteral() {
         String sourceString = "``a:Integer << 2, :a + 5, _``";
-
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 1;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String expectedToken = sourceString;
-        String actualToken = statementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed string literal.");
+        List<String> statement = lexSingleStatementAsTokens(sourceString, 1);
+        testToken(statement.get(0), sourceString);
     }
 
     @Test
     @Order(2)
     public void testLexer_StringTokens_CaptureQuotations_BasicStringLiteralAssignment() {
-        String sourceString = "a << ``b:Integer << 2, :b + 5, _``";
+        List<String> statement = lexSingleStatementAsTokens("a << ``b:Integer << 2, :b + 5, _``", 5);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 5;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String actualStringToken = statementTokens.get(4);
-        String expectedStringToken = "``b:Integer << 2, :b + 5, _``";
-        assertEquals(expectedStringToken, actualStringToken, "Malformed string literal.");
+        testToken(statement.get(0), "a");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "``b:Integer << 2, :b + 5, _``");
     }
 
     @Test
@@ -73,34 +45,10 @@ public class LexerTest_StringTokens_Strings {
         String sourceString = "``This is a string which spans \n" +
                                 "across two individual lines.``";
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        List<List<String>> statements = lexAsTokens(sourceString, 2, tokenCounts(1, 1));
 
-        int expectedStatementCount = 2;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        // test line 1
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 1;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String actualStringToken = statementTokens.get(0);
-        String expectedStringToken = "``This is a string which spans ";
-        assertEquals(expectedStringToken, actualStringToken, "Malformed string literal.");
-
-        // test line 2
-        statementTokens = listOfStatementTokens.get(1);
-
-        expectedTokenCount = 1;
-        actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        actualStringToken = statementTokens.get(0);
-        expectedStringToken = "across two individual lines.``";
-        assertEquals(expectedStringToken, actualStringToken, "Malformed string literal.");
+        testToken(statements.get(0).get(0), "``This is a string which spans ");
+        testToken(statements.get(1).get(0), "across two individual lines.``");
     }
 
     @Test
@@ -110,45 +58,11 @@ public class LexerTest_StringTokens_Strings {
                 "across 3 lines. So I'm going to \n" +
                 "ensure that it most certainly does.``";
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        List<List<String>> statements = lexAsTokens(sourceString, 3, tokenCounts(1, 1, 1));
 
-        int expectedStatementCount = 3;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        // test line 1
-        List<String> firstStatementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 1;
-        int actualTokenCount = firstStatementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String actualStringToken = firstStatementTokens.get(0);
-        String expectedStringToken = "``This string needs to span ";
-        assertEquals(expectedStringToken, actualStringToken, "Malformed string literal.");
-
-        // test line 2
-        List<String> secondStatementTokens = listOfStatementTokens.get(1);
-
-        expectedTokenCount = 1;
-        actualTokenCount = secondStatementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        actualStringToken = secondStatementTokens.get(0);
-        expectedStringToken = "across 3 lines. So I'm going to ";
-        assertEquals(expectedStringToken, actualStringToken, "Malformed string literal.");
-
-        // test line 3
-        List<String> thirdStatementTokens = listOfStatementTokens.get(2);
-
-        expectedTokenCount = 1;
-        actualTokenCount = thirdStatementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        actualStringToken = thirdStatementTokens.get(0);
-        expectedStringToken = "ensure that it most certainly does.``";
-        assertEquals(expectedStringToken, actualStringToken, "Malformed string literal.");
+        testToken(statements.get(0).get(0), "``This string needs to span ");
+        testToken(statements.get(1).get(0), "across 3 lines. So I'm going to ");
+        testToken(statements.get(2).get(0), "ensure that it most certainly does.``");
     }
 
     @Test
@@ -157,57 +71,28 @@ public class LexerTest_StringTokens_Strings {
         String sourceString = "foo << ``This is a string being assigned \n" +
                 "to an identifier named: `foo`.``";
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        List<List<String>> statements = lexAsTokens(sourceString, 2, tokenCounts(5, 1));
 
-        int expectedStatementCount = 2;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
+        testToken(statements.get(0).get(0), "foo");
+        testToken(statements.get(0).get(1), " ");
+        testToken(statements.get(0).get(2), "<<");
+        testToken(statements.get(0).get(3), " ");
 
-        // test line 1
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 5;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String actualStringToken = statementTokens.get(4);
-        String expectedStringToken = "``This is a string being assigned ";
-        assertEquals(expectedStringToken, actualStringToken, "Malformed string literal.");
-
-        // test line 2
-        statementTokens = listOfStatementTokens.get(1);
-
-        expectedTokenCount = 1;
-        actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        actualStringToken = statementTokens.get(0);
-        expectedStringToken = "to an identifier named: `foo`.``";
-        assertEquals(expectedStringToken, actualStringToken, "Malformed string literal.");
+        testToken(statements.get(0).get(4), "``This is a string being assigned ");
+        testToken(statements.get(1).get(0), "to an identifier named: `foo`.``");
     }
 
     @Test
     @Order(6)
     public void testLexer_StringTokens_CaptureQuotations_StringLiteralContainingCodeWithOtherEnclosures() {
         String sourceString = "foo << ``{bar} << 2, :foo.`baz`, buzz << _``";
+        List<String> statement = lexSingleStatementAsTokens(sourceString, 5);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 5;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String expectedToken = "``{bar} << 2, :foo.`baz`, buzz << _``";
-        String actualToken = statementTokens.get(4);
-        assertEquals(expectedToken, actualToken, "Malformed string literal.");
+        testToken(statement.get(0), "foo");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "``{bar} << 2, :foo.`baz`, buzz << _``");
     }
 
     @Test
@@ -218,56 +103,24 @@ public class LexerTest_StringTokens_Strings {
                 ":foo.`baz`\n" +
                 "buzz << _``!";
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        List<List<String>> statements = lexAsTokens(sourceString, 4, tokenCounts(10, 1, 1, 2));
 
-        int expectedStatementCount = 4;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
+        testToken(statements.get(0).get(0), "function");
+        testToken(statements.get(0).get(1), " ");
+        testToken(statements.get(0).get(2), "<<");
+        testToken(statements.get(0).get(3), " ");
+        testToken(statements.get(0).get(4), "(");
+        testToken(statements.get(0).get(5), ")");
+        testToken(statements.get(0).get(6), " ");
+        testToken(statements.get(0).get(7), "::");
+        testToken(statements.get(0).get(8), " ");
 
-        // Test line 1
-        List<String> firstStatementTokens = listOfStatementTokens.get(0);
+        testToken(statements.get(0).get(9), "``{foo} << *");
+        testToken(statements.get(1).get(0), "{bar} << 2");
+        testToken(statements.get(2).get(0), ":foo.`baz`");
+        testToken(statements.get(3).get(0), "buzz << _``");
 
-        int expectedTokenCount = 10;
-        int actualTokenCount = firstStatementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String expectedToken = "``{foo} << *";
-        String actualToken = firstStatementTokens.get(9);
-        assertEquals(expectedToken, actualToken, "Malformed string literal.");
-
-        // Test line 2
-        List<String> secondStatementTokens = listOfStatementTokens.get(1);
-
-        expectedTokenCount = 1;
-        actualTokenCount = secondStatementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        expectedToken = "{bar} << 2";
-        actualToken = secondStatementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed string literal.");
-
-        // Test line 3
-        List<String> thirdStatementTokens = listOfStatementTokens.get(2);
-
-        expectedTokenCount = 1;
-        actualTokenCount = thirdStatementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        expectedToken = ":foo.`baz`";
-        actualToken = thirdStatementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed string literal.");
-
-        // Test line 4
-        List<String> fourthStatementTokens = listOfStatementTokens.get(3);
-
-        expectedTokenCount = 2;
-        actualTokenCount = fourthStatementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        expectedToken = "buzz << _``";
-        actualToken = fourthStatementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed string literal.");
+        testToken(statements.get(3).get(1), "!");
     }
 
     @Test
@@ -275,35 +128,13 @@ public class LexerTest_StringTokens_Strings {
     public void testLexer_StringTokens_CaptureQuotations_ErrorHandlingForUnclosedString_SingleLine() {
         String sourceString = "``This is a malformed string literal.";
 
-        Lexer lexer = new Lexer();
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
+        List<String> statement = lexSingleStatementAsTokens(sourceString, 1, errorReporter, 1);
 
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing capture quotation.");
+        testToken(statement.get(0), sourceString);
 
         List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
-        int expectedSize = 1;
-        int actualSize = syntaxErrors.size();
-        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
-
-        // Syntax Error 1
-        SyntaxError syntaxError = syntaxErrors.get(0);
-        File expectedFile = null;
-        File actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
-        CoordinatePair actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        String expectedLine = sourceString;
-        String actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        String errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("capture quotation"), "Unexpected syntax error message.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Missing closing capture quotation");
     }
 
     @Test
@@ -312,34 +143,15 @@ public class LexerTest_StringTokens_Strings {
         String sourceString = "``This is a malformed string literal \n" +
                 "because it has no ending capture quotation!";
 
-        Lexer lexer = new Lexer();
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
+        List<List<String>> statements = lexAsTokens(sourceString, 2, errorReporter, 1, tokenCounts(1, 1));
 
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing capture quotation.");
+        testToken(statements.get(0).get(0), "``This is a malformed string literal ");
+        testToken(statements.get(1).get(0), "because it has no ending capture quotation!");
 
         List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
-        int expectedSize = 1;
-        int actualSize = syntaxErrors.size();
-        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
-
-        // Syntax Error 1
-        SyntaxError syntaxError = syntaxErrors.get(0);
-        File expectedFile = null;
-        File actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
-        CoordinatePair actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
 
         String expectedLine = "``This is a malformed string literal ";
-        String actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        String errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("capture quotation"), "Unexpected syntax error message.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 0), expectedLine, "Missing closing capture quotation");
     }
 }

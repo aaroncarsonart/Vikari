@@ -1,6 +1,5 @@
 package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
-import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -8,7 +7,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.lexSingleStatementAsTokens;
+import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.testToken;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_StringTokens_Whitespace {
@@ -16,32 +16,14 @@ public class LexerTest_StringTokens_Whitespace {
     @Test
     @Order(1)
     public void testLexer_StringTokens_Whitespace_CollapsionOfSpaces() {
-        String sourceString = "    a <<  *";
+        List<String> statement = lexSingleStatementAsTokens("    a <<  *", 6);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 6;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String expectedToken = "    ";
-        String actualToken = statementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 4 spaces.");
-
-        expectedToken = " ";
-        actualToken = statementTokens.get(2);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 1 space.");
-
-        expectedToken = "  ";
-        actualToken = statementTokens.get(4);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 2 spaces.");
+        testToken(statement.get(0), "    ");
+        testToken(statement.get(1), "a");
+        testToken(statement.get(2), " ");
+        testToken(statement.get(3), "<<");
+        testToken(statement.get(4), "  ");
+        testToken(statement.get(5), "*");
     }
 
     @Test
@@ -49,32 +31,15 @@ public class LexerTest_StringTokens_Whitespace {
     public void testLexer_StringTokens_Whitespace_CollapsionOfTabs() {
         // NOTE: Code should never be written this way.
         // But still, sequential tabs should collapse together!
-        String sourceString = "\t\t\ta\t<<\t\t*";
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        List<String> statement = lexSingleStatementAsTokens("\t\t\ta\t<<\t\t*", 6);
 
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 6;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String expectedToken = "\t\t\t";
-        String actualToken = statementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 3 tabs.");
-
-        expectedToken = "\t";
-        actualToken = statementTokens.get(2);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 1 tab.");
-
-        expectedToken = "\t\t";
-        actualToken = statementTokens.get(4);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 2 tabs.");
+        testToken(statement.get(0), "\t\t\t");
+        testToken(statement.get(1), "a");
+        testToken(statement.get(2), "\t");
+        testToken(statement.get(3), "<<");
+        testToken(statement.get(4), "\t\t");
+        testToken(statement.get(5), "*");
     }
 
     @Test
@@ -83,72 +48,35 @@ public class LexerTest_StringTokens_Whitespace {
         // NOTE: Code should never be written this way.
         // But still, arbitrary combinations of tabs
         // and spaces should collapse together!
-        String sourceString = "\t\t  a << \t 2   +\t \t7\t/  9";
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        List<String> statement = lexSingleStatementAsTokens("\t\t  a << \t 2   +\t \t7\t/  9", 14);
 
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 14;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String expectedToken = "\t\t  ";
-        String actualToken = statementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 2 tabs and 2 spaces.");
-
-        expectedToken = " ";
-        actualToken = statementTokens.get(2);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 1 space.");
-
-        expectedToken = " \t ";
-        actualToken = statementTokens.get(4);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 1 space, 1 tab, and " +
-                "1 space.");
-
-        expectedToken = "   ";
-        actualToken = statementTokens.get(6);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 3 spaces.");
-
-        expectedToken = "\t \t";
-        actualToken = statementTokens.get(8);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 1 tab, 1 space, and " +
-                "1 tab.");
-
-        expectedToken = "\t";
-        actualToken = statementTokens.get(10);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 1 tab.");
-
-        expectedToken = "  ";
-        actualToken = statementTokens.get(12);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 2 spaces.");
+        testToken(statement.get(0), "\t\t  ");
+        testToken(statement.get(1), "a");
+        testToken(statement.get(2), " ");
+        testToken(statement.get(3), "<<");
+        testToken(statement.get(4), " \t ");
+        testToken(statement.get(5), "2");
+        testToken(statement.get(6), "   ");
+        testToken(statement.get(7), "+");
+        testToken(statement.get(8), "\t \t");
+        testToken(statement.get(9), "7");
+        testToken(statement.get(10), "\t");
+        testToken(statement.get(11), "/");
+        testToken(statement.get(12), "  ");
+        testToken(statement.get(13), "9");
     }
 
     @Test
     @Order(4)
     public void testLexer_StringTokens_Whitespace_AtEndOfLine() {
-        String sourceString = "a << *   ";
+        List<String> statement = lexSingleStatementAsTokens("a << *   ", 6);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 6;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String expectedToken = "   ";
-        String actualToken = statementTokens.get(5);
-        assertEquals(expectedToken, actualToken, "Expected a whitespace token consisting of 3 spaces.");
+        testToken(statement.get(0), "a");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "*");
+        testToken(statement.get(5), "   ");
     }
 }

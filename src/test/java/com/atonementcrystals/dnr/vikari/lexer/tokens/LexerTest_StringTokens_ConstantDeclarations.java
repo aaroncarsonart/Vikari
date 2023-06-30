@@ -1,15 +1,13 @@
 package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
-import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.*;
 
 /**
  * Test that constant declarations (i.e. "{foo}") are properly tokenized by the Lexer.
@@ -20,78 +18,42 @@ public class LexerTest_StringTokens_ConstantDeclarations {
     @Test
     @Order(1)
     public void testLexer_StringTokens_ConstantDeclarations_BasicIdentifier() {
-        String sourceString = "{foo}";
+        List<String> statement = lexSingleStatementAsTokens("{foo}", 3);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        List<String> expectedTokens = Arrays.asList("{", "foo", "}");
-        int expectedTokenCount = expectedTokens.size();
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        for (int i = 0; i < expectedTokenCount; i++) {
-            String expectedToken = expectedTokens.get(i);
-            String actualToken = statementTokens.get(i);
-            assertEquals(expectedToken, actualToken, "Malformed constant declaration.");
-        }
+        testToken(statement.get(0), "{");
+        testToken(statement.get(1), "foo");
+        testToken(statement.get(2), "}");
     }
 
     @Test
     @Order(2)
     public void testLexer_StringTokens_ConstantDeclarations_BasicIdentifierAssignment() {
-        String sourceString = "{foo}:Integer << 2";
+        List<String> statement = lexSingleStatementAsTokens("{foo}:Integer << 2", 9);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        List<String> expectedTokens = Arrays.asList("{", "foo", "}", ":", "Integer", " ", "<<", " ", "2");
-        int expectedTokenCount = expectedTokens.size();
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        for (int i = 0; i < expectedTokenCount; i++) {
-            String expectedToken = expectedTokens.get(i);
-            String actualToken = statementTokens.get(i);
-            assertEquals(expectedToken, actualToken, "Malformed constant declaration.");
-        }
+        testToken(statement.get(0), "{");
+        testToken(statement.get(1), "foo");
+        testToken(statement.get(2), "}");
+        testToken(statement.get(3), ":");
+        testToken(statement.get(4), "Integer");
+        testToken(statement.get(5), " ");
+        testToken(statement.get(6), "<<");
+        testToken(statement.get(7), " ");
+        testToken(statement.get(8), "2");
     }
 
     @Test
     @Order(3)
     public void testLexer_StringTokens_ConstantDeclarations_IdentifierContainingBackticks() {
-        String sourceString = "{`An Identifier`}:Integer << 2";
+        List<String> statement = lexSingleStatementAsTokens("{`An Identifier`}:Integer << 2", 9);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        List<String> expectedTokens = Arrays.asList("{", "`An Identifier`", "}", ":", "Integer", " ", "<<", " ", "2");
-        int expectedTokenCount = expectedTokens.size();
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        for (int i = 0; i < expectedTokenCount; i++) {
-            String expectedToken = expectedTokens.get(i);
-            String actualToken = statementTokens.get(i);
-            assertEquals(expectedToken, actualToken, "Malformed constant declaration.");
-        }
+        testToken(statement.get(0), "{");
+        testToken(statement.get(1), "`An Identifier`");
+        testToken(statement.get(2), "}");
+        testToken(statement.get(3), ":");
+        testToken(statement.get(4), "Integer");
+        testToken(statement.get(5), " ");
+        testToken(statement.get(6), "<<");
+        testToken(statement.get(7), " ");
+        testToken(statement.get(8), "2");
     }
 }

@@ -195,5 +195,4 @@ public class LexerTest_Crystals_Strings {
 
         testLinkage(crystal1, crystal2, crystal3);
     }
-
 }

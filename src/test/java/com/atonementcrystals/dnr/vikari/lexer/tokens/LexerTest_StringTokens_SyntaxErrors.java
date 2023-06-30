@@ -1,19 +1,17 @@
 package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
-import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
-import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.File;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.atonementcrystals.dnr.vikari.TestUtils.location;
+import static com.atonementcrystals.dnr.vikari.TestUtils.testSyntaxError;
+import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.*;
 
 /**
  * Ensure multiple error types can all occur together, and be reported accurately
@@ -30,86 +28,44 @@ public class LexerTest_StringTokens_SyntaxErrors {
                               "bar:String << `  `\n" +
                               ":``baz``:``buzz:";
 
-        Lexer lexer = new Lexer();
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
+        List<List<String>> statements = lexAsTokens(sourceString, 4, errorReporter, 4, tokenCounts(5, 9, 7, 4));
 
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        testToken(statements.get(0).get(0), "a");
+        testToken(statements.get(0).get(1), " ");
+        testToken(statements.get(0).get(2), "<<");
+        testToken(statements.get(0).get(3), " ");
+        testToken(statements.get(0).get(4), "`foo");
 
-        assertTrue(errorReporter.hasErrors(), "Expected syntax errors for multiple error types.");
+        testToken(statements.get(1).get(0), "`z\tz`");
+        testToken(statements.get(1).get(1), " ");
+        testToken(statements.get(1).get(2), "<<");
+        testToken(statements.get(1).get(3), " ");
+        testToken(statements.get(1).get(4), "a");
+        testToken(statements.get(1).get(5), " ");
+        testToken(statements.get(1).get(6), "*");
+        testToken(statements.get(1).get(7), " ");
+        testToken(statements.get(1).get(8), "2");
+
+        testToken(statements.get(2).get(0), "bar");
+        testToken(statements.get(2).get(1), ":");
+        testToken(statements.get(2).get(2), "String");
+        testToken(statements.get(2).get(3), " ");
+        testToken(statements.get(2).get(4), "<<");
+        testToken(statements.get(2).get(5), " ");
+        testToken(statements.get(2).get(6), "`  `");
+
+        testToken(statements.get(3).get(0), ":");
+        testToken(statements.get(3).get(1), "``baz``");
+        testToken(statements.get(3).get(2), ":");
+        testToken(statements.get(3).get(3), "``buzz:");
 
         List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
-        int expectedSize = 4;
-        int actualSize = syntaxErrors.size();
-        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
 
-        // Syntax Error 1
-        SyntaxError syntaxError = syntaxErrors.get(0);
-        File expectedFile = null;
-        File actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        CoordinatePair expectedLocation = new CoordinatePair(0, 5);
-        CoordinatePair actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        String expectedLine = "a << `foo";
-        String actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        String errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("backtick"), "Unexpected syntax error message.");
-
-        // Syntax Error 2
-        syntaxError = syntaxErrors.get(1);
-        expectedFile = null;
-        actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        expectedLocation = new CoordinatePair(1, 1);
-        actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        expectedLine = "`z\tz` << a * 2";
-        actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("tab"), "Unexpected syntax error message.");
-
-        // Syntax Error 3
-        syntaxError = syntaxErrors.get(2);
-        expectedFile = null;
-        actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        expectedLocation = new CoordinatePair(2, 15);
-        actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        expectedLine = "bar:String << `  `";
-        actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("whitespace"), "Unexpected syntax error message.");
-
-        // Syntax Error 4
-        syntaxError = syntaxErrors.get(3);
-        expectedFile = null;
-        actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        expectedLocation = new CoordinatePair(3, 9);
-        actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        expectedLine = ":``baz``:``buzz:";
-        actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("capture quotation"), "Unexpected syntax error message.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 5), "a << `foo", "Missing closing backtick quotation");
+        testSyntaxError(syntaxErrors.get(1), location(1, 1), "`z\tz` << a * 2", "Backtick-quoted identifiers cannot contain tabs");
+        testSyntaxError(syntaxErrors.get(2), location(2, 15), "bar:String << `  `", "Backtick-quoted identifiers cannot contain only whitespace");
+        testSyntaxError(syntaxErrors.get(3), location(3, 9), ":``baz``:``buzz:", "Missing closing capture quotation");
     }
 
     @Test
@@ -118,122 +74,46 @@ public class LexerTest_StringTokens_SyntaxErrors {
         String sourceString = "`z\tz` << `foo\n" +
                               "~:Unclosed comment.";
 
-        Lexer lexer = new Lexer();
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
+        List<List<String>> statements = lexAsTokens(sourceString, 2, errorReporter, 3, tokenCounts(5, 1));
 
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        testToken(statements.get(0).get(0), "`z\tz`");
+        testToken(statements.get(0).get(1), " ");
+        testToken(statements.get(0).get(2), "<<");
+        testToken(statements.get(0).get(3), " ");
+        testToken(statements.get(0).get(4), "`foo");
 
-        assertTrue(errorReporter.hasErrors(), "Expected syntax errors for multiple error types.");
+        testComment(statements.get(1).get(0), "~:Unclosed comment.".length(), CommentTokenType.START);
 
         List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
-        int expectedSize = 3;
-        int actualSize = syntaxErrors.size();
-        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
 
-        // Syntax Error 1
-        SyntaxError syntaxError = syntaxErrors.get(0);
-        File expectedFile = null;
-        File actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        CoordinatePair expectedLocation = new CoordinatePair(0, 1);
-        CoordinatePair actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        String expectedLine = "`z\tz` << `foo";
-        String actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        String errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("tab"), "Unexpected syntax error message.");
-
-        // Syntax Error 2
-        syntaxError = syntaxErrors.get(1);
-        expectedFile = null;
-        actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        expectedLocation = new CoordinatePair(0, 9);
-        actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        expectedLine = "`z\tz` << `foo";
-        actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("backtick"), "Unexpected syntax error message.");
-
-        // Syntax Error 3
-        syntaxError = syntaxErrors.get(2);
-        expectedFile = null;
-        actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        expectedLocation = new CoordinatePair(1, 0);
-        actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        expectedLine = "~:Unclosed comment.";
-        actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("comment suffix"), "Unexpected syntax error message.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 1), "`z\tz` << `foo", "Backtick-quoted identifiers cannot contain tabs");
+        testSyntaxError(syntaxErrors.get(1), location(0, 9), "`z\tz` << `foo", "Missing closing backtick quotation");
+        testSyntaxError(syntaxErrors.get(2), location(1, 0), "~:Unclosed comment.", "Missing comment suffix token");
     }
 
     @Test
     @Order(3)
     public void testLexer_StringTokens_SyntaxErrors_tabIndentedCode() {
-        String sourceString = "\t\t`z` << `foo\n" +
+        String sourceString = "\t\t`zz` << `foo\n" +
                               "\t\t~:Unclosed comment.";
 
-        Lexer lexer = new Lexer();
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
+        List<List<String>> statements = lexAsTokens(sourceString, 2, errorReporter, 2, tokenCounts(6, 2));
 
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        testToken(statements.get(0).get(0), "\t\t");
+        testToken(statements.get(0).get(1), "`zz`");
+        testToken(statements.get(0).get(2), " ");
+        testToken(statements.get(0).get(3), "<<");
+        testToken(statements.get(0).get(4), " ");
+        testToken(statements.get(0).get(5), "`foo");
 
-        assertTrue(errorReporter.hasErrors(), "Expected syntax errors for multiple error types.");
+        testToken(statements.get(1).get(0), "\t\t");
+        testComment(statements.get(1).get(1), "~:Unclosed comment.".length(), CommentTokenType.START);
 
         List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
-        int expectedSize = 2;
-        int actualSize = syntaxErrors.size();
-        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
 
-        // Syntax Error 1
-        SyntaxError syntaxError = syntaxErrors.get(0);
-        File expectedFile = null;
-        File actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        CoordinatePair expectedLocation = new CoordinatePair(0, 9);
-        CoordinatePair actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        String expectedLine = "\t\t`z` << `foo";
-        String actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        String errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("backtick"), "Unexpected syntax error message.");
-
-        // Syntax Error 2
-        syntaxError = syntaxErrors.get(1);
-        expectedFile = null;
-        actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        expectedLocation = new CoordinatePair(1, 2);
-        actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        expectedLine = "\t\t~:Unclosed comment.";
-        actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("comment suffix"), "Unexpected syntax error message.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 10), "\t\t`zz` << `foo", "Missing closing backtick quotation");
+        testSyntaxError(syntaxErrors.get(1), location(1, 2), "\t\t~:Unclosed comment.", "Missing comment suffix token");
     }
 }

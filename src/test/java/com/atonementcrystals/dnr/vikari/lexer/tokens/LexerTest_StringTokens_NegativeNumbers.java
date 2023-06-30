@@ -1,6 +1,5 @@
 package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
-import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -8,7 +7,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.lexSingleStatementAsTokens;
+import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.testToken;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_StringTokens_NegativeNumbers {
@@ -16,112 +16,63 @@ public class LexerTest_StringTokens_NegativeNumbers {
     @Test
     @Order(1)
     public void testLexer_StringTokens_NegativeNumbers_BasicNegativeInteger() {
-        String sourceString = "a << -2";
+        List<String> statement = lexSingleStatementAsTokens("a << -2", 6);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 6;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens: " + statementTokens);
-
-        String expectedToken = "-";
-        String actualToken = statementTokens.get(4);
-        assertEquals(expectedToken, actualToken, "Malformed negative integer literal.");
-
-        expectedToken = "2";
-        actualToken = statementTokens.get(5);
-        assertEquals(expectedToken, actualToken, "Malformed negative integer literal.");
+        testToken(statement.get(0), "a");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "-");
+        testToken(statement.get(5), "2");
     }
 
     @Test
     @Order(2)
     public void testLexer_StringTokens_NegativeNumbers_BasicNegativeDecimal() {
-        String sourceString = "negative_pi << -3.14";
+        List<String> statement = lexSingleStatementAsTokens("negative_pi << -3.14", 6);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 6;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String expectedToken = "-";
-        String actualToken = statementTokens.get(4);
-        assertEquals(expectedToken, actualToken, "Malformed negative decimal literal.");
-
-        expectedToken = "3.14";
-        actualToken = statementTokens.get(5);
-        assertEquals(expectedToken, actualToken, "Malformed negative decimal literal.");
+        testToken(statement.get(0), "negative_pi");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "-");
+        testToken(statement.get(5), "3.14");
     }
 
     @Test
     @Order(3)
     public void testLexer_StringTokens_NegativeNumbers_BasicNegatedIdentifier() {
-        String sourceString = "^^ -bar";
+        List<String> statement = lexSingleStatementAsTokens("^^ -bar", 4);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 4;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String expectedToken = "-";
-        String actualToken = statementTokens.get(2);
-        assertEquals(expectedToken, actualToken, "Malformed negation operator.");
-
-        expectedToken = "bar";
-        actualToken = statementTokens.get(3);
-        assertEquals(expectedToken, actualToken, "Malformed identifier.");
+        testToken(statement.get(0), "^^");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "-");
+        testToken(statement.get(3), "bar");
     }
 
     @Test
     @Order(4)
     public void testLexer_StringTokens_NegativeNumbers_BasicArithmetic() {
-        String sourceString = "^^ 1.7 * -[3 + 4 / -2.4]";
+        List<String> statement = lexSingleStatementAsTokens("^^ 1.7 * -[3 + 4 / -2.4]", 19);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 19;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String expectedToken = "-";
-        String actualToken = statementTokens.get(6);
-        assertEquals(expectedToken, actualToken, "Malformed negation operator.");
-
-        expectedToken = "-";
-        actualToken = statementTokens.get(16);
-        assertEquals(expectedToken, actualToken, "Malformed negation operator.");
-
-        expectedToken = "2.4";
-        actualToken = statementTokens.get(17);
-        assertEquals(expectedToken, actualToken, "Malformed negative decimal number literal.");
+        testToken(statement.get(0), "^^");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "1.7");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "*");
+        testToken(statement.get(5), " ");
+        testToken(statement.get(6), "-");
+        testToken(statement.get(7), "[");
+        testToken(statement.get(8), "3");
+        testToken(statement.get(9), " ");
+        testToken(statement.get(10), "+");
+        testToken(statement.get(11), " ");
+        testToken(statement.get(12), "4");
+        testToken(statement.get(13), " ");
+        testToken(statement.get(14), "/");
+        testToken(statement.get(15), " ");
+        testToken(statement.get(16), "-");
+        testToken(statement.get(17), "2.4");
+        testToken(statement.get(18), "]");
     }
 }

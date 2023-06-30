@@ -1,6 +1,5 @@
 package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
-import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
@@ -9,163 +8,83 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.File;
 import java.util.List;
 
-import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.lexSingleStatementAsTokens;
-import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.testToken;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.atonementcrystals.dnr.vikari.TestUtils.location;
+import static com.atonementcrystals.dnr.vikari.TestUtils.testSyntaxError;
+import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.*;
 
 /**
  * Test that single-backtick quoted identifiers (i.e. `foo`) are properly tokenized by the Lexer.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_StringTokens_Backticks {
-    private static final CoordinatePair COORDINATE_PAIR_ZERO_ZERO = new CoordinatePair(0, 0);
 
     @Test
     @Order(1)
-    public void testLexer_StringTokens_SingleBacktickQuotation_SingleCharacterIdentifer() {
-        String sourceString = "`a` << 2";
+    public void testLexer_StringTokens_SingleBacktickQuotation_SingleCharacterIdentifier() {
+        List<String> statement = lexSingleStatementAsTokens("`a` << 2", 5);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokensCount = 5;
-        int actualTokensCount = statementTokens.size();
-        assertEquals(expectedTokensCount, actualTokensCount, "Unexpected number of tokens.");
-
-        String expectedToken = "`a`";
-        String actualToken = statementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed backtick-quoted identifier.");
+        testToken(statement.get(0), "`a`");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "2");
     }
 
     @Test
     @Order(2)
-    public void testLexer_StringTokens_SingleBacktickQuotation_MultiCharacterIdentifer() {
-        String sourceString = "`foo` << *";
+    public void testLexer_StringTokens_SingleBacktickQuotation_MultiCharacterIdentifier() {
+        List<String> statement = lexSingleStatementAsTokens("`foo` << *", 5);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokensCount = 5;
-        int actualTokensCount = statementTokens.size();
-        assertEquals(expectedTokensCount, actualTokensCount, "Unexpected number of tokens.");
-
-        String expectedToken = "`foo`";
-        String actualToken = statementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed backtick-quoted identifier.");
+        testToken(statement.get(0), "`foo`");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "*");
     }
 
     @Test
     @Order(3)
-    public void testLexer_StringTokens_SingleBacktickQuotation_IdentiferContainingPunctuationSymbols() {
-        String sourceString = "`~\\*/~` << _";
+    public void testLexer_StringTokens_SingleBacktickQuotation_IdentifierContainingPunctuationSymbols() {
+        List<String> statement = lexSingleStatementAsTokens("`~\\*/~` << _", 5);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokensCount = 5;
-        int actualTokensCount = statementTokens.size();
-        assertEquals(expectedTokensCount, actualTokensCount, "Unexpected number of tokens.");
-
-        String expectedToken = "`~\\*/~`";
-        String actualToken = statementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed backtick-quoted identifier.");
+        testToken(statement.get(0), "`~\\*/~`");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "_");
     }
 
     @Test
     @Order(4)
-    public void testLexer_StringTokens_SingleBacktickQuotation_IdentiferContainingMixOfSymbols() {
+    public void testLexer_StringTokens_SingleBacktickQuotation_IdentifierContainingMixOfSymbols() {
         String sourceString = "`~a.~*||_where::foo }{ ^^public ~\\\\.__.//~`:Integer << *";
+        List<String> statement = lexSingleStatementAsTokens(sourceString, 7);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokensCount = 7;
-        int actualTokensCount = statementTokens.size();
-        assertEquals(expectedTokensCount, actualTokensCount, "Unexpected number of tokens.");
-
-        String expectedToken = "`~a.~*||_where::foo }{ ^^public ~\\\\.__.//~`";
-        String actualToken = statementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed backtick-quoted identifier.");
+        testToken(statement.get(0), "`~a.~*||_where::foo }{ ^^public ~\\\\.__.//~`");
+        testToken(statement.get(1), ":");
+        testToken(statement.get(2), "Integer");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "<<");
+        testToken(statement.get(5), " ");
+        testToken(statement.get(6), "*");
     }
 
     @Test
     @Order(5)
     public void testLexer_StringTokens_SingleBacktickQuotation_IdentifierContainingNewline() {
-        String sourceString = "`foo\n`:Integer << *";
-
-        Lexer lexer = new Lexer();
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
+        List<List<String>> statements = lexAsTokens("`foo\n`:Integer << *", 2, errorReporter, 2, tokenCounts(1, 1));
 
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for backtick quoted identifier across 2 lines.");
+        testToken(statements.get(0).get(0), "`foo");
+        testToken(statements.get(1).get(0), "`:Integer << *");
 
         List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
-        int expectedSize = 2;
-        int actualSize = syntaxErrors.size();
-        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
 
-        // Syntax Error 1
-        SyntaxError syntaxError = syntaxErrors.get(0);
-        File expectedFile = null;
-        File actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        CoordinatePair expectedLocation = COORDINATE_PAIR_ZERO_ZERO;
-        CoordinatePair actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        String expectedLine = "`foo";
-        String actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        String errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("backtick"), "Unexpected syntax error message.");
-
-        // Syntax Error 2
-        syntaxError = syntaxErrors.get(1);
-        expectedFile = null;
-        actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        expectedLocation = new CoordinatePair(1, 0);
-        actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        expectedLine = "`:Integer << *";
-        actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("backtick"), "Unexpected syntax error message.");
+        String expectedErrorMessage = "Missing closing backtick quotation";
+        testSyntaxError(syntaxErrors.get(0), location(0, 0), "`foo", expectedErrorMessage);
+        testSyntaxError(syntaxErrors.get(1), location(1, 0), "`:Integer << *", expectedErrorMessage);
     }
 
     @Test
@@ -173,119 +92,69 @@ public class LexerTest_StringTokens_Backticks {
     public void testLexer_StringTokens_SingleBacktickQuotation_IdentifierMissingClosingBacktickQuote() {
         String sourceString = "foo:Integer << `bar";
 
-        Lexer lexer = new Lexer();
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
+        List<String> statement = lexSingleStatementAsTokens(sourceString, 7, errorReporter, 1);
 
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for missing a closing backtick.");
+        testToken(statement.get(0), "foo");
+        testToken(statement.get(1), ":");
+        testToken(statement.get(2), "Integer");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "<<");
+        testToken(statement.get(5), " ");
+        testToken(statement.get(6), "`bar");
 
         List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
-        int expectedSize = 1;
-        int actualSize = syntaxErrors.size();
-        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
-
-        // Syntax Error 1
-        SyntaxError syntaxError = syntaxErrors.get(0);
-        File expectedFile = null;
-        File actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        CoordinatePair expectedLocation = new CoordinatePair(0, 15);
-        CoordinatePair actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        String expectedLine = "foo:Integer << `bar";
-        String actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        String errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("backtick"), "Unexpected syntax error message.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 15), sourceString, "Missing closing backtick quotation");
     }
 
     @Test
     @Order(7)
     public void testLexer_StringTokens_SingleBacktickQuotation_MultipleQuotedIdentifiers() {
-        String sourceString = "`foo`:Integer << `bar`";
+        List<String> statement = lexSingleStatementAsTokens("`foo`:Integer << `bar`", 7);
 
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokensCount = 7;
-        int actualTokensCount = statementTokens.size();
-        assertEquals(expectedTokensCount, actualTokensCount, "Unexpected number of tokens.");
-
-        String expectedToken = "`foo`";
-        String actualToken = statementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed backtick-quoted identifier.");
-
-        expectedToken = "`bar`";
-        actualToken = statementTokens.get(6);
-        assertEquals(expectedToken, actualToken, "Malformed backtick-quoted identifier.");
+        testToken(statement.get(0), "`foo`");
+        testToken(statement.get(1), ":");
+        testToken(statement.get(2), "Integer");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "<<");
+        testToken(statement.get(5), " ");
+        testToken(statement.get(6), "`bar`");
     }
 
     @Test
     @Order(8)
     public void testLexer_StringTokens_SingleBacktickQuotation_BasicArithmetic() {
-        String sourceString = "a << [`b` + 2] * `foo`";
+        List<String> statement = lexSingleStatementAsTokens("a << [`b` + 2] * `foo`", 15);
 
-        Lexer lexer = new Lexer();
-
-        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
-
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        if (syntaxErrorReporter.hasErrors()) {
-            syntaxErrorReporter.reportErrors();
-        }
-
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokenCount = 15;
-        int actualTokenCount = statementTokens.size();
-        assertEquals(expectedTokenCount, actualTokenCount, "Unexpected number of tokens.");
-
-        String expectedToken = "`b`";
-        String actualToken = statementTokens.get(5);
-        assertEquals(expectedToken, actualToken, "Malformed backtick-quoted identifier.");
-
-        expectedToken = "`foo`";
-        actualToken = statementTokens.get(14);
-        assertEquals(expectedToken, actualToken, "Malformed backtick-quoted identifier.");
+        testToken(statement.get(0), "a");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "[");
+        testToken(statement.get(5), "`b`");
+        testToken(statement.get(6), " ");
+        testToken(statement.get(7), "+");
+        testToken(statement.get(8), " ");
+        testToken(statement.get(9), "2");
+        testToken(statement.get(10), "]");
+        testToken(statement.get(11), " ");
+        testToken(statement.get(12), "*");
+        testToken(statement.get(13), " ");
+        testToken(statement.get(14), "`foo`");
     }
 
     @Test
     @Order(9)
     public void testLexer_StringTokens_SingleBacktickQuotation_ContainingSpaceWithNonSpaceCharacters() {
-        String sourceString = "`foo bar`:Integer << 2";
-        Lexer lexer = new Lexer();
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
+        List<String> statement = lexSingleStatementAsTokens("`foo bar`:Integer << 2", 7);
 
-        int expectedStatementCount = 1;
-        int actualStatementCount = listOfStatementTokens.size();
-        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected number of statements.");
-
-        List<String> statementTokens = listOfStatementTokens.get(0);
-
-        int expectedTokensCount = 7;
-        int actualTokensCount = statementTokens.size();
-        assertEquals(expectedTokensCount, actualTokensCount, "Unexpected number of tokens.");
-
-        String expectedToken = "`foo bar`";
-        String actualToken = statementTokens.get(0);
-        assertEquals(expectedToken, actualToken, "Malformed backtick-quoted identifier containing a space.");
+        testToken(statement.get(0), "`foo bar`");
+        testToken(statement.get(1), ":");
+        testToken(statement.get(2), "Integer");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "<<");
+        testToken(statement.get(5), " ");
+        testToken(statement.get(6), "2");
     }
 
     @Test
@@ -293,36 +162,19 @@ public class LexerTest_StringTokens_Backticks {
     public void testLexer_StringTokens_SingleBacktickQuotation_ContainingTabsShouldFail() {
         String sourceString = "`foo\tbar`:Integer << 2";
 
-        Lexer lexer = new Lexer();
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
+        List<String> statement = lexSingleStatementAsTokens(sourceString, 7, errorReporter, 1);
 
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for a backtick-quoted identifier containing a " +
-                "tab.");
+        testToken(statement.get(0), "`foo\tbar`");
+        testToken(statement.get(1), ":");
+        testToken(statement.get(2), "Integer");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "<<");
+        testToken(statement.get(5), " ");
+        testToken(statement.get(6), "2");
 
         List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
-        int expectedSize = 1;
-        int actualSize = syntaxErrors.size();
-        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
-
-        // Syntax Error 1
-        SyntaxError syntaxError = syntaxErrors.get(0);
-        File expectedFile = null;
-        File actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        CoordinatePair expectedLocation = new CoordinatePair(0, 1);
-        CoordinatePair actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        String expectedLine = sourceString;
-        String actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        String errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("tab"), "Unexpected syntax error message.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Backtick-quoted identifiers cannot contain tabs.");
     }
 
     @Test
@@ -331,166 +183,93 @@ public class LexerTest_StringTokens_Backticks {
         // ------------
         // single space
         // ------------
-        String sourceString = "space:Character << ` `";
+        List<String> statement = lexSingleStatementAsTokens("space:Character << ` `", 7);
 
-        Lexer lexer = new Lexer();
-        SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
-
-        List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        assertFalse(errorReporter.hasErrors(), "A space character literal should not cause a syntax error");
+        testToken(statement.get(0), "space");
+        testToken(statement.get(1), ":");
+        testToken(statement.get(2), "Character");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "<<");
+        testToken(statement.get(5), " ");
+        testToken(statement.get(6), "` `");
 
         // ---------------
         // multiple spaces
         // ---------------
-        sourceString = "`   ` << *";
+        String sourceString = "`   ` << *";
 
-        lexer = new Lexer();
-        errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
+        SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+        statement = lexSingleStatementAsTokens(sourceString, 5, errorReporter, 1);
 
-        listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for a backtick-quoted identifier containing " +
-                "only whitespace.");
+        testToken(statement.get(0), "`   `");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "*");
 
         List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
-        int expectedSize = 1;
-        int actualSize = syntaxErrors.size();
-        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
-
-        // Syntax Error 1
-        SyntaxError syntaxError = syntaxErrors.get(0);
-        File expectedFile = null;
-        File actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        CoordinatePair expectedLocation = new CoordinatePair(0, 1);
-        CoordinatePair actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        String expectedLine = sourceString;
-        String actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        String errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("whitespace"), "Unexpected syntax error message.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Backtick-quoted identifiers cannot " +
+                "contain only whitespace.");
 
         // ----------
         // single tab
         // ----------
         sourceString = "`\t` << *";
 
-        lexer = new Lexer();
         errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
+        statement = lexSingleStatementAsTokens(sourceString, 5, errorReporter, 1);
 
-        listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for a backtick-quoted identifier containing a " +
-                "tab.");
+        testToken(statement.get(0), "`\t`");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "*");
 
         syntaxErrors = errorReporter.getSyntaxErrors();
-        expectedSize = 1;
-        actualSize = syntaxErrors.size();
-        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
-
-        // Syntax Error 1
-        syntaxError = syntaxErrors.get(0);
-        expectedFile = null;
-        actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        expectedLocation = new CoordinatePair(0, 1);
-        actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        expectedLine = sourceString;
-        actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("whitespace"), "Unexpected syntax error message.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Backtick-quoted identifiers cannot " +
+                "contain only whitespace.");
 
         // -------------
         // multiple tabs
         // -------------
         sourceString = "`\t\t` << *";
 
-        lexer = new Lexer();
         errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
+        statement = lexSingleStatementAsTokens(sourceString, 5, errorReporter, 1);
 
-        listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for a backtick-quoted identifier containing " +
-                "tabs.");
+        testToken(statement.get(0), "`\t\t`");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "*");
 
         syntaxErrors = errorReporter.getSyntaxErrors();
-        expectedSize = 1;
-        actualSize = syntaxErrors.size();
-        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
-
-        // Syntax Error 1
-        syntaxError = syntaxErrors.get(0);
-        expectedFile = null;
-        actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        expectedLocation = new CoordinatePair(0, 1);
-        actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        expectedLine = sourceString;
-        actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("whitespace"), "Unexpected syntax error message.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Backtick-quoted identifiers cannot " +
+                "contain only whitespace.");
 
         // ----------------------
         // mix of spaces and tabs
         // ----------------------
         sourceString = "` \t  \t\t   ` << *";
 
-        lexer = new Lexer();
         errorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(errorReporter);
+        statement = lexSingleStatementAsTokens(sourceString, 5, errorReporter, 1);
 
-        listOfStatementTokens = lexer.lexToStringTokens(sourceString);
-
-        assertTrue(errorReporter.hasErrors(), "Expected a syntax error for a backtick-quoted identifier containing a " +
-                "tab.");
+        testToken(statement.get(0), "` \t  \t\t   `");
+        testToken(statement.get(1), " ");
+        testToken(statement.get(2), "<<");
+        testToken(statement.get(3), " ");
+        testToken(statement.get(4), "*");
 
         syntaxErrors = errorReporter.getSyntaxErrors();
-        expectedSize = 1;
-        actualSize = syntaxErrors.size();
-        assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
-
-        // Syntax Error 1
-        syntaxError = syntaxErrors.get(0);
-        expectedFile = null;
-        actualFile = syntaxError.getFile();
-        assertEquals(expectedFile, actualFile, "Expected file to be null.");
-
-        expectedLocation = new CoordinatePair(0, 1);
-        actualLocation = syntaxError.getLocation();
-        assertEquals(expectedLocation, actualLocation, "Unexpected location.");
-
-        expectedLine = sourceString;
-        actualLine = syntaxError.getLine();
-        assertEquals(expectedLine, actualLine, "Unexpected line.");
-
-        errorMessage = syntaxError.getMessage();
-        assertTrue(errorMessage.contains("whitespace"), "Unexpected syntax error message.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Backtick-quoted identifiers cannot " +
+                "contain only whitespace.");
     }
 
     @Test
     @Order(12)
     public void testLexer_StringTokens_BacktickCharacterLiteral() {
         List<String> statement = lexSingleStatementAsTokens("`\\``", 1);
-
         testToken(statement.get(0), "`\\``");
     }
 }
