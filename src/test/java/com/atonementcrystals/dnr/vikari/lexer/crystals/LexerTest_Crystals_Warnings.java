@@ -12,7 +12,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorC
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.StatementSeparatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.LeftSquareBracketCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.RightSquareBracketCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
@@ -206,20 +205,19 @@ public class LexerTest_Crystals_Warnings {
             sourceString = "~\nfoo,~\nbar,~\nbaz,";
 
             errorReporter = new SyntaxErrorReporter();
-            statements = lex(sourceString, 1, errorReporter, 0, crystalCounts(6));
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(1, 1, 1));
 
             testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "foo", location(1, 0));
-            testCrystal(statements.get(0).get(1), StatementSeparatorCrystal.class, ",", location(1, 3));
-            testCrystal(statements.get(0).get(2), ReferenceCrystal.class, "bar", location(2, 0));
-            testCrystal(statements.get(0).get(3), StatementSeparatorCrystal.class, ",", location(2, 3));
-            testCrystal(statements.get(0).get(4), ReferenceCrystal.class, "baz", location(3, 0));
-            testCrystal(statements.get(0).get(5), StatementSeparatorCrystal.class, ",", location(3, 3));
+            testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "bar", location(2, 0));
+            testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "baz", location(3, 0));
 
             if (warningsEnabled) {
-                // TODO: Expect 3 warnings instead of 1 when statement separators are refactored.
-                assertWarnings(errorReporter, 1);
+                assertWarnings(errorReporter, 3);
                 warnings = errorReporter.getCompilationWarnings();
+
                 testWarning(warnings.get(0), location(0, 0), "~", START_OF_STATEMENT);
+                testWarning(warnings.get(1), location(1, 4), "foo,~", START_OF_STATEMENT);
+                testWarning(warnings.get(2), location(2, 4), "bar,~", START_OF_STATEMENT);
             } else {
                 assertNoWarnings(errorReporter);
             }
@@ -228,20 +226,19 @@ public class LexerTest_Crystals_Warnings {
             sourceString = "~\nfoo\n,~\nbar\n,~\nbaz\n,";
 
             errorReporter = new SyntaxErrorReporter();
-            statements = lex(sourceString, 4, errorReporter, 0, crystalCounts(1, 2, 2, 1));
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(1, 1, 1));
 
             testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "foo", location(1, 0));
-            testCrystal(statements.get(1).get(0), StatementSeparatorCrystal.class, ",", location(2, 0));
-            testCrystal(statements.get(1).get(1), ReferenceCrystal.class, "bar", location(3, 0));
-            testCrystal(statements.get(2).get(0), StatementSeparatorCrystal.class, ",", location(4, 0));
-            testCrystal(statements.get(2).get(1), ReferenceCrystal.class, "baz", location(5, 0));
-            testCrystal(statements.get(3).get(0), StatementSeparatorCrystal.class, ",", location(6, 0));
+            testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "bar", location(3, 0));
+            testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "baz", location(5, 0));
 
             if (warningsEnabled) {
-                // TODO: Expect 3 warnings instead of 1 when statement separators are refactored.
-                assertWarnings(errorReporter, 1);
+                assertWarnings(errorReporter, 3);
                 warnings = errorReporter.getCompilationWarnings();
+
                 testWarning(warnings.get(0), location(0, 0), "~", START_OF_STATEMENT);
+                testWarning(warnings.get(1), location(2, 1), ",~", START_OF_STATEMENT);
+                testWarning(warnings.get(2), location(4, 1), ",~", START_OF_STATEMENT);
             } else {
                 assertNoWarnings(errorReporter);
             }
@@ -250,18 +247,16 @@ public class LexerTest_Crystals_Warnings {
             sourceString = "~\nfoo,\n~\nbar,\n~\nbaz,\n";
 
             errorReporter = new SyntaxErrorReporter();
-            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(2, 2, 2));
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(1, 1, 1));
 
             testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "foo", location(1, 0));
-            testCrystal(statements.get(0).get(1), StatementSeparatorCrystal.class, ",", location(1, 3));
             testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "bar", location(3, 0));
-            testCrystal(statements.get(1).get(1), StatementSeparatorCrystal.class, ",", location(3, 3));
             testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "baz", location(5, 0));
-            testCrystal(statements.get(2).get(1), StatementSeparatorCrystal.class, ",", location(5, 3));
 
             if (warningsEnabled) {
                 assertWarnings(errorReporter, 3);
                 warnings = errorReporter.getCompilationWarnings();
+
                 testWarning(warnings.get(0), location(0, 0), "~", START_OF_STATEMENT);
                 testWarning(warnings.get(1), location(2, 0), "~", START_OF_STATEMENT);
                 testWarning(warnings.get(2), location(4, 0), "~", START_OF_STATEMENT);
@@ -273,18 +268,16 @@ public class LexerTest_Crystals_Warnings {
             sourceString = "~\nfoo\n,\n~\nbar\n,\n~\nbaz\n,\n";
 
             errorReporter = new SyntaxErrorReporter();
-            statements = lex(sourceString, 6, errorReporter, 0, crystalCounts(1, 1, 1, 1, 1, 1));
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(1, 1, 1));
 
             testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "foo", location(1, 0));
-            testCrystal(statements.get(1).get(0), StatementSeparatorCrystal.class, ",", location(2, 0));
-            testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "bar", location(4, 0));
-            testCrystal(statements.get(3).get(0), StatementSeparatorCrystal.class, ",", location(5, 0));
-            testCrystal(statements.get(4).get(0), ReferenceCrystal.class, "baz", location(7, 0));
-            testCrystal(statements.get(5).get(0), StatementSeparatorCrystal.class, ",", location(8, 0));
+            testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "bar", location(4, 0));
+            testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "baz", location(7, 0));
 
             if (warningsEnabled) {
                 assertWarnings(errorReporter, 3);
                 warnings = errorReporter.getCompilationWarnings();
+
                 testWarning(warnings.get(0), location(0, 0), "~", START_OF_STATEMENT);
                 testWarning(warnings.get(1), location(3, 0), "~", START_OF_STATEMENT);
                 testWarning(warnings.get(2), location(6, 0), "~", START_OF_STATEMENT);
@@ -324,75 +317,77 @@ public class LexerTest_Crystals_Warnings {
                 assertNoWarnings(errorReporter);
             }
 
-            // Terminated by commas.
+            // NOTE: The terminated by commas case is invalid.
             sourceString = "foo~,bar~,baz~,";
 
             errorReporter = new SyntaxErrorReporter();
-            statements = lex(sourceString, 1, errorReporter, 0, crystalCounts(9));
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(2, 2, 2));
 
             testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "foo", location(0, 0));
             testCrystal(statements.get(0).get(1), DeleteOperatorCrystal.class, "~", location(0, 3));
-            testCrystal(statements.get(0).get(2), StatementSeparatorCrystal.class, ",", location(0, 4));
-            testCrystal(statements.get(0).get(3), ReferenceCrystal.class, "bar", location(0, 5));
-            testCrystal(statements.get(0).get(4), DeleteOperatorCrystal.class, "~", location(0, 8));
-            testCrystal(statements.get(0).get(5), StatementSeparatorCrystal.class, ",", location(0, 9));
-            testCrystal(statements.get(0).get(6), ReferenceCrystal.class, "baz", location(0, 10));
-            testCrystal(statements.get(0).get(7), DeleteOperatorCrystal.class, "~", location(0, 13));
-            testCrystal(statements.get(0).get(8), StatementSeparatorCrystal.class, ",", location(0, 14));
+            testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "bar", location(0, 5));
+            testCrystal(statements.get(1).get(1), DeleteOperatorCrystal.class, "~", location(0, 8));
+            testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "baz", location(0, 10));
+            testCrystal(statements.get(2).get(1), DeleteOperatorCrystal.class, "~", location(0, 13));
 
-            // TODO: Expect 3 warnings instead of 0 when statement separators are refactored.
             assertNoWarnings(errorReporter);
 
             // Terminated by commas with newlines before.
             sourceString = "foo~\n,bar~\n,baz~\n,";
 
             errorReporter = new SyntaxErrorReporter();
-            statements = lex(sourceString, 1, errorReporter, 0, crystalCounts(6));
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(1, 1, 1));
 
             testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "foo", location(0, 0));
-            testCrystal(statements.get(0).get(1), StatementSeparatorCrystal.class, ",", location(1, 0));
-            testCrystal(statements.get(0).get(2), ReferenceCrystal.class, "bar", location(1, 1));
-            testCrystal(statements.get(0).get(3), StatementSeparatorCrystal.class, ",", location(2, 0));
-            testCrystal(statements.get(0).get(4), ReferenceCrystal.class, "baz", location(2, 1));
-            testCrystal(statements.get(0).get(5), StatementSeparatorCrystal.class, ",", location(3, 0));
+            testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "bar", location(1, 1));
+            testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "baz", location(2, 1));
 
-            // TODO: Expect 3 warnings instead of 0 when statement separators are refactored.
-            assertNoWarnings(errorReporter);
+            if (warningsEnabled) {
+                assertWarnings(errorReporter, 3);
+                warnings = errorReporter.getCompilationWarnings();
 
-            // Terminated by commas with newlines after.
+                testWarning(warnings.get(0), location(0, 3), "foo~", END_OF_STATEMENT);
+                testWarning(warnings.get(1), location(1, 4), ",bar~", END_OF_STATEMENT);
+                testWarning(warnings.get(2), location(2, 4), ",baz~", END_OF_STATEMENT);
+            } else {
+                assertNoWarnings(errorReporter);
+            }
+
+            // NOTE: The terminated by commas with newlines after case is invalid.
             sourceString = "foo~,\nbar~,\nbaz~,\n";
 
             errorReporter = new SyntaxErrorReporter();
-            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(3, 3, 3));
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(2, 2, 2));
 
             testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "foo", location(0, 0));
             testCrystal(statements.get(0).get(1), DeleteOperatorCrystal.class, "~", location(0, 3));
-            testCrystal(statements.get(0).get(2), StatementSeparatorCrystal.class, ",", location(0, 4));
             testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "bar", location(1, 0));
             testCrystal(statements.get(1).get(1), DeleteOperatorCrystal.class, "~", location(1, 3));
-            testCrystal(statements.get(1).get(2), StatementSeparatorCrystal.class, ",", location(1, 4));
             testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "baz", location(2, 0));
             testCrystal(statements.get(2).get(1), DeleteOperatorCrystal.class, "~", location(2, 3));
-            testCrystal(statements.get(2).get(2), StatementSeparatorCrystal.class, ",", location(2, 4));
 
-            // TODO: Expect 3 warnings instead of 0 when statement separators are refactored.
             assertNoWarnings(errorReporter);
 
             // Terminated by commas with newlines before and after.
             sourceString = "foo~\n,\nbar~\n,\nbaz~\n,\n";
 
             errorReporter = new SyntaxErrorReporter();
-            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(2, 2, 2));
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(1, 1, 1));
 
             testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "foo", location(0, 0));
-            testCrystal(statements.get(0).get(1), StatementSeparatorCrystal.class, ",", location(1, 0));
             testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "bar", location(2, 0));
-            testCrystal(statements.get(1).get(1), StatementSeparatorCrystal.class, ",", location(3, 0));
             testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "baz", location(4, 0));
-            testCrystal(statements.get(2).get(1), StatementSeparatorCrystal.class, ",", location(5, 0));
 
-            // TODO: Expect 3 warnings instead of 0 when statement separators are refactored.
-            assertNoWarnings(errorReporter);
+            if (warningsEnabled) {
+                assertWarnings(errorReporter, 3);
+                warnings = errorReporter.getCompilationWarnings();
+
+                testWarning(warnings.get(0), location(0, 3), "foo~", END_OF_STATEMENT);
+                testWarning(warnings.get(1), location(2, 3), "bar~", END_OF_STATEMENT);
+                testWarning(warnings.get(2), location(4, 3), "baz~", END_OF_STATEMENT);
+            } else {
+                assertNoWarnings(errorReporter);
+            }
         }
     }
 
@@ -429,28 +424,26 @@ public class LexerTest_Crystals_Warnings {
                 assertNoWarnings(errorReporter);
             }
 
-            // Terminated by commas.
+            // NOTE: The terminated by commas case is invalid.
             sourceString = "~\nfoo~,~\nbar~,~\nbaz~,";
 
             errorReporter = new SyntaxErrorReporter();
-            statements = lex(sourceString, 1, errorReporter, 0, crystalCounts(9));
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(2, 2, 2));
 
             testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "foo", location(1, 0));
             testCrystal(statements.get(0).get(1), DeleteOperatorCrystal.class, "~", location(1, 3));
-            testCrystal(statements.get(0).get(2), StatementSeparatorCrystal.class, ",", location(1, 4));
-            testCrystal(statements.get(0).get(3), ReferenceCrystal.class, "bar", location(2, 0));
-            testCrystal(statements.get(0).get(4), DeleteOperatorCrystal.class, "~", location(2, 3));
-            testCrystal(statements.get(0).get(5), StatementSeparatorCrystal.class, ",", location(2, 4));
-            testCrystal(statements.get(0).get(6), ReferenceCrystal.class, "baz", location(3, 0));
-            testCrystal(statements.get(0).get(7), DeleteOperatorCrystal.class, "~", location(3, 3));
-            testCrystal(statements.get(0).get(8), StatementSeparatorCrystal.class, ",", location(3, 4));
+            testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "bar", location(2, 0));
+            testCrystal(statements.get(1).get(1), DeleteOperatorCrystal.class, "~", location(2, 3));
+            testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "baz", location(3, 0));
+            testCrystal(statements.get(2).get(1), DeleteOperatorCrystal.class, "~", location(3, 3));
 
             if (warningsEnabled) {
-                // TODO: Expect 6 warnings instead of 1 when statement separators are refactored.
-                assertWarnings(errorReporter, 1);
+                assertWarnings(errorReporter, 3);
                 warnings = errorReporter.getCompilationWarnings();
 
                 testWarning(warnings.get(0), location(0, 0), "~", START_OF_STATEMENT);
+                testWarning(warnings.get(1), location(1, 5), "foo~,~", START_OF_STATEMENT);
+                testWarning(warnings.get(2), location(2, 5), "bar~,~", START_OF_STATEMENT);
             } else {
                 assertNoWarnings(errorReporter);
             }
@@ -459,43 +452,40 @@ public class LexerTest_Crystals_Warnings {
             sourceString = "~\nfoo~\n,~\nbar~\n,~\nbaz~\n,";
 
             errorReporter = new SyntaxErrorReporter();
-            statements = lex(sourceString, 1, errorReporter, 0, crystalCounts(6));
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(1, 1, 1));
 
             testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "foo", location(1, 0));
-            testCrystal(statements.get(0).get(1), StatementSeparatorCrystal.class, ",", location(2, 0));
-            testCrystal(statements.get(0).get(2), ReferenceCrystal.class, "bar", location(3, 0));
-            testCrystal(statements.get(0).get(3), StatementSeparatorCrystal.class, ",", location(4, 0));
-            testCrystal(statements.get(0).get(4), ReferenceCrystal.class, "baz", location(5, 0));
-            testCrystal(statements.get(0).get(5), StatementSeparatorCrystal.class, ",", location(6, 0));
+            testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "bar", location(3, 0));
+            testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "baz", location(5, 0));
 
             if (warningsEnabled) {
-                // TODO: Expect 6 warnings instead of 1 when statement separators are refactored.
-                assertWarnings(errorReporter, 1);
+                assertWarnings(errorReporter, 6);
                 warnings = errorReporter.getCompilationWarnings();
 
                 testWarning(warnings.get(0), location(0, 0), "~", START_OF_STATEMENT);
+                testWarning(warnings.get(1), location(1, 3), "foo~", END_OF_STATEMENT);
+                testWarning(warnings.get(2), location(2, 1), ",~", START_OF_STATEMENT);
+                testWarning(warnings.get(3), location(3, 3), "bar~", END_OF_STATEMENT);
+                testWarning(warnings.get(4), location(4, 1), ",~", START_OF_STATEMENT);
+                testWarning(warnings.get(5), location(5, 3), "baz~", END_OF_STATEMENT);
             } else {
                 assertNoWarnings(errorReporter);
             }
 
-            // Terminated by commas with newlines after.
+            // NOTE: The terminated by commas with newlines after case is invalid.
             sourceString = "~\nfoo~,\n~\nbar~,\n~\nbaz~,\n";
 
             errorReporter = new SyntaxErrorReporter();
-            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(3, 3, 3));
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(2, 2, 2));
 
             testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "foo", location(1, 0));
             testCrystal(statements.get(0).get(1), DeleteOperatorCrystal.class, "~", location(1, 3));
-            testCrystal(statements.get(0).get(2), StatementSeparatorCrystal.class, ",", location(1, 4));
             testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "bar", location(3, 0));
             testCrystal(statements.get(1).get(1), DeleteOperatorCrystal.class, "~", location(3, 3));
-            testCrystal(statements.get(1).get(2), StatementSeparatorCrystal.class, ",", location(3, 4));
             testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "baz", location(5, 0));
             testCrystal(statements.get(2).get(1), DeleteOperatorCrystal.class, "~", location(5, 3));
-            testCrystal(statements.get(2).get(2), StatementSeparatorCrystal.class, ",", location(5, 4));
 
             if (warningsEnabled) {
-                // TODO: Expect 6 warnings instead of 3 when statement separators are refactored.
                 assertWarnings(errorReporter, 3);
                 warnings = errorReporter.getCompilationWarnings();
 
@@ -505,21 +495,207 @@ public class LexerTest_Crystals_Warnings {
             } else {
                 assertNoWarnings(errorReporter);
             }
+
             // Terminated by commas with newlines before and after.
             sourceString = "~\nfoo~\n,\n~\nbar~\n,\n~\nbaz~\n,\n";
 
             errorReporter = new SyntaxErrorReporter();
-            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(2, 2, 2));
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(1, 1, 1));
 
             testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "foo", location(1, 0));
-            testCrystal(statements.get(0).get(1), StatementSeparatorCrystal.class, ",", location(2, 0));
             testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "bar", location(4, 0));
-            testCrystal(statements.get(1).get(1), StatementSeparatorCrystal.class, ",", location(5, 0));
             testCrystal(statements.get(2).get(0), ReferenceCrystal.class, "baz", location(7, 0));
-            testCrystal(statements.get(2).get(1), StatementSeparatorCrystal.class, ",", location(8, 0));
 
             if (warningsEnabled) {
-                // TODO: Expect 6 warnings instead of 3 when statement separators are refactored.
+                assertWarnings(errorReporter, 6);
+                warnings = errorReporter.getCompilationWarnings();
+
+                testWarning(warnings.get(0), location(0, 0), "~", START_OF_STATEMENT);
+                testWarning(warnings.get(1), location(1, 3), "foo~", END_OF_STATEMENT);
+                testWarning(warnings.get(2), location(3, 0), "~", START_OF_STATEMENT);
+                testWarning(warnings.get(3), location(4, 3), "bar~", END_OF_STATEMENT);
+                testWarning(warnings.get(4), location(6, 0), "~", START_OF_STATEMENT);
+                testWarning(warnings.get(5), location(7, 3), "baz~", END_OF_STATEMENT);
+            } else {
+                assertNoWarnings(errorReporter);
+            }
+        }
+    }
+
+    @Test
+    @Order(8)
+    public void testLexer_Crystals_Warnings_LineContinuation_ThreeStatements_OnlyLineContinuations() {
+        for (int i = 0; i < 2; i++) {
+            boolean warningsEnabled = i == 0;
+            LexerTestUtils.setEnableWarnings(warningsEnabled);
+
+            // Terminated by newlines.
+            String sourceString = "~\n\n~\n\n~\n\n";
+
+            SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+            lex(sourceString, 0, errorReporter, 0);
+
+            List<VikariError> warnings;
+
+            if (warningsEnabled) {
+                assertWarnings(errorReporter, 3);
+                warnings = errorReporter.getCompilationWarnings();
+
+                testWarning(warnings.get(0), location(0, 0), "~", ONLY_LINE_CONTINUATIONS);
+                testWarning(warnings.get(1), location(2, 0), "~", ONLY_LINE_CONTINUATIONS);
+                testWarning(warnings.get(2), location(4, 0), "~", ONLY_LINE_CONTINUATIONS);
+            } else {
+                assertNoWarnings(errorReporter);
+            }
+
+            // NOTE: The terminated by commas case is invalid.
+            sourceString = "~,~,~";
+
+            errorReporter = new SyntaxErrorReporter();
+            List<List<AtonementCrystal>> statements = lex(sourceString, 2, errorReporter, 0);
+
+            testCrystal(statements.get(0).get(0), DeleteOperatorCrystal.class, "~", location(0, 0));
+            testCrystal(statements.get(1).get(0), DeleteOperatorCrystal.class, "~", location(0, 2));
+
+            if (warningsEnabled) {
+                assertWarnings(errorReporter, 1);
+                warnings = errorReporter.getCompilationWarnings();
+                testWarning(warnings.get(0), location(0, 4), sourceString, ONLY_LINE_CONTINUATIONS);
+            } else {
+                assertNoWarnings(errorReporter);
+            }
+
+            // Terminated by commas with newlines before.
+            sourceString = "~\n,~\n,~\n,";
+
+            errorReporter = new SyntaxErrorReporter();
+            lex(sourceString, 0, errorReporter, 0);
+
+            if (warningsEnabled) {
+                assertWarnings(errorReporter, 3);
+                warnings = errorReporter.getCompilationWarnings();
+
+                testWarning(warnings.get(0), location(0, 0), "~", ONLY_LINE_CONTINUATIONS);
+                testWarning(warnings.get(1), location(1, 1), ",~", ONLY_LINE_CONTINUATIONS);
+                testWarning(warnings.get(2), location(2, 1), ",~", ONLY_LINE_CONTINUATIONS);
+            } else {
+                assertNoWarnings(errorReporter);
+            }
+
+            // NOTE: The terminated by commas with newlines after case is invalid.
+            sourceString = "~,\n~,\n~,\n";
+
+            errorReporter = new SyntaxErrorReporter();
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(1, 1, 1));
+
+            testCrystal(statements.get(0).get(0), DeleteOperatorCrystal.class, "~", location(0, 0));
+            testCrystal(statements.get(1).get(0), DeleteOperatorCrystal.class, "~", location(1, 0));
+            testCrystal(statements.get(2).get(0), DeleteOperatorCrystal.class, "~", location(2, 0));
+
+            assertNoWarnings(errorReporter);
+
+            // Terminated by commas with newlines before and after.
+            sourceString = "~\n,\n~\n,\n~\n,\n";
+
+            errorReporter = new SyntaxErrorReporter();
+            lex(sourceString, 0, errorReporter, 0);
+
+            if (warningsEnabled) {
+                assertWarnings(errorReporter, 3);
+                warnings = errorReporter.getCompilationWarnings();
+
+                testWarning(warnings.get(0), location(0, 0), "~", ONLY_LINE_CONTINUATIONS);
+                testWarning(warnings.get(1), location(2, 0), "~", ONLY_LINE_CONTINUATIONS);
+                testWarning(warnings.get(2), location(4, 0), "~", ONLY_LINE_CONTINUATIONS);
+            } else {
+                assertNoWarnings(errorReporter);
+            }
+        }
+    }
+
+    @Test
+    @Order(9)
+    public void testLexer_Crystals_Warnings_LineContinuation_ThreeStatements_OnlyMultipleLineContinuations() {
+        for (int i = 0; i < 2; i++) {
+            boolean warningsEnabled = i == 0;
+            LexerTestUtils.setEnableWarnings(warningsEnabled);
+
+            // Terminated by newlines.
+            String sourceString = "~\n~\n~\n\n" +
+                    "~\n~\n~\n\n" +
+                    "~\n~\n~\n\n";
+
+            SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+            lex(sourceString, 0, errorReporter, 0);
+
+            List<VikariError> warnings;
+
+            if (warningsEnabled) {
+                assertWarnings(errorReporter, 3);
+                warnings = errorReporter.getCompilationWarnings();
+
+                testWarning(warnings.get(0), location(0, 0), "~", ONLY_LINE_CONTINUATIONS);
+                testWarning(warnings.get(1), location(4, 0), "~", ONLY_LINE_CONTINUATIONS);
+                testWarning(warnings.get(2), location(8, 0), "~", ONLY_LINE_CONTINUATIONS);
+            } else {
+                assertNoWarnings(errorReporter);
+            }
+
+            // NOTE: The terminated by commas case is invalid.
+            sourceString = "~\n~\n~," +
+                    "~\n~\n~," +
+                    "~\n~\n~,";
+
+            errorReporter = new SyntaxErrorReporter();
+            List<List<AtonementCrystal>> statements = lex(sourceString, 3, errorReporter, 0);
+
+            testCrystal(statements.get(0).get(0), DeleteOperatorCrystal.class, "~", location(2, 0));
+            testCrystal(statements.get(1).get(0), DeleteOperatorCrystal.class, "~", location(4, 0));
+            testCrystal(statements.get(2).get(0), DeleteOperatorCrystal.class, "~", location(6, 0));
+
+            if (warningsEnabled) {
+                assertWarnings(errorReporter, 3);
+                warnings = errorReporter.getCompilationWarnings();
+
+                testWarning(warnings.get(0), location(0, 0), "~", START_OF_STATEMENT);
+                testWarning(warnings.get(1), location(2, 2), "~,~", START_OF_STATEMENT);
+                testWarning(warnings.get(2), location(4, 2), "~,~", START_OF_STATEMENT);
+            } else {
+                assertNoWarnings(errorReporter);
+            }
+
+            // Terminated by commas with newlines before.
+            sourceString = "~\n~\n~\n," +
+                    "~\n~\n~\n," +
+                    "~\n~\n~\n,";
+
+            errorReporter = new SyntaxErrorReporter();
+            lex(sourceString, 0, errorReporter, 0);
+
+            if (warningsEnabled) {
+                assertWarnings(errorReporter, 3);
+                warnings = errorReporter.getCompilationWarnings();
+
+                testWarning(warnings.get(0), location(0, 0), "~", ONLY_LINE_CONTINUATIONS);
+                testWarning(warnings.get(1), location(3, 1), ",~", ONLY_LINE_CONTINUATIONS);
+                testWarning(warnings.get(2), location(6, 1), ",~", ONLY_LINE_CONTINUATIONS);
+            } else {
+                assertNoWarnings(errorReporter);
+            }
+
+            // NOTE: The terminated by commas with newlines after case is invalid.
+            sourceString = "~\n~\n~,\n" +
+                    "~\n~\n~,\n" +
+                    "~\n~\n~,\n";
+
+            errorReporter = new SyntaxErrorReporter();
+            statements = lex(sourceString, 3, errorReporter, 0, crystalCounts(1, 1, 1));
+
+            testCrystal(statements.get(0).get(0), DeleteOperatorCrystal.class, "~", location(2, 0));
+            testCrystal(statements.get(1).get(0), DeleteOperatorCrystal.class, "~", location(5, 0));
+            testCrystal(statements.get(2).get(0), DeleteOperatorCrystal.class, "~", location(8, 0));
+
+            if (warningsEnabled) {
                 assertWarnings(errorReporter, 3);
                 warnings = errorReporter.getCompilationWarnings();
 
@@ -529,9 +705,25 @@ public class LexerTest_Crystals_Warnings {
             } else {
                 assertNoWarnings(errorReporter);
             }
+
+            // Terminated by commas with newlines before and after.
+            sourceString = "~\n~\n~\n,\n" +
+                    "~\n~\n~\n,\n" +
+                    "~\n~\n~\n,\n";
+
+            errorReporter = new SyntaxErrorReporter();
+            lex(sourceString, 0, errorReporter, 0);
+
+            if (warningsEnabled) {
+                assertWarnings(errorReporter, 3);
+                warnings = errorReporter.getCompilationWarnings();
+
+                testWarning(warnings.get(0), location(0, 0), "~", ONLY_LINE_CONTINUATIONS);
+                testWarning(warnings.get(1), location(4, 0), "~", ONLY_LINE_CONTINUATIONS);
+                testWarning(warnings.get(2), location(8, 0), "~", ONLY_LINE_CONTINUATIONS);
+            } else {
+                assertNoWarnings(errorReporter);
+            }
         }
     }
-
-    // TODO: Write unit tests for statements composed of only line continuations and commas
-    //       once statement separators are refactored.
 }

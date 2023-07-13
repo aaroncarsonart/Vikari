@@ -380,7 +380,7 @@ public class ParserTest_StatementSeparator {
     @Test
     @Order(21)
     public void testParser_Statement_syntaxError_FourStatements_MultipleLines() {
-        String sourceString = "5 ++, * 7 *,\n"+
+        String sourceString = "5 ++, * 7 *,\n" +
                               "22 -, / 3";
         List<VikariError> syntaxErrors = lexAndParse_ErrorCase(sourceString);
 
@@ -407,5 +407,60 @@ public class ParserTest_StatementSeparator {
         expectedLocation = location(1, 6);
         expectedLine = "22 -, / 3";
         TestUtils.testSyntaxError(error4, expectedLocation, expectedLine, "Expected expression.");
+    }
+
+    @Test
+    @Order(22)
+    public void testParser_Statement_MultipleStatementSeparators() {
+        // 1. Single statement separator.
+        String sourceString = ",5 + 2,3 - 9,2 * 8,22 / 7,";
+        List<Statement> parsedStatements = lexAndParse(sourceString);
+        checkFourArithmeticExpressionStatements(parsedStatements);
+
+        sourceString = "\n,5 + 2\n,3 - 9\n,2 * 8\n,22 / 7\n,";
+        parsedStatements = lexAndParse(sourceString);
+        checkFourArithmeticExpressionStatements(parsedStatements);
+
+        sourceString = ",\n5 + 2,\n3 - 9,\n2 * 8,\n22 / 7,\n";
+        parsedStatements = lexAndParse(sourceString);
+        checkFourArithmeticExpressionStatements(parsedStatements);
+
+        sourceString = "\n,\n5 + 2\n,\n3 - 9\n,\n2 * 8\n,\n22 / 7\n,\n";
+        parsedStatements = lexAndParse(sourceString);
+        checkFourArithmeticExpressionStatements(parsedStatements);
+
+        // 2. Two statement separators.
+        sourceString = ",,5 + 2,,3 - 9,,2 * 8,,22 / 7,,";
+        parsedStatements = lexAndParse(sourceString);
+        checkFourArithmeticExpressionStatements(parsedStatements);
+
+        sourceString = "\n,,5 + 2\n,,3 - 9\n,,2 * 8\n,,22 / 7\n,,";
+        parsedStatements = lexAndParse(sourceString);
+        checkFourArithmeticExpressionStatements(parsedStatements);
+
+        sourceString = ",,\n5 + 2,,\n3 - 9,,\n2 * 8,,\n22 / 7,,\n";
+        parsedStatements = lexAndParse(sourceString);
+        checkFourArithmeticExpressionStatements(parsedStatements);
+
+        sourceString = "\n,,\n5 + 2\n,,\n3 - 9\n,,\n2 * 8\n,,\n22 / 7\n,,\n";
+        parsedStatements = lexAndParse(sourceString);
+        checkFourArithmeticExpressionStatements(parsedStatements);
+
+        // 2. Four statement separators.
+        sourceString = ",,,,5 + 2,,,,3 - 9,,,,2 * 8,,,,22 / 7,,,,";
+        parsedStatements = lexAndParse(sourceString);
+        checkFourArithmeticExpressionStatements(parsedStatements);
+
+        sourceString = "\n,,,,5 + 2\n,,,,3 - 9\n,,,,2 * 8\n,,,,22 / 7\n,,,,";
+        parsedStatements = lexAndParse(sourceString);
+        checkFourArithmeticExpressionStatements(parsedStatements);
+
+        sourceString = ",,,,\n5 + 2,,,,\n3 - 9,,,,\n2 * 8,,,,\n22 / 7,,,,\n";
+        parsedStatements = lexAndParse(sourceString);
+        checkFourArithmeticExpressionStatements(parsedStatements);
+
+        sourceString = "\n,,,,\n5 + 2\n,,,,\n3 - 9\n,,,,\n2 * 8\n,,,,\n22 / 7\n,,,,\n";
+        parsedStatements = lexAndParse(sourceString);
+        checkFourArithmeticExpressionStatements(parsedStatements);
     }
 }

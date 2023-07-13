@@ -11,7 +11,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCr
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionSeparatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.StatementSeparatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.LeftSquareBracketCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.RightSquareBracketCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
@@ -45,17 +44,16 @@ public class LexerTest_Crystals_ThrowStatement {
     @Test
     @Order(2)
     public void testLexer_Crystals_ThrowStatement_AfterStatementSeparator() {
-        List<AtonementCrystal> statement = lexSingleStatement(":foo:, --[bar]", 8);
+        List<List<AtonementCrystal>> statements = lex(":foo:, --[bar]", 2, crystalCounts(3, 4));
 
-        testCrystal(statement.get(0), TypeLabelOperatorCrystal.class, ":", location(0, 0));
-        testCrystal(statement.get(1), ReferenceCrystal.class, "foo", location(0, 1));
-        testCrystal(statement.get(2), TypeLabelOperatorCrystal.class, ":", location(0, 4));
-        testCrystal(statement.get(3), StatementSeparatorCrystal.class, ",", location(0, 5));
+        testCrystal(statements.get(0).get(0), TypeLabelOperatorCrystal.class, ":", location(0, 0));
+        testCrystal(statements.get(0).get(1), ReferenceCrystal.class, "foo", location(0, 1));
+        testCrystal(statements.get(0).get(2), TypeLabelOperatorCrystal.class, ":", location(0, 4));
 
-        testCrystal(statement.get(4), ThrowCrystal.class, "--", location(0, 7));
-        testCrystal(statement.get(5), LeftSquareBracketCrystal.class, "[", location(0, 9));
-        testCrystal(statement.get(6), ReferenceCrystal.class, "bar", location(0, 10));
-        testCrystal(statement.get(7), RightSquareBracketCrystal.class, "]", location(0, 13));
+        testCrystal(statements.get(1).get(0), ThrowCrystal.class, "--", location(0, 7));
+        testCrystal(statements.get(1).get(1), LeftSquareBracketCrystal.class, "[", location(0, 9));
+        testCrystal(statements.get(1).get(2), ReferenceCrystal.class, "bar", location(0, 10));
+        testCrystal(statements.get(1).get(3), RightSquareBracketCrystal.class, "]", location(0, 13));
     }
 
     @Test

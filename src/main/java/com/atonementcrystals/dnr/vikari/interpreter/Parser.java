@@ -288,8 +288,7 @@ public class Parser {
             printOperator.setCoordinates(typeLabel.getCoordinates());
 
             Expression expr = null;
-            if (currentLine == lineNumber && !check(TokenType.TYPE_LABEL) && !check(TokenType.STATEMENT_SEPARATOR)
-                    && !isAtEnd() && !isAtEndOfStatement()) {
+            if (currentLine == lineNumber && !check(TokenType.TYPE_LABEL) && !isAtEnd() && !isAtEndOfStatement()) {
                 expr = expression();
             }
 
@@ -300,9 +299,6 @@ public class Parser {
         PrintStatement printStatement = new PrintStatement(printExpressions);
         CoordinatePair location = printExpressions.get(0).getLocation();
         printStatement.setLocation(location);
-
-        // Advance past an optional statement separator , crystal.
-        match(TokenType.STATEMENT_SEPARATOR);
 
         return printStatement;
     }
@@ -452,19 +448,11 @@ public class Parser {
     }
 
     public boolean isAtEndOfStatement(int tokenNumber) {
-        if (tokenNumber >= currentLine.size()) {
-            return true;
-        }
-        AtonementCrystal currentToken = currentLine.get(tokenNumber);
-        return TokenType.STATEMENT_SEPARATOR.getJavaType().isInstance(currentToken);
+        return tokenNumber >= currentLine.size();
     }
 
     public boolean isAtEndOfStatement() {
-        return check(TokenType.STATEMENT_SEPARATOR) || tokenNumber >= currentLine.size();
-    }
-
-    public boolean isAtEnd(TokenPosition position) {
-        return isAtEnd(position.getLineNumber(), position.getTokenNumber());
+        return tokenNumber >= currentLine.size();
     }
 
     public boolean isAtEnd(int tokenNumber) {
@@ -522,15 +510,8 @@ public class Parser {
         return previous;
     }
 
-    public void advanceToEndOfLine() {
-        tokenNumber = currentLine.size();
-    }
-
     public void advanceToEndOfStatement() {
         while (tokenNumber < currentLine.size()) {
-            if (match(TokenType.STATEMENT_SEPARATOR)) {
-                break;
-            }
             advance();
         }
     }

@@ -58,6 +58,8 @@ public class TreeWalkInterpreterTest_StatementSeparator {
         }
         String actualOutput = testOut.toString();
         assertEquals(expectedOutput, actualOutput, "Unexpected output of print statement.");
+
+        testOut.reset();
     }
 
     // The following 12 tests are all identical to TreeWalkInterpreterTest_PrintStatements,
@@ -134,5 +136,29 @@ public class TreeWalkInterpreterTest_StatementSeparator {
     @Order(12)
     public void testTreeWalkInterpreter_StatementSeparator_PrintlnExpression_Chained_MultiLine() {
         testPrintStatement(":5 + 3,:,\n:7 - 2,:,\n:,\n:22,:7,:,", "8\n5\n\n227\n");
+    }
+
+    @Test
+    @Order(12)
+    public void testTreeWalkInterpreter_StatementSeparator_PrintlnExpression_MultipleStatementSeparators() {
+        String expectedOutput = "8\n5\n27\n";
+
+        // 1. Single statement separator.
+        testPrintStatement(",:5 + 3:,:7 - 2:,:9 * 3:,", expectedOutput);
+        testPrintStatement("\n,:5 + 3:\n,:7 - 2:\n,:9 * 3:\n,", expectedOutput);
+        testPrintStatement(",\n:5 + 3:,\n:7 - 2:,\n:9 * 3:,\n", expectedOutput);
+        testPrintStatement("\n,\n:5 + 3:\n,\n:7 - 2:\n,\n:9 * 3:\n,\n", expectedOutput);
+
+        // 2. Two statement separators.
+        testPrintStatement(",,:5 + 3:,,:7 - 2:,,:9 * 3:,,", expectedOutput);
+        testPrintStatement("\n,,:5 + 3:\n,,:7 - 2:\n,,:9 * 3:\n,,", expectedOutput);
+        testPrintStatement(",,\n:5 + 3:,,\n:7 - 2:,,\n:9 * 3:,,\n", expectedOutput);
+        testPrintStatement("\n,,\n:5 + 3:\n,,\n:7 - 2:\n,,\n:9 * 3:\n,,\n", expectedOutput);
+
+        // 3. Four statement separators.
+        testPrintStatement(",,,,:5 + 3:,,,,:7 - 2:,,,,:9 * 3:,,,,", expectedOutput);
+        testPrintStatement("\n,,,,:5 + 3:\n,,,,:7 - 2:\n,,,,:9 * 3:\n,,,,", expectedOutput);
+        testPrintStatement(",,,,\n:5 + 3:,,,,\n:7 - 2:,,,,\n:9 * 3:,,,,\n", expectedOutput);
+        testPrintStatement("\n,,,,\n:5 + 3:\n,,,,\n:7 - 2:\n,,,,\n:9 * 3:\n,,,,\n", expectedOutput);
     }
 }

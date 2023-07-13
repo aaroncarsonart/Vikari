@@ -22,7 +22,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.ModulusOperat
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.StatementSeparatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.quotation.CaptureQuotationCrystal;
 import com.atonementcrystals.dnr.vikari.error.CompilationWarning;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
@@ -79,7 +78,7 @@ public class Lexer {
      * the operators should be collapsed together into a single ThrowCrystal.
      */
     private static final HashSet<Class<? extends AtonementCrystal>> COLLAPSE_THROW_CRYSTAL_CLASSES = Stream.of(
-                    TokenType.STATEMENT_SEPARATOR, TokenType.REGION_SEPARATOR, TokenType.REGION_OPERATOR)
+                    TokenType.REGION_SEPARATOR, TokenType.REGION_OPERATOR)
             .map(TokenType::getJavaType)
             .collect(Collectors.toCollection(HashSet::new));
 
@@ -89,7 +88,7 @@ public class Lexer {
      */
     private static final HashSet<Class<? extends AtonementCrystal>> COLLAPSE_NEGATION_OPERATOR_CLASSES = Stream.of(
                     TokenType.RETURN, TokenType.BREAK, TokenType.CONTINUE, TokenType.LEFT_SQUARE_BRACKET,
-                    TokenType.STATEMENT_SEPARATOR, TokenType.REGION_SEPARATOR, TokenType.LEFT_PARENTHESIS,
+                    TokenType.REGION_SEPARATOR, TokenType.LEFT_PARENTHESIS,
                     TokenType.LIST_ELEMENT_SEPARATOR, TokenType.RANGE, TokenType.TYPE_LABEL,
                     TokenType.INDEX_OPERATOR, TokenType.COPY_CONSTRUCTOR, TokenType.MODULUS, TokenType.MULTIPLY,
                     TokenType.SUBTRACT, TokenType.LEFT_ASSIGNMENT, TokenType.LEFT_ADD_ASSIGNMENT,
@@ -759,6 +758,17 @@ public class Lexer {
 
                 int row = startLineNumber + statementNumber;
                 CoordinatePair tokenCoordinates = new CoordinatePair(row, column);
+
+                if (TokenType.STATEMENT_SEPARATOR.getIdentifier().equals(stringToken)) {
+
+                    // Begin a new statement.
+                    if (!statementOfCrystals.isEmpty()) {
+                        statementsOfCrystals.add(statementOfCrystals);
+                        statementOfCrystals = new ArrayList<>();
+                    }
+
+                    continue;
+                }
 
                 if (Utils.isWhitespace(stringToken)) {
                     // All whitespace (besides indentation) is omitted in the final output of the Lexer.
