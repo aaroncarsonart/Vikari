@@ -121,7 +121,7 @@ public class Main {
                 // Run REPL mode.
                 else if (argsList.size() == 0) {
                     log.debug("Zero arguments. Default behavior.");
-                    runReplMode();
+                    runReplMode(warningsEnabled);
                     return;
                 }
             }
@@ -284,7 +284,7 @@ public class Main {
             } else if (sourceString != null) {
                 runSourceString(sourceString, phase, lexerOptions, parserOptions, warningsEnabled);
             } else if (replMode) {
-                runReplMode();
+                runReplMode(warningsEnabled);
             }else {
                 throw new IllegalStateException("Unreachable code.");
             }
@@ -551,10 +551,11 @@ public class Main {
     /**
      * Run the interpreter in REPL mode.
      */
-    public static void runReplMode() {
+    public static void runReplMode(boolean warningsEnabled) {
         log.debug("Run REPL mode.");
 
         VikariREPL repl = new VikariREPL();
+        repl.setWarningsEnabled(warningsEnabled);
         repl.start();
 
         log.debug("Exit REPL mode.");

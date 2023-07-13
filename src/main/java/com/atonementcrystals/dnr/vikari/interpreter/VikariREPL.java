@@ -9,6 +9,7 @@ import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.error.Vikari_RuntimeException;
 import com.atonementcrystals.dnr.vikari.interpreter.jline.VikariJLineParser;
+import com.atonementcrystals.dnr.vikari.interpreter.resolver.TypeResolver;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,6 +19,7 @@ import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.completer.NullCompleter;
 
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 
@@ -38,8 +40,10 @@ public class VikariREPL {
     private Parser parser;
     private REPL_Interpreter interpreter;
     private SyntaxErrorReporter syntaxErrorReporter;
+    private TypeResolver typeResolver;
 
     private boolean exit;
+    private boolean warningsEnabled;
     private LineReader userInput;
 
     /**
@@ -63,6 +67,13 @@ public class VikariREPL {
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
         interpreter.setGetLineFunction(syntaxErrorReporter::getLineFromCache);
+
+        typeResolver = parser.getTypeResolver();
+    }
+
+    public void setWarningsEnabled(boolean warningsEnabled) {
+        this.warningsEnabled = warningsEnabled;
+        lexer.setCompilationWarningsEnabled(warningsEnabled);
     }
 
     /**
@@ -70,7 +81,7 @@ public class VikariREPL {
      * to drive the behavior of the REPL mode.
      */
     public enum ReplCommand {
-        NONE, HELP, VERBOSE, CLEAR, EXIT, QUIT;
+        NONE, HELP, VERBOSE, WARNINGS, CLEAR, EXIT, QUIT;
 
         private final String nameLowerCase;
 
@@ -150,12 +161,13 @@ public class VikariREPL {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(nextLineOfUserInput);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        // Report syntax errors, if any.
-        if (syntaxErrorReporter.hasErrors()) {
-            reportSyntaxErrors(nextLineOfUserInput);
+        // Report syntax errors, if any. And compilation warnings, if they are enabled.
+        if (syntaxErrorReporter.hasErrors() || (warningsEnabled && syntaxErrorReporter.hasWarnings())) {
+            reportProblems(nextLineOfUserInput);
 
             // Clear any previous erroneous state.
             syntaxErrorReporter.clear();
+            typeResolver.clear();
             lexer.resetTo(lexerLineNumber);
             parser.resetTo(parserLineNumber);
             undefineNewVariablesDeclared(parsedStatements);
@@ -208,6 +220,7 @@ public class VikariREPL {
             case HELP -> printHelp();
             case CLEAR -> clearReplState();
             case VERBOSE -> toggleVerbose();
+            case WARNINGS -> toggleWarnings();
             case EXIT, QUIT -> exitReplMode();
             default -> throw new IllegalStateException("Unsupported REPL command: " + replCommand.name());
         }
@@ -222,7 +235,10 @@ public class VikariREPL {
             if (statement instanceof VariableDeclarationStatement variableDeclarationStatement) {
                 String identifier = variableDeclarationStatement.getDeclaredVariable().getIdentifier();
                 AtonementField environment = variableDeclarationStatement.getEnvironment();
-                if (environment.isDefined(identifier)) {
+
+                // If the environment is null, then the variable already exists and was
+                // not redefined because of a "Variable is already defined" error.
+                if (environment != null && environment.isDefined(identifier)) {
                     environment.undefine(identifier);
                 }
             }
@@ -237,11 +253,12 @@ public class VikariREPL {
         Formatter formatter = new Formatter(sb);
 
         formatter.format("\n");
-        formatter.format("!%-6s Print help menu.\n", ReplCommand.HELP);
-        formatter.format("!%-6s Clear REPL state.\n", ReplCommand.CLEAR);
-        formatter.format("!%-6s Toggle results of declarations, assignments, and expressions.\n", ReplCommand.VERBOSE);
-        formatter.format("!%-6s Exit REPL mode.\n", ReplCommand.EXIT);
-        formatter.format("!%-6s Exit REPL mode.\n", ReplCommand.QUIT);
+        formatter.format("!%-8s Print help menu.\n", ReplCommand.HELP);
+        formatter.format("!%-8s Clear REPL state.\n", ReplCommand.CLEAR);
+        formatter.format("!%-8s Toggle results of declarations, assignments, and expressions.\n", ReplCommand.VERBOSE);
+        formatter.format("!%-8s Toggle compilation warnings.\n", ReplCommand.WARNINGS);
+        formatter.format("!%-8s Exit REPL mode.\n", ReplCommand.EXIT);
+        formatter.format("!%-8s Exit REPL mode.\n", ReplCommand.QUIT);
         formatter.format("\n");
         formatter.format("Note that Vikari REPL commands are case-insensitive.\n");
 
@@ -265,6 +282,17 @@ public class VikariREPL {
         }
     }
 
+    public void toggleWarnings() {
+        warningsEnabled = !warningsEnabled;
+        lexer.setCompilationWarningsEnabled(warningsEnabled);
+
+        if (warningsEnabled) {
+            System.out.println("Warnings enabled.");
+        } else {
+            System.out.println("Warnings disabled.");
+        }
+    }
+
     /**
      * Exit the Vikari REPL mode.
      */
@@ -276,38 +304,52 @@ public class VikariREPL {
      * Report syntax errors for the given line of user input.
      * @param line The line to report the error for.
      */
-    private void reportSyntaxErrors(String line) {
-        if (!syntaxErrorReporter.hasErrors()) {
+    private void reportProblems(String line) {
+        if (!syntaxErrorReporter.hasErrors() && !syntaxErrorReporter.hasWarnings()) {
             return;
         }
+
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        if (syntaxErrors.size() == 1 && (!line.contains(NEWLINE) || errorAtEnd(syntaxErrors.get(0)))) {
-            VikariError syntaxError = syntaxErrors.get(0);
-            reportSingleSyntaxError(syntaxError);
+        List<VikariError> warnings = syntaxErrorReporter.getCompilationWarnings();
+
+        for (VikariError syntaxError : syntaxErrors) {
+            syntaxError.setMessage("Error: " + syntaxError.getMessage());
+        }
+        for (VikariError warning : warnings) {
+            warning.setMessage("Warning: " + warning.getMessage());
+        }
+
+        List<VikariError> problems = new ArrayList<>();
+        problems.addAll(syntaxErrors);
+        problems.addAll(warnings);
+
+        if (problems.size() == 1 && (!line.contains(NEWLINE) || problemAtEnd(problems.get(0)))) {
+            VikariError problem = problems.get(0);
+            reportSingleProblem(problem);
         } else {
-            reportMultipleSyntaxErrors(syntaxErrors);
+            reportMultipleProblems(problems);
         }
     }
 
-    private boolean errorAtEnd(VikariError syntaxError) {
+    private boolean problemAtEnd(VikariError problem) {
         int lastLineNumber = lexer.getLineNumber() - 1;
-        int errorLineNumber = syntaxError.getLocation().getRow();
-        return lastLineNumber == errorLineNumber;
+        int problemLineNumber = problem.getLocation().getRow();
+        return lastLineNumber == problemLineNumber;
     }
 
     /**
-     * Report a single SyntaxError in a shortened format. Taking advantage of the fact
+     * Report a single VikariError in a shortened format. Taking advantage of the fact
      * that the user already typed the line containing the error. So only the caret ^
      * pointing to the location of the error and the error message need to be reported.
-     * @param syntaxError the SyntaxError to report.
+     * @param problem the VikariError to report.
      */
-    private void reportSingleSyntaxError(VikariError syntaxError) {
-        CoordinatePair location = syntaxError.getLocation();
+    private void reportSingleProblem(VikariError problem) {
+        CoordinatePair location = problem.getLocation();
         int column = location.getColumn();
-        String line = syntaxError.getLine();
+        String line = problem.getLine();
 
         // Build a string of spaces and tabs to ensure the caret ^ matches the location
-        // of the SyntaxError in the line of user input just typed in the prompt.
+        // of the VikariError in the line of user input just typed in the prompt.
         StringBuilder sb = new StringBuilder();
         sb.append(REPL_PROMPT.replaceAll(".", " "));
         for (int i = 0; i < column; i++) {
@@ -323,23 +365,23 @@ public class VikariREPL {
         String caretStr = sb.toString();
         System.out.println(caretStr);
 
-        String errorMessage = syntaxError.getMessage();
-        System.out.println(errorMessage);
+        String problemMessage = problem.getMessage();
+        System.out.println(problemMessage);
 
         // Print equivalent output as REPL in logs.
-        log.debug("\n{}{}\n{}", REPL_PROMPT, line, errorMessage);
+        log.debug("\n{}{}\n{}", REPL_PROMPT, line, problemMessage);
     }
 
     /**
-     * Report SyntaxErrors the same as SyntaxErrorReporter, but without the large
+     * Report VikariErrors the same as SyntaxErrorReporter, but without the large
      * banner prefixing the error report.
-     * @param syntaxErrors The SyntaxErrors to report.
+     * @param problems The VikariErrors to report.
      */
-    private void reportMultipleSyntaxErrors(List<VikariError> syntaxErrors) {
+    private void reportMultipleProblems(List<VikariError> problems) {
         StringBuilder sb = new StringBuilder();
 
-        for (VikariError syntaxError : syntaxErrors) {
-            String errorReport = syntaxError.getErrorReport();
+        for (VikariError problem : problems) {
+            String errorReport = problem.getErrorReport();
             sb.append(errorReport);
             sb.append(NEWLINE);
             sb.append(NEWLINE);

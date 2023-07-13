@@ -369,6 +369,17 @@ public class Utils {
         return matchCount;
     }
 
+    public static int countOccurrences(String sourceString, char searchChar) {
+        int count = 0;
+        for (int i = 0; i < sourceString.length(); i++) {
+            char c = sourceString.charAt(i);
+            if (searchChar == c) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     /**
      * Replaces spaces, tabs, and newlines with "·", "→", and "¶".
      * @param text The string to modify.

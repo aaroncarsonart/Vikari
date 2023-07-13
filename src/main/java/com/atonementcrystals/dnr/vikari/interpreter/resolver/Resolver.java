@@ -49,4 +49,8 @@ public abstract class Resolver<T> implements Statement.Visitor<T>, Expression.Vi
         ResolverError resolverError = new ResolverError(location, errorMessage);
         resolutionErrors.add(resolverError);
     }
+
+    public void clear() {
+        resolutionErrors.clear();
+    }
 }

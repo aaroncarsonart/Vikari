@@ -45,6 +45,10 @@ public abstract class VikariError {
         return message;
     }
 
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     public String getErrorReport() {
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb);

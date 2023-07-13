@@ -125,9 +125,8 @@ public class Lexer {
     private int startLineNumber;
     private boolean compilationWarningsEnabled;
 
-    public static HashSet<Class<? extends AtonementCrystal>> getCollapseNegationOperatorClasses() {
-        return COLLAPSE_NEGATION_OPERATOR_CLASSES;
-    }
+    /** For detecting line continuations in the VikariJLineParser. */
+    private CoordinatePair terminatingLineContinuationLocation;
 
     public void setSyntaxErrorReporter(SyntaxErrorReporter syntaxErrorReporter) {
         this.syntaxErrorReporter = syntaxErrorReporter;
@@ -139,6 +138,10 @@ public class Lexer {
 
     public void setCompilationWarningsEnabled(boolean compilationWarningsEnabled) {
         this.compilationWarningsEnabled = compilationWarningsEnabled;
+    }
+
+    public CoordinatePair getTerminatingLineContinuationLocation() {
+        return terminatingLineContinuationLocation;
     }
 
     /**
@@ -346,6 +349,7 @@ public class Lexer {
         for (int i = lines.size() - 1; i >= lineNumber; i--) {
             lines.remove(i);
         }
+        this.terminatingLineContinuationLocation = null;
     }
 
     private String readNextLine() {
@@ -1095,6 +1099,11 @@ public class Lexer {
                     AtonementCrystal firstCrystal = statement.get(0);
                     CoordinatePair location = firstCrystal.getCoordinates();
                     reportWarning("Statement contains only line continuations.", location);
+
+                    // Cache the final line continuation location for the VikariJLineParser algorithm.
+                    AtonementCrystal lastCrystal = statement.get(statement.size() - 1);
+                    terminatingLineContinuationLocation = lastCrystal.getCoordinates();
+
                 } else {
                     AtonementCrystal firstCrystal = statement.get(0);
                     if (firstCrystal instanceof LineContinuationCrystal) {
@@ -1106,6 +1115,9 @@ public class Lexer {
                     if (lastCrystal instanceof LineContinuationCrystal) {
                         CoordinatePair warningLocation = lastCrystal.getCoordinates();
                         reportWarning("Unnecessary line continuation at end of statement.", warningLocation);
+
+                        // Cache the final line continuation location for the VikariJLineParser algorithm.
+                        terminatingLineContinuationLocation = warningLocation;
                     }
                 }
 

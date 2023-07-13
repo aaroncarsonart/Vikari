@@ -4,6 +4,7 @@ import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
+import com.atonementcrystals.dnr.vikari.util.Utils;
 import org.jline.reader.EOFError;
 import org.jline.reader.ParsedLine;
 import org.jline.reader.Parser;
@@ -22,6 +23,7 @@ public class VikariJLineParser implements Parser {
         lexer = new Lexer();
         errorReporter = new SyntaxErrorReporter();
         lexer.setSyntaxErrorReporter(errorReporter);
+        lexer.setCompilationWarningsEnabled(true);
     }
 
     @Override
@@ -32,20 +34,43 @@ public class VikariJLineParser implements Parser {
             return parsedLine;
         }
 
-        lexer.lexToStringTokens(line);
+        lexer.lex(line);
+
+        // Accept a new line of input if the statement is terminated by an unclosed comment token.
         List<CoordinatePair> unclosedCommentLocations = getUnclosedCommentLocations();
-
-        errorReporter.clear();
-        lexer.resetTo(0);
-
         if (!unclosedCommentLocations.isEmpty()) {
+            reset();
+
             CoordinatePair firstErrorLocation = unclosedCommentLocations.get(0);
             int row = firstErrorLocation.getRow();
             int column = firstErrorLocation.getColumn();
             throw new EOFError(row, column, "Unclosed comment.", "comment", unclosedCommentLocations.size(), ":~");
         }
 
+        // Accept a new line of input if the statement is terminated by a line continuation.
+        CoordinatePair terminatingLineContinuationLocation = lexer.getTerminatingLineContinuationLocation();
+        if (terminatingLineContinuationLocation != null) {
+            reset();
+
+            int row = terminatingLineContinuationLocation.getRow();
+            int finalLineNumber = Utils.countOccurrences(line, '\n');
+
+            // Ignore line continuation if the next line is blank.
+            if (finalLineNumber > row) {
+                return parsedLine;
+            }
+
+            int column = terminatingLineContinuationLocation.getColumn();
+            throw new EOFError(row, column, "Line continuation.", "~", 0, "");
+        }
+
+        reset();
         return parsedLine;
+    }
+
+    private void reset() {
+        errorReporter.clear();
+        lexer.resetTo(0);
     }
 
     private List<CoordinatePair> getUnclosedCommentLocations() {

@@ -101,18 +101,16 @@ public class Parser {
         }
     }
 
+    public TypeResolver getTypeResolver() {
+        return typeResolver;
+    }
+
     public List<Statement> parse(File file, List<List<AtonementCrystal>> lexedStatements) {
         log.trace("parse({})", file == null ? "null" : "\"" + file + "\"");
         this.file = file;
 
-        // Short-circuit if no statements exist to parse.
-        List<Statement> statements = new ArrayList<>();
-        if (lexedStatements.isEmpty()) {
-            return statements;
-        }
-
         // First pass on user input.
-        if (lineNumber == 0) {
+        if (lineNumber == 0 && this.lexedStatements == null) {
             this.lexedStatements = lexedStatements;
             establishRootEnvironment();
         }
@@ -120,6 +118,12 @@ public class Parser {
         // REPL mode is reusing the Parser state.
         else {
             this.lexedStatements.addAll(lexedStatements);
+        }
+
+        // Short-circuit if no statements exist to parse.
+        List<Statement> statements = new ArrayList<>();
+        if (lexedStatements.isEmpty()) {
+            return statements;
         }
 
         lineCount = this.lexedStatements.size();
