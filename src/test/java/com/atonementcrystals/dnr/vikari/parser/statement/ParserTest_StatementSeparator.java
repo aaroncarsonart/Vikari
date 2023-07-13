@@ -9,7 +9,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOpera
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import com.atonementcrystals.dnr.vikari.interpreter.Parser;
@@ -44,7 +44,7 @@ public class ParserTest_StatementSeparator {
         return parsedStatements;
     }
 
-    private List<SyntaxError> lexAndParse_ErrorCase(String sourceString) {
+    private List<VikariError> lexAndParse_ErrorCase(String sourceString) {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
 
@@ -344,13 +344,13 @@ public class ParserTest_StatementSeparator {
     @Order(19)
     public void testParser_Statement_syntaxError_SingleStatement() {
         String sourceString = "5 +,";
-        List<SyntaxError> syntaxErrors = lexAndParse_ErrorCase(sourceString);
+        List<VikariError> syntaxErrors = lexAndParse_ErrorCase(sourceString);
 
         int expectedSize = 1;
         int actualSize = syntaxErrors.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
 
-        SyntaxError error1 = syntaxErrors.get(0);
+        VikariError error1 = syntaxErrors.get(0);
         CoordinatePair expectedLocation = location(0, 2);
         String expectedLine = sourceString;
         TestUtils.testSyntaxError(error1, expectedLocation, expectedLine, "Expected expression.");
@@ -360,18 +360,18 @@ public class ParserTest_StatementSeparator {
     @Order(20)
     public void testParser_Statement_syntaxError_TwoStatements_SingleLine() {
         String sourceString = "5 +,* 7,";
-        List<SyntaxError> syntaxErrors = lexAndParse_ErrorCase(sourceString);
+        List<VikariError> syntaxErrors = lexAndParse_ErrorCase(sourceString);
 
         int expectedSize = 2;
         int actualSize = syntaxErrors.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
 
-        SyntaxError error1 = syntaxErrors.get(0);
+        VikariError error1 = syntaxErrors.get(0);
         CoordinatePair expectedLocation = location(0, 2);
         String expectedLine = sourceString;
         TestUtils.testSyntaxError(error1, expectedLocation, expectedLine, "Expected expression.");
 
-        SyntaxError error2 = syntaxErrors.get(1);
+        VikariError error2 = syntaxErrors.get(1);
         expectedLocation = location(0, 4);
         expectedLine = sourceString;
         TestUtils.testSyntaxError(error2, expectedLocation, expectedLine, "Expected expression.");
@@ -382,28 +382,28 @@ public class ParserTest_StatementSeparator {
     public void testParser_Statement_syntaxError_FourStatements_MultipleLines() {
         String sourceString = "5 ++, * 7 *,\n"+
                               "22 -, / 3";
-        List<SyntaxError> syntaxErrors = lexAndParse_ErrorCase(sourceString);
+        List<VikariError> syntaxErrors = lexAndParse_ErrorCase(sourceString);
 
         int expectedSize = 4;
         int actualSize = syntaxErrors.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of syntax errors.");
 
-        SyntaxError error1 = syntaxErrors.get(0);
+        VikariError error1 = syntaxErrors.get(0);
         CoordinatePair expectedLocation = location(0, 2);
         String expectedLine = "5 ++, * 7 *,";
         TestUtils.testSyntaxError(error1, expectedLocation, expectedLine, "Expected expression.");
 
-        SyntaxError error2 = syntaxErrors.get(1);
+        VikariError error2 = syntaxErrors.get(1);
         expectedLocation = location(0, 6);
         expectedLine = "5 ++, * 7 *,";
         TestUtils.testSyntaxError(error2, expectedLocation, expectedLine, "Expected expression.");
 
-        SyntaxError error3 = syntaxErrors.get(2);
+        VikariError error3 = syntaxErrors.get(2);
         expectedLocation = location(1, 3);
         expectedLine = "22 -, / 3";
         TestUtils.testSyntaxError(error3, expectedLocation, expectedLine, "Expected expression.");
 
-        SyntaxError error4 = syntaxErrors.get(3);
+        VikariError error4 = syntaxErrors.get(3);
         expectedLocation = location(1, 6);
         expectedLine = "22 -, / 3";
         TestUtils.testSyntaxError(error4, expectedLocation, expectedLine, "Expected expression.");

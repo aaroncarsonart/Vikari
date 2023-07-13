@@ -12,7 +12,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOpe
 import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -150,7 +150,7 @@ public class ParserTest_Grouping {
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing opening square bracket.");
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1
@@ -177,7 +177,7 @@ public class ParserTest_Grouping {
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing closing square bracket.");
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1
@@ -204,7 +204,7 @@ public class ParserTest_Grouping {
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing closing square bracket.");
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1
@@ -231,7 +231,7 @@ public class ParserTest_Grouping {
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for an empty grouping expression.");
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1
@@ -259,7 +259,7 @@ public class ParserTest_Grouping {
             assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
             assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing a matching square bracket.");
-            List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+            List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
             assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
             // Syntax Error 1
@@ -288,7 +288,7 @@ public class ParserTest_Grouping {
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected syntax errors for missing opening square brackets.");
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(2, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1
@@ -319,7 +319,7 @@ public class ParserTest_Grouping {
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing closing square brackets.");
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(2, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         // Syntax Error 1

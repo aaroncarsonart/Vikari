@@ -33,7 +33,11 @@ class VikariProgramTest {
     }
 
     private void runVikariProgram(String sourceString) {
-        Main.runSourceString(sourceString, Phase.EXECUTE, null, null);
+        Main.runSourceString(sourceString, Phase.EXECUTE, null, null, false);
+    }
+
+    private void runMain(String[] args) {
+        Main.main(args);
     }
 
     private void assertOutput(String expectedOutput) {
@@ -102,5 +106,214 @@ class VikariProgramTest {
                 """;
         runVikariProgram(sourceString);
         assertOutput("2\n4.0\n");
+    }
+
+    // Need to test all combinations of the following conditions for VikariProgram:
+    // ```!program.hasErrors() && (!warningsEnabled || !program.hasWarnings())```
+
+    @Test
+    @Order(6)
+    public void testMain_NoErrors_WarningsFlagEnabled_LineContinuationWarning() {
+        String sourceString = """
+                ~
+                foo:Integer << 2
+                :foo:
+                """;
+        String[] args = { "-w", "-c", sourceString };
+        runMain(args);
+
+        String expectedOutput = """
+                ---------------------
+                Compilation Warnings:
+                ---------------------
+                <repl>:1:1:
+                    ~
+                    ^
+                    Unnecessary line continuation at start of statement.
+
+                """;
+        assertOutput(expectedOutput);
+    }
+
+    @Test
+    @Order(7)
+    public void testMain_NoErrors_WarningsFlagEnabled_NoWarnings() {
+        String sourceString = """
+                foo:Integer << 2
+                :foo:
+                """;
+        String[] args = { "-w", "-c", sourceString };
+        runMain(args);
+        assertOutput("2\n");
+    }
+
+    @Test
+    @Order(8)
+    public void testMain_NoErrors_WarningsFlagDisabled_LineContinuationWarning() {
+        String sourceString = """
+                ~
+                foo:Integer << 2
+                :foo:
+                """;
+        String[] args = { "-c", sourceString };
+        runMain(args);
+        assertOutput("2\n");
+    }
+
+    @Test
+    @Order(9)
+    public void testMain_NoErrors_WarningsFlagDisabled_NoWarnings() {
+        String sourceString = """
+                foo:Integer << 2
+                :foo:
+                """;
+        String[] args = { "-c", sourceString };
+        runMain(args);
+        assertOutput("2\n");
+    }
+
+    //TODO: Fix 4 test expectations.
+
+    @Test
+    @Order(10)
+    public void testMain_WithErrors_WarningsFlagEnabled_LineContinuationWarning() {
+        String sourceString = """
+                +5
+                ~
+                foo:Integer << 2
+                :foo:
+                """;
+        String[] args = { "-w", "-c", sourceString };
+        runMain(args);
+
+        String expectedOutput = """
+                --------------
+                Syntax Errors:
+                --------------
+                <repl>:1:1:
+                    +5
+                    ^
+                    Expected expression.
+
+                ---------------------
+                Compilation Warnings:
+                ---------------------
+                <repl>:2:1:
+                    ~
+                    ^
+                    Unnecessary line continuation at start of statement.
+
+                """;
+        assertOutput(expectedOutput);
+    }
+
+    @Test
+    @Order(11)
+    public void testMain_WithErrors_WarningsFlagEnabled_NoWarnings() {
+        String sourceString = """
+                +5
+                foo:Integer << 2
+                :foo:
+                """;
+        String[] args = { "-w", "-c", sourceString };
+        runMain(args);
+
+        String expectedOutput = """
+                --------------
+                Syntax Errors:
+                --------------
+                <repl>:1:1:
+                    +5
+                    ^
+                    Expected expression.
+
+                """;
+        assertOutput(expectedOutput);
+    }
+
+    @Test
+    @Order(12)
+    public void testMain_WithErrors_WarningsFlagDisabled_LineContinuationWarning() {
+        String sourceString = """
+                +5
+                ~
+                foo:Integer << 2
+                :foo:
+                """;
+        String[] args = {"-c", sourceString};
+        runMain(args);
+
+        String expectedOutput = """
+                --------------
+                Syntax Errors:
+                --------------
+                <repl>:1:1:
+                    +5
+                    ^
+                    Expected expression.
+
+                """;
+        assertOutput(expectedOutput);
+    }
+
+    @Test
+    @Order(13)
+    public void testMain_WithErrors_WarningsFlagDisabled_NoWarnings() {
+        String sourceString = """
+                +5
+                foo:Integer << 2
+                :foo:
+                """;
+        String[] args = { "-c", sourceString };
+        runMain(args);
+
+        String expectedOutput = """
+                --------------
+                Syntax Errors:
+                --------------
+                <repl>:1:1:
+                    +5
+                    ^
+                    Expected expression.
+
+                """;
+        assertOutput(expectedOutput);
+    }
+
+    @Test
+    @Order(14)
+    public void testMain_LexerOptionsWarning_LineContinuationWarning() {
+        String sourceString = """
+                ~
+                foo:Integer << 2
+                :foo:
+                """;
+        String[] args = { "-E", "w", "-c", sourceString };
+        runMain(args);
+
+        String expectedOutput = """
+                ---------------------
+                Compilation Warnings:
+                ---------------------
+                <repl>:1:1:
+                    ~
+                    ^
+                    Unnecessary line continuation at start of statement.
+
+                2
+                """;
+        assertOutput(expectedOutput);
+    }
+
+    @Test
+    @Order(15)
+    public void testMain_LexerOptionsWarning_NoWarnings() {
+        String sourceString = """
+                foo:Integer << 2
+                :foo:
+                """;
+        String[] args = { "-E", "w", "-c", sourceString };
+        runMain(args);
+        assertOutput("2\n");
     }
 }

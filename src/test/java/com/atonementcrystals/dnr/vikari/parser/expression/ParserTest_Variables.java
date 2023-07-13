@@ -15,7 +15,7 @@ import com.atonementcrystals.dnr.vikari.core.expression.VariableExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.core.statement.VariableDeclarationStatement;
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import com.atonementcrystals.dnr.vikari.interpreter.Parser;
@@ -153,7 +153,7 @@ public class ParserTest_Variables {
         int expectedErrorCount = 1;
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), sourceString, "Unexpected token(s) in " +
                 "variable declaration statement");
 
@@ -174,7 +174,7 @@ public class ParserTest_Variables {
         int expectedErrorCount = 1;
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), sourceString, "Undefined variable reference.");
 
         int expectedStatementCount = 1;
@@ -239,7 +239,7 @@ public class ParserTest_Variables {
         int expectedErrorCount = 2;
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         TestUtils.testSyntaxError(syntaxErrors.get(0), location(1, 0), "foo + 5", "Arithmetic " +
                 "expression expects a Number for operands.");
         TestUtils.testSyntaxError(syntaxErrors.get(1), location(2, 4), "5 + foo", "Arithmetic " +

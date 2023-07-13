@@ -20,7 +20,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.DotOperatorCrystal
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.FunctionCallOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.KeyValuePairOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.LineContinuationMinimizedOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.LineContinuationOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.LineContinuationCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.PrintStatementOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.VariableArgumentsListOperatorCrystal;
@@ -177,7 +177,7 @@ public enum TokenType {
     LEFT_DIVIDE("/", LeftDivideOperatorCrystal.class),
     RIGHT_DIVIDE("\\", RightDivideOperatorCrystal.class),
     DELETE("~", DeleteOperatorCrystal.class),
-    LINE_CONTINUATION("~", LineContinuationOperatorCrystal.class),
+    LINE_CONTINUATION("~", LineContinuationCrystal.class),
     LINE_CONTINUATION_MINIMIZED("/~/", LineContinuationMinimizedOperatorCrystal.class),
 
     // logical and comparison operators
@@ -221,11 +221,12 @@ public enum TokenType {
             TokenType.NEGATE,
             TokenType.RIGHT_ASSIGNMENT,
             TokenType.CONCATENATE,
-            TokenType.LINE_CONTINUATION,
+            TokenType.DELETE,
             TokenType.PRINT_STATEMENT,
             // special cases
             TokenType.SWORD,
-            TokenType.THROW);
+            TokenType.THROW,
+            TokenType.LINE_CONTINUATION);
 
     /**
      * This is the set of all TokenTypes to be handled by the Lexer.

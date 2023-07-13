@@ -1,6 +1,6 @@
 package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -133,7 +133,7 @@ public class LexerTest_StringTokens_Strings {
 
         testToken(statement.get(0), sourceString);
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Missing closing capture quotation");
     }
 
@@ -149,7 +149,7 @@ public class LexerTest_StringTokens_Strings {
         testToken(statements.get(0).get(0), "``This is a malformed string literal ");
         testToken(statements.get(1).get(0), "because it has no ending capture quotation!");
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
 
         String expectedLine = "``This is a malformed string literal ";
         testSyntaxError(syntaxErrors.get(0), location(0, 0), expectedLine, "Missing closing capture quotation");

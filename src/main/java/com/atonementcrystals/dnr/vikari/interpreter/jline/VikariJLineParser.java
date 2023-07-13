@@ -1,6 +1,6 @@
 package com.atonementcrystals.dnr.vikari.interpreter.jline;
 
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
@@ -49,10 +49,10 @@ public class VikariJLineParser implements Parser {
     }
 
     private List<CoordinatePair> getUnclosedCommentLocations() {
-        List<SyntaxError> allSyntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> allSyntaxErrors = errorReporter.getSyntaxErrors();
         List<CoordinatePair> unclosedCommentLocations = new ArrayList<>();
 
-        for (SyntaxError syntaxError : allSyntaxErrors) {
+        for (VikariError syntaxError : allSyntaxErrors) {
             String errorMessage = syntaxError.getMessage();
             if (errorMessage.contains("Missing comment suffix token")) {
                 CoordinatePair errorLocation = syntaxError.getLocation();

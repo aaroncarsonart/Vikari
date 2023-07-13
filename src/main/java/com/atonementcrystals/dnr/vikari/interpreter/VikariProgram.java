@@ -39,7 +39,6 @@ public class VikariProgram {
     private List<List<List<AtonementCrystal>>> replLexerResults;
     private List<List<Statement>> replParserResults;
 
-    // TODO: Add these fields to VikariREPL.
     private AtonementField globalAtonementField;
 
     public VikariProgram() {
@@ -92,6 +91,9 @@ public class VikariProgram {
     public void setLexerOptions(LexerOptions lexerOptions) {
         log.trace("setLexerOptions()");
         this.lexerOptions = lexerOptions;
+        if (lexerOptions != null) {
+            lexer.setCompilationWarningsEnabled(lexerOptions.warnings);
+        }
     }
 
     public void setParserOptions(ParserOptions parserOptions) {
@@ -355,16 +357,26 @@ public class VikariProgram {
         return syntaxErrorReporter.hasErrors();
     }
 
-    public void reportSyntaxErrors() {
+    public boolean hasWarnings() {
+        return syntaxErrorReporter.hasWarnings();
+    }
+
+    public void reportErrors() {
         if (syntaxErrorReporter.hasErrors()) {
-            syntaxErrorReporter.reportErrors();
-            syntaxErrorReporter.clear();
+            syntaxErrorReporter.reportSyntaxErrors();
+        }
+    }
+
+    public void reportWarnings() {
+        if (syntaxErrorReporter.hasWarnings()) {
+            syntaxErrorReporter.reportWarnings();
         }
     }
 
     public boolean shouldPrintLexerResults() {
         Level logLevel = log.getLevel();
-        return lexerOptions != null && (logLevel == Level.TRACE || logLevel == Level.DEBUG || logLevel == Level.ALL);
+        return lexerOptions != null && lexerOptions.printTokens && (logLevel == Level.TRACE || logLevel == Level.DEBUG ||
+                logLevel == Level.ALL);
     }
 
     public boolean shouldPrintParserResults() {

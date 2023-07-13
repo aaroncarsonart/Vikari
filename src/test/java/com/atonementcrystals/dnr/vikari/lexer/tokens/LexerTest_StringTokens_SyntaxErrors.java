@@ -1,7 +1,7 @@
 package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,7 @@ public class LexerTest_StringTokens_SyntaxErrors {
         testToken(statements.get(3).get(2), ":");
         testToken(statements.get(3).get(3), "``buzz:");
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
 
         testSyntaxError(syntaxErrors.get(0), location(0, 5), "a << `foo", "Missing closing backtick quotation");
         testSyntaxError(syntaxErrors.get(1), location(1, 1), "`z\tz` << a * 2", "Backtick-quoted identifiers cannot contain tabs");
@@ -85,7 +85,7 @@ public class LexerTest_StringTokens_SyntaxErrors {
 
         testComment(statements.get(1).get(0), "~:Unclosed comment.".length(), CommentTokenType.START);
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
 
         testSyntaxError(syntaxErrors.get(0), location(0, 1), "`z\tz` << `foo", "Backtick-quoted identifiers cannot contain tabs");
         testSyntaxError(syntaxErrors.get(1), location(0, 9), "`z\tz` << `foo", "Missing closing backtick quotation");
@@ -111,7 +111,7 @@ public class LexerTest_StringTokens_SyntaxErrors {
         testToken(statements.get(1).get(0), "\t\t");
         testComment(statements.get(1).get(1), "~:Unclosed comment.".length(), CommentTokenType.START);
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
 
         testSyntaxError(syntaxErrors.get(0), location(0, 10), "\t\t`zz` << `foo", "Missing closing backtick quotation");
         testSyntaxError(syntaxErrors.get(1), location(1, 2), "\t\t~:Unclosed comment.", "Missing comment suffix token");

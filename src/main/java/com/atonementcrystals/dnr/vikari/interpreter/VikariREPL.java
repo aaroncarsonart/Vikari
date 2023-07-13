@@ -5,7 +5,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.core.statement.VariableDeclarationStatement;
 import com.atonementcrystals.dnr.vikari.error.RuntimeError;
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.error.Vikari_RuntimeException;
 import com.atonementcrystals.dnr.vikari.interpreter.jline.VikariJLineParser;
@@ -280,16 +280,16 @@ public class VikariREPL {
         if (!syntaxErrorReporter.hasErrors()) {
             return;
         }
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         if (syntaxErrors.size() == 1 && (!line.contains(NEWLINE) || errorAtEnd(syntaxErrors.get(0)))) {
-            SyntaxError syntaxError = syntaxErrors.get(0);
+            VikariError syntaxError = syntaxErrors.get(0);
             reportSingleSyntaxError(syntaxError);
         } else {
             reportMultipleSyntaxErrors(syntaxErrors);
         }
     }
 
-    private boolean errorAtEnd(SyntaxError syntaxError) {
+    private boolean errorAtEnd(VikariError syntaxError) {
         int lastLineNumber = lexer.getLineNumber() - 1;
         int errorLineNumber = syntaxError.getLocation().getRow();
         return lastLineNumber == errorLineNumber;
@@ -301,7 +301,7 @@ public class VikariREPL {
      * pointing to the location of the error and the error message need to be reported.
      * @param syntaxError the SyntaxError to report.
      */
-    private void reportSingleSyntaxError(SyntaxError syntaxError) {
+    private void reportSingleSyntaxError(VikariError syntaxError) {
         CoordinatePair location = syntaxError.getLocation();
         int column = location.getColumn();
         String line = syntaxError.getLine();
@@ -335,10 +335,10 @@ public class VikariREPL {
      * banner prefixing the error report.
      * @param syntaxErrors The SyntaxErrors to report.
      */
-    private void reportMultipleSyntaxErrors(List<SyntaxError> syntaxErrors) {
+    private void reportMultipleSyntaxErrors(List<VikariError> syntaxErrors) {
         StringBuilder sb = new StringBuilder();
 
-        for (SyntaxError syntaxError : syntaxErrors) {
+        for (VikariError syntaxError : syntaxErrors) {
             String errorReport = syntaxError.getErrorReport();
             sb.append(errorReport);
             sb.append(NEWLINE);

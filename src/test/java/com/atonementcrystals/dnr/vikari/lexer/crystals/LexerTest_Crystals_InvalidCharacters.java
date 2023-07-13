@@ -8,7 +8,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.LeftAss
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ public class LexerTest_Crystals_InvalidCharacters {
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
         lex(sourceString, 0, syntaxErrorReporter, 1);
 
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Invalid characters.");
     }
 
@@ -80,7 +80,7 @@ public class LexerTest_Crystals_InvalidCharacters {
         testCrystal(crystals.get(0), ReferenceCrystal.class, validToken4, location(0, column4));
         testCrystal(crystals.get(1), DoubleCrystal.class, validToken8, location(0, column8));
 
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         String expectedErrorMessage = "Invalid characters.";
 
         testSyntaxError(syntaxErrors.get(0), location(0, column1), sourceString, expectedErrorMessage);

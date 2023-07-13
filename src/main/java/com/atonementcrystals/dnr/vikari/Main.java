@@ -81,8 +81,13 @@ public class Main {
                 log.debug("runVikariProgram()");
             }
 
+            // This flag prevents the EXECUTE phase if any warnings are encountered.
+            // Use the LexerOption w in the argument to -L,-W, or -E to enable warnings
+            // without halting program execution instead.
+            boolean warningsEnabled = cmd.hasOption("warnings");
+
             Phase phase = Phase.DEFAULT;
-            String defaultConfigOptions = "";
+            String defaultConfigOptions = setWarningConfigOption("", warningsEnabled);
             LexerOptions lexerOptions = parseLexerOptions(defaultConfigOptions, false);
             ParserOptions parserOptions = parseParserOptions(defaultConfigOptions, false);
             List<String> argsList = cmd.getArgList();
@@ -109,7 +114,7 @@ public class Main {
 
                     VikariSourceFileLoader sourceFileLoader = new VikariSourceFileLoader();
                     File sourceFile = sourceFileLoader.loadSourceFile(pathToSourceFile);
-                    runSourceFile(sourceFile, phase, lexerOptions, parserOptions);
+                    runSourceFile(sourceFile, phase, lexerOptions, parserOptions, warningsEnabled);
                     return;
                 }
 
@@ -156,6 +161,7 @@ public class Main {
                 phase = Phase.LEX;
 
                 String configArgument = cmd.getOptionValue("Lex");
+                configArgument = setWarningConfigOption(configArgument, warningsEnabled);
                 lexerOptions = parseLexerOptions(configArgument, true);
                 log.debug("Use config:\n    {}", lexerOptions);
             }
@@ -170,6 +176,7 @@ public class Main {
                 phase = Phase.PARSE;
 
                 String configArgument = cmd.getOptionValue("Parse");
+                configArgument = setWarningConfigOption(configArgument, warningsEnabled);
                 lexerOptions = parseLexerOptions(configArgument, true);
                 parserOptions = parseParserOptions(configArgument, true);
                 log.debug("Use config:\n    {}\n    {}", lexerOptions, parserOptions);
@@ -186,6 +193,7 @@ public class Main {
                 phase = Phase.EXECUTE;
 
                 String configArgument = cmd.getOptionValue("Execute");
+                configArgument = setWarningConfigOption(configArgument, warningsEnabled);
                 lexerOptions = parseLexerOptions(configArgument, true);
                 parserOptions = parseParserOptions(configArgument, true);
                 log.debug("Use config:\n    {}\n    {}", lexerOptions, parserOptions);
@@ -272,9 +280,9 @@ public class Main {
             if (pathToFile != null) {
                 VikariSourceFileLoader sourceFileLoader = new VikariSourceFileLoader();
                 File sourceFile = sourceFileLoader.loadSourceFile(pathToFile);
-                runSourceFile(sourceFile, phase, lexerOptions, parserOptions);
+                runSourceFile(sourceFile, phase, lexerOptions, parserOptions, warningsEnabled);
             } else if (sourceString != null) {
-                runSourceString(sourceString, phase, lexerOptions, parserOptions);
+                runSourceString(sourceString, phase, lexerOptions, parserOptions, warningsEnabled);
             } else if (replMode) {
                 runReplMode();
             }else {
@@ -384,12 +392,17 @@ public class Main {
                 .required(false)
                 .build();
 
+        Option warningOption = Option.builder("w").longOpt("warnings")
+                .desc("Compilation warnings prevent program execution like syntax errors.")
+                .build();
+
         Options options = new Options();
         options.addOptionGroup(interpreterPhaseOptions);
         options.addOptionGroup(sourceLocationOptions);
         options.addOption(versionNumberOption);
         options.addOption(helpOption);
         options.addOption(logLevelOption);
+        options.addOption(warningOption);
 
         return options;
     }
@@ -409,16 +422,20 @@ public class Main {
             return null;
         }
 
+        boolean printTokens = optionsArgument.contains("p");
         boolean printLineNumbers = optionsArgument.contains("l");
         boolean showInvisibles = optionsArgument.contains("i");
         boolean separateTokens = optionsArgument.contains("t");
         boolean verbose = optionsArgument.contains("v");
+        boolean warnings = optionsArgument.contains("w");
 
         LexerOptions lexerOptions = new LexerOptions(
+                printTokens,
                 printLineNumbers,
                 showInvisibles,
                 separateTokens,
-                verbose);
+                verbose,
+                warnings);
 
         return lexerOptions;
     }
@@ -457,7 +474,7 @@ public class Main {
      * @param phase The phase of the interpreter to run the source file through.
      * @param lexerOptions An optional set of options for configuring output of the Lexer.
      */
-    public static void runSourceFile(File sourceFile, Phase phase, LexerOptions lexerOptions, ParserOptions parserOptions) {
+    public static void runSourceFile(File sourceFile, Phase phase, LexerOptions lexerOptions, ParserOptions parserOptions, boolean warningsEnabled) {
         log.debug("Run source file.");
         VikariProgram program = new VikariProgram();
         program.setLexerOptions(lexerOptions);
@@ -466,18 +483,21 @@ public class Main {
         switch (phase) {
             case LEX:
                 program.lex(sourceFile);
-                program.reportSyntaxErrors();
+                program.reportErrors();
+                program.reportWarnings();
                 break;
             case PARSE:
                 program.lexAndParse(sourceFile);
-                program.reportSyntaxErrors();
+                program.reportErrors();
+                program.reportWarnings();
                 break;
             case EXECUTE:
             case DEFAULT:
                 program.lexAndParse(sourceFile);
-                if (program.hasErrors()) {
-                    program.reportSyntaxErrors();
-                } else {
+                program.reportErrors();
+                program.reportWarnings();
+
+                if (!program.hasErrors() && (!warningsEnabled || !program.hasWarnings())) {
                     program.execute(sourceFile);
                 }
                 break;
@@ -492,9 +512,11 @@ public class Main {
      * @param sourceString The source code string to interpret.
      * @param phase The phase of the interpreter to run the source file through.
      * @param lexerOptions An optional set of options for configuring output of the Lexer.
+     * @param parserOptions An optional set of options for configuring output of the Parser.
+     * @param warningsEnabled A flag for preventing program execution if any compilation warnings are detected.
      */
     public static void runSourceString(String sourceString, Phase phase, LexerOptions lexerOptions,
-                                       ParserOptions parserOptions) {
+                                       ParserOptions parserOptions, boolean warningsEnabled) {
         log.debug("Run source string.");
         VikariProgram program = new VikariProgram();
         program.setLexerOptions(lexerOptions);
@@ -503,18 +525,21 @@ public class Main {
         switch (phase) {
             case LEX:
                 program.lex(sourceString);
-                program.reportSyntaxErrors();
+                program.reportErrors();
+                program.reportWarnings();
                 break;
             case PARSE:
                 program.lexAndParse(sourceString);
-                program.reportSyntaxErrors();
+                program.reportErrors();
+                program.reportWarnings();
                 break;
             case EXECUTE:
             case DEFAULT:
                 List<Statement> statements = program.lexAndParse(sourceString);
-                if (program.hasErrors()) {
-                    program.reportSyntaxErrors();
-                } else {
+                program.reportErrors();
+                program.reportWarnings();
+
+                if (!program.hasErrors() && (!warningsEnabled || !program.hasWarnings())) {
                     program.execute(statements);
                 }
                 break;
@@ -540,11 +565,13 @@ public class Main {
         log.trace("printHelp()");
         HelpFormatter helpFormatter = new HelpFormatter();
         String header = "\nInterpret the Vikari programming language.\n";
-        String footer = "\n<config_options>: [litv] for each line of code in output:\n" +
+        String footer = "\n<config_options>: [plitvw] for each line of code in output:\n" +
+         " p: [print] Print the lexed tokens or parsed statements.\n" +
          " l: [lines] Print line numbers before each line.\n" +
          " i: [invisibles] Show SPACE, TAB, and NEWLINE as `·`, `→`, and `¶`.\n" +
          " t: [tokens] Show each token as quoted strings separated by commas.\n" +
          " v: [verbose] Print each token's type name.\n" +
+         " w: [warnings] Show compilation warnings. Won't halt program execution like -w.\n" +
          "\n" +
          "<log_level>: one of the following:\n" +
          " ALL, TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF.";
@@ -572,5 +599,12 @@ public class Main {
         LoggerConfig loggerConfig = configuration.getLoggerConfig(rootPackageName);
         loggerConfig.setLevel(logLevel);
         loggerContext.updateLoggers();
+    }
+
+    public static String setWarningConfigOption(String configArgument, boolean warningsEnabled) {
+        if (warningsEnabled && !configArgument.contains("w")) {
+            configArgument += "w";
+        }
+        return configArgument;
     }
 }

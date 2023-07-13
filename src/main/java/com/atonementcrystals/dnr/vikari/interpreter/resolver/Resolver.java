@@ -10,7 +10,6 @@ import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Resolvers optionally return a value of type T after walking the AST output of

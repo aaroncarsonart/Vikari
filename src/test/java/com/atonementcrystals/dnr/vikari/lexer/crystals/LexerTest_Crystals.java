@@ -11,7 +11,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionOperatorCry
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.ListElementSeparatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.RightParenthesisCrystal;
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
@@ -82,7 +82,7 @@ public class LexerTest_Crystals {
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
         lex(sourceString, 0, errorReporter, 1);
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 0), "~:", "comment suffix");
     }
 
@@ -244,7 +244,7 @@ public class LexerTest_Crystals {
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
         lexSingleStatement(sourceString, 1, errorReporter, 1);
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "backtick");
     }
 
@@ -268,7 +268,7 @@ public class LexerTest_Crystals {
     @Order(18)
     public void testLexer_Crystals_OverloadedTokenTypes() {
         List<TokenType> overloadedTypesToExpect = List.of(
-                TokenType.MODULUS, TokenType.MULTIPLY, TokenType.SUBTRACT, TokenType.DELETE, TokenType.ADD);
+                TokenType.MODULUS, TokenType.MULTIPLY, TokenType.SUBTRACT, TokenType.ADD);
 
         for (TokenType tokenType : overloadedTypesToExpect) {
             String sourceString = tokenType.getIdentifier();

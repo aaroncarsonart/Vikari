@@ -1,6 +1,6 @@
 package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
@@ -33,15 +33,15 @@ public class LexerTest_StringTokens_Comments {
         }
         testComment(statement.get(0), sourceString.length(), commentTokenType);
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
         for (int i = 0; i < expectedErrorCount; i++) {
-            SyntaxError syntaxError = syntaxErrors.get(i);
+            VikariError syntaxError = syntaxErrors.get(i);
             CoordinatePair expecedLocation = errorLocations[i];
             testSyntaxError(syntaxError, expecedLocation, sourceString, "Missing comment suffix token");
         }
     }
 
-    private void testCommentSyntaxError(SyntaxError syntaxError, CoordinatePair expectedLocation, String expectedLine) {
+    private void testCommentSyntaxError(VikariError syntaxError, CoordinatePair expectedLocation, String expectedLine) {
         testSyntaxError(syntaxError, expectedLocation, expectedLine, "Missing comment suffix token");
     }
 
@@ -148,7 +148,7 @@ public class LexerTest_StringTokens_Comments {
         testComment(statements.get(0).get(0), "~:`a` is approximately: [pi * 100].".length(), CommentTokenType.START);
         testComment(statements.get(1).get(0), "However, I forgot to close this comment!".length(), CommentTokenType.MIDDLE);
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
         testCommentSyntaxError(syntaxErrors.get(0), location(0, 0), "~:`a` is approximately: [pi * 100].");
     }
 
@@ -587,7 +587,7 @@ public class LexerTest_StringTokens_Comments {
         List<List<String>> statements = lexAsTokens(sourceString, 2, errorReporter, 1, tokenCounts(1, 1));
         testComment(statements.get(0).get(0), lines[0].length(), CommentTokenType.START);
         testComment(statements.get(1).get(0), lines[1].length(), CommentTokenType.MIDDLE);
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
         testCommentSyntaxError(syntaxErrors.get(0), location(0, 0), lines[0]);
 
         sourceString = "~: ~:Single-line comment.\n";

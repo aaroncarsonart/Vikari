@@ -11,7 +11,7 @@ import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.core.statement.VariableDeclarationStatement;
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.interpreter.Arithmetic;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
@@ -539,7 +539,7 @@ public class ParserTest_VariableDeclarationStatements {
         int expectedErrorCount = 1;
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         TestUtils.testSyntaxError(syntaxErrors.get(0), location(1, 0), "a:Integer << 2", "Variable is already defined.");
 
         int expectedSize = 2;
@@ -561,7 +561,7 @@ public class ParserTest_VariableDeclarationStatements {
         int expectedErrorCount = 2;
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), "foo:Foo", "Unknown Type.");
         TestUtils.testSyntaxError(syntaxErrors.get(1), location(1, 4), "bar:Bar", "Unknown Type.");
 
@@ -584,7 +584,7 @@ public class ParserTest_VariableDeclarationStatements {
         int expectedErrorCount = 2;
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), "foo:Foo << 22", "Unknown Type.");
         TestUtils.testSyntaxError(syntaxErrors.get(1), location(1, 4), "bar:Bar << 7L", "Unknown Type.");
 
@@ -604,7 +604,7 @@ public class ParserTest_VariableDeclarationStatements {
         int expectedErrorCount = 1;
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 0), "foo:Type << 2", "Variable with " +
                 "type Type cannot be assigned a value of type Integer.");
 

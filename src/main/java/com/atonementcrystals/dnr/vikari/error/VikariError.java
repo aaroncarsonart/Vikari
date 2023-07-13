@@ -6,7 +6,7 @@ import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import java.io.File;
 import java.util.Formatter;
 
-public class VikariError {
+public abstract class VikariError {
     private File file;
     private CoordinatePair location;
     private String line;

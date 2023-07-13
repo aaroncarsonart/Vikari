@@ -1,6 +1,6 @@
 package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -79,7 +79,7 @@ public class LexerTest_StringTokens_Backticks {
         testToken(statements.get(0).get(0), "`foo");
         testToken(statements.get(1).get(0), "`:Integer << *");
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
 
         String expectedErrorMessage = "Missing closing backtick quotation";
         testSyntaxError(syntaxErrors.get(0), location(0, 0), "`foo", expectedErrorMessage);
@@ -102,7 +102,7 @@ public class LexerTest_StringTokens_Backticks {
         testToken(statement.get(5), " ");
         testToken(statement.get(6), "`bar");
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 15), sourceString, "Missing closing backtick quotation");
     }
 
@@ -172,7 +172,7 @@ public class LexerTest_StringTokens_Backticks {
         testToken(statement.get(5), " ");
         testToken(statement.get(6), "2");
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Backtick-quoted identifiers cannot contain tabs.");
     }
 
@@ -206,7 +206,7 @@ public class LexerTest_StringTokens_Backticks {
         testToken(statement.get(3), " ");
         testToken(statement.get(4), "*");
 
-        List<SyntaxError> syntaxErrors = errorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Backtick-quoted identifiers cannot " +
                 "contain only whitespace.");
 

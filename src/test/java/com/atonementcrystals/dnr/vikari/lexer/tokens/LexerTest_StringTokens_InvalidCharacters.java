@@ -1,6 +1,6 @@
 package com.atonementcrystals.dnr.vikari.lexer.tokens;
 
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ public class LexerTest_StringTokens_InvalidCharacters {
 
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
         lexSingleStatementAsTokens(sourceString, 37, syntaxErrorReporter, 1);
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
 
         testSyntaxError(syntaxErrors.get(0), location(0, 96), sourceString, "Missing closing backtick quotation `.");
     }
@@ -40,7 +40,7 @@ public class LexerTest_StringTokens_InvalidCharacters {
 
             testToken(tokens.get(0), sourceString);
 
-            List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+            List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
             testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Invalid characters.");
         }
     }
@@ -71,7 +71,7 @@ public class LexerTest_StringTokens_InvalidCharacters {
                 testToken(tokens.get(0), invalidCharacter);
                 testToken(tokens.get(1), validCharacter);
 
-                List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+                List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
                 testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Invalid characters.");
 
                 if (atBacktickCharacter) {
@@ -110,7 +110,7 @@ public class LexerTest_StringTokens_InvalidCharacters {
                     testToken(tokens.get(1), invalidCharacter);
                 }
 
-                List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+                List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
 
                 if (atBacktickCharacter) {
                     testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Missing closing backtick quotation `.");
@@ -150,7 +150,7 @@ public class LexerTest_StringTokens_InvalidCharacters {
                 testToken(tokens.get(1), invalidCharacter);
                 testToken(tokens.get(2), validCharacter2);
 
-                List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+                List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
 
                 testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Invalid characters.");
                 if (atBacktickCharacter) {
@@ -192,7 +192,7 @@ public class LexerTest_StringTokens_InvalidCharacters {
                     testToken(tokens.get(2), invalidCharacter2);
                 }
 
-                List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+                List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
 
                 testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Invalid characters.");
                 if (atBacktickCharacter) {
@@ -214,7 +214,7 @@ public class LexerTest_StringTokens_InvalidCharacters {
         List<String> tokens = lexSingleStatementAsTokens(sourceString, 1, syntaxErrorReporter, 1);
         testToken(tokens.get(0), sourceString);
 
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Invalid characters.");
     }
 
@@ -248,7 +248,7 @@ public class LexerTest_StringTokens_InvalidCharacters {
         testToken(tokens.get(7),   validToken8);
         testToken(tokens.get(8), invalidToken9);
 
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         String expectedErrorMessage = "Invalid characters.";
 
         int column1 = 0;

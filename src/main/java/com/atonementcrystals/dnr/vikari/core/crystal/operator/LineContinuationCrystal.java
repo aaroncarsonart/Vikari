@@ -7,9 +7,9 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
  * The line continuation operator ~ allows for individual statements to be
  * defined across multiple lines.
  */
-public class LineContinuationOperatorCrystal  extends AtonementCrystal {
+public class LineContinuationCrystal extends AtonementCrystal {
 
-    public LineContinuationOperatorCrystal() {
+    public LineContinuationCrystal() {
         super(TokenType.LINE_CONTINUATION.getIdentifier());
     }
 

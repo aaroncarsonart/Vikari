@@ -15,17 +15,20 @@ import com.atonementcrystals.dnr.vikari.core.crystal.number.DoubleCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.FloatCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.LongCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.LineContinuationCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.control.flow.ContinueOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.ModulusOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.StatementSeparatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.quotation.CaptureQuotationCrystal;
+import com.atonementcrystals.dnr.vikari.error.CompilationWarning;
+import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.error.Vikari_IOException;
 import com.atonementcrystals.dnr.vikari.error.Vikari_LexerException;
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import com.atonementcrystals.dnr.vikari.util.Utils;
 import org.apache.logging.log4j.LogManager;
@@ -41,6 +44,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +123,7 @@ public class Lexer {
     private List<List<String>> statementsOfStringTokens;
 
     private int startLineNumber;
+    private boolean compilationWarningsEnabled;
 
     public static HashSet<Class<? extends AtonementCrystal>> getCollapseNegationOperatorClasses() {
         return COLLAPSE_NEGATION_OPERATOR_CLASSES;
@@ -130,6 +135,10 @@ public class Lexer {
 
     public int getLineNumber() {
         return lineNumber;
+    }
+
+    public void setCompilationWarningsEnabled(boolean compilationWarningsEnabled) {
+        this.compilationWarningsEnabled = compilationWarningsEnabled;
     }
 
     /**
@@ -697,6 +706,16 @@ public class Lexer {
     }
 
     /**
+     * Report a CompilationWarning.
+     * @param message The warning message.
+     * @param location The location of the warning.
+     */
+    private void reportWarning(String message, CoordinatePair location) {
+        CompilationWarning compilationWarning = new CompilationWarning(currentFile, location, message);
+        syntaxErrorReporter.add(compilationWarning);
+    }
+
+    /**
      * Converts string tokens into their associated crystal types.
      * Identifiers which are references will be resolved later by the parser.
      *
@@ -711,9 +730,18 @@ public class Lexer {
             defaultIdentifiersMap.put(identifierMapping.getIdentifier(), identifierMapping);
         }
 
+        boolean lineContinuation = false;
+
         for (int statementNumber = 0; statementNumber < statementsOfStringTokens.size(); statementNumber++) {
             List<String> statementOfStringTokens = statementsOfStringTokens.get(statementNumber);
-            List<AtonementCrystal> statementOfCrystals = new ArrayList<>();
+
+            List<AtonementCrystal> statementOfCrystals;
+            if (lineContinuation) {
+                statementOfCrystals = statementsOfCrystals.remove(statementsOfCrystals.size() - 1);
+            } else {
+                statementOfCrystals = new ArrayList<>();
+            }
+
             int column = 0;
 
             for (int tokenNumber = 0; tokenNumber < statementOfStringTokens.size(); tokenNumber++) {
@@ -1034,33 +1062,73 @@ public class Lexer {
                 }
             }
 
-            // Ensure blank lines contain a single expected crystal to preserve the line number.
-            if (!statementOfCrystals.isEmpty()) {
+            lineContinuation = hasLineContinuation(statementOfCrystals);
+            if (lineContinuation) {
+                // Remove the unneeded line continuation operator.
+                AtonementCrystal deleteCrystal = statementOfCrystals.remove(statementOfCrystals.size() - 1);
+
+                // Add it back temporarily as the proper type to detect warning cases.
+                if (compilationWarningsEnabled) {
+                    LineContinuationCrystal lineContinuationCrystal = new LineContinuationCrystal();
+                    lineContinuationCrystal.setCoordinates(deleteCrystal.getCoordinates());
+                    statementOfCrystals.add(lineContinuationCrystal);
+                }
+            }
+
+            if (!statementOfCrystals.isEmpty() || lineContinuation) {
                 statementsOfCrystals.add(statementOfCrystals);
             }
+        }
+
+        // Report warnings for line continuations.
+        if (compilationWarningsEnabled) {
+            Iterator<List<AtonementCrystal>> it = statementsOfCrystals.iterator();
+            while (it.hasNext()) {
+                List<AtonementCrystal> statement = it.next();
+
+                List<Class<? extends AtonementCrystal>> crystalTypes = statement.stream()
+                        .map(AtonementCrystal::getClass)
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                if (crystalTypes.size() == 1 && crystalTypes.get(0).equals(LineContinuationCrystal.class)) {
+                    AtonementCrystal firstCrystal = statement.get(0);
+                    CoordinatePair location = firstCrystal.getCoordinates();
+                    reportWarning("Statement contains only line continuations.", location);
+                } else {
+                    AtonementCrystal firstCrystal = statement.get(0);
+                    if (firstCrystal instanceof LineContinuationCrystal) {
+                        CoordinatePair warningLocation = firstCrystal.getCoordinates();
+                        reportWarning("Unnecessary line continuation at start of statement.", warningLocation);
+                    }
+
+                    AtonementCrystal lastCrystal = statement.get(statement.size() - 1);
+                    if (lastCrystal instanceof LineContinuationCrystal) {
+                        CoordinatePair warningLocation = lastCrystal.getCoordinates();
+                        reportWarning("Unnecessary line continuation at end of statement.", warningLocation);
+                    }
+                }
+
+                // Remove all line continuations after any warnings have been reported.
+                statement.removeIf(crystal -> crystal instanceof LineContinuationCrystal);
+
+                if (statement.isEmpty()) {
+                    it.remove();
+                }
+            }
+        } else {
+            statementsOfCrystals.removeIf(List::isEmpty);
         }
 
         return statementsOfCrystals;
     }
 
-    private String getPreviousNonWhitespaceToken(List<String> stringTokens, int tokenNumber) {
-        for (int i = tokenNumber - 1; i >= 0; i--) {
-            String token = stringTokens.get(i);
-            if (!Utils.isWhitespace(token)) {
-                return token;
-            }
+    public boolean hasLineContinuation(List<AtonementCrystal> statement) {
+        if (!statement.isEmpty()) {
+            AtonementCrystal lastCrystal = statement.get(statement.size() - 1);
+            return lastCrystal instanceof DeleteOperatorCrystal;
         }
-        return null;
-    }
-
-    private int getNextNonWhitespaceTokenNumber(List<String> stringTokens, int tokenNumber) {
-        for (int i = tokenNumber + 1; i < stringTokens.size(); i++) {
-            String token = stringTokens.get(i);
-            if (!Utils.isWhitespace(token)) {
-                return i;
-            }
-        }
-        return -1;
+        return false;
     }
 
     private boolean isNumberToken(String token) {
@@ -1072,22 +1140,4 @@ public class Lexer {
         Matcher matcher = invalidCharactersRegex.matcher(token);
         return matcher.matches();
     }
-
-    /**
-     * Sum the lengths of all tokens in the given range.
-     * @param stringTokens The list of tokens against which to sum the lengths across the given range.
-     * @param startTokenNumber The start of the range (inclusive).
-     * @param endTokenNumber The end of the range. (exclusive).
-     * @return The sum of all tokens in the given range.
-     */
-    private int getTokenWidths(List<String> stringTokens, int startTokenNumber, int endTokenNumber) {
-        int sum = 0;
-        for (int i = startTokenNumber; i < endTokenNumber; i++) {
-            String token = stringTokens.get(i);
-            sum += token.length();
-        }
-        return sum;
-    }
-
-
 }

@@ -16,7 +16,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOpera
 import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
-import com.atonementcrystals.dnr.vikari.error.SyntaxError;
+import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -426,7 +426,7 @@ public class ParserTest_Arithmetic {
         parser.parse(null, lexedStatements);
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for invalid operator.");
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         testSyntaxError(syntaxErrors.get(0), location(0, 2), sourceString, "Expected expression.");
@@ -448,7 +448,7 @@ public class ParserTest_Arithmetic {
         parser.parse(null, lexedStatements);
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing operands.");
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Expected expression.");
@@ -470,7 +470,7 @@ public class ParserTest_Arithmetic {
         parser.parse(null, lexedStatements);
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing left operand.");
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Expected expression.");
@@ -492,7 +492,7 @@ public class ParserTest_Arithmetic {
         parser.parse(null, lexedStatements);
 
         assertTrue(syntaxErrorReporter.hasErrors(), "Expected a syntax error for missing right operand.");
-        List<SyntaxError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         testSyntaxError(syntaxErrors.get(0), location(0, 2), sourceString, "Expected expression.");

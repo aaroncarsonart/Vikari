@@ -11,6 +11,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LexerTestUtils {
 
+    private static boolean enableWarnings = false;
+
+    public static void setEnableWarnings(boolean enableWarnings) {
+        LexerTestUtils.enableWarnings = enableWarnings;
+    }
+
     // -----------------------------
     // 1: String token test methods.
     // -----------------------------
@@ -30,7 +36,7 @@ public class LexerTestUtils {
         List<List<String>> statements = lexer.lexToStringTokens(sourceString);
 
         if (expectedErrorCount == 0 && syntaxErrorReporter.hasErrors()) {
-            syntaxErrorReporter.reportErrors();
+            syntaxErrorReporter.reportSyntaxErrors();
             fail("Expected no syntax errors.");
         } else {
             int actualErrorCount = syntaxErrorReporter.getSyntaxErrors().size();
@@ -140,6 +146,7 @@ public class LexerTestUtils {
                                                    SyntaxErrorReporter syntaxErrorReporter, int expectedErrorCount,
                                                    int... statementSizes) {
         Lexer lexer = new Lexer();
+        lexer.setCompilationWarningsEnabled(enableWarnings);
 
         lexer.setSyntaxErrorReporter(syntaxErrorReporter);
 
@@ -147,7 +154,7 @@ public class LexerTestUtils {
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
         if (expectedErrorCount == 0 && syntaxErrorReporter.hasErrors()) {
-            syntaxErrorReporter.reportErrors();
+            syntaxErrorReporter.reportSyntaxErrors();
             fail("Expected no syntax errors.");
         } else {
             int actualErrorCount = syntaxErrorReporter.getSyntaxErrors().size();
