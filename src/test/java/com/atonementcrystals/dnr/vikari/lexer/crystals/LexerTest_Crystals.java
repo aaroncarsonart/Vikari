@@ -13,7 +13,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.ListElementS
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.RightParenthesisCrystal;
 import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
-import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanLiteralCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.StringLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.SwordCrystal;
@@ -253,7 +253,7 @@ public class LexerTest_Crystals {
     public void testLexer_Crystals_TrueLiteral() {
         String sourceString = "true";
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 1);
-        testCrystal(statement.get(0), BooleanLiteralCrystal.class, "true", location(0, 0));
+        testCrystal(statement.get(0), BooleanCrystal.class, "true", location(0, 0));
     }
 
     @Test
@@ -261,7 +261,7 @@ public class LexerTest_Crystals {
     public void testLexer_Crystals_FalseLiteral() {
         String sourceString = "false";
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 1);
-        testCrystal(statement.get(0), BooleanLiteralCrystal.class, "false", location(0, 0));
+        testCrystal(statement.get(0), BooleanCrystal.class, "false", location(0, 0));
     }
 
     @Test

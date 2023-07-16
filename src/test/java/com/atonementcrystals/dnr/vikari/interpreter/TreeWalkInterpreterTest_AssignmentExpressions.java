@@ -5,7 +5,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.NullCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
-import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.value.ValueCrystal;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.MethodOrderer;
@@ -70,10 +70,9 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
             assertEquals(expectedLength, actualLength, "Unexpected length for null crystal.");
         }
 
-        // TODO: Change to ValueCrystal once it is refactored to contain the <V> value reference.
-        else if (variable instanceof NumberCrystal) {
-            NumberCrystal numberCrystal = (NumberCrystal) variable;
-            Object actualvalue = numberCrystal.getValue();
+        else if (variable instanceof ValueCrystal) {
+            ValueCrystal valueCrystal = (ValueCrystal) variable;
+            Object actualvalue = valueCrystal.getValue();
             assertEquals(expectedValue, actualvalue, "Unexpected value.");
         } else {
             TypeCrystal typeCrystal = variable.getInstantiatedType();
@@ -871,5 +870,157 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
         testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, 2);
         testVariable("c", VikariType.VALUE, VikariType.INTEGER, 3);
         testVariable("d", VikariType.NUMBER, VikariType.INTEGER, 4);
+    }
+
+    @Test
+    @Order(31)
+    public void testTreeWalkInterpreter_LeftAssignment_Booleans() {
+        String sourceString = """
+                a
+                b
+                c:Boolean
+                d:Boolean
+                e:AtonementCrystal
+                f:AtonementCrystal
+                g:Value
+                h:Value
+
+                a << true
+                b << false
+                c << true
+                d << false
+                e << true
+                f << false
+                g << true
+                h << false
+                """;
+
+        lexParseAndInterpret(sourceString);
+
+        testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("c", VikariType.BOOLEAN, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.BOOLEAN, VikariType.BOOLEAN, false);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("g", VikariType.VALUE, VikariType.BOOLEAN, true);
+        testVariable("h", VikariType.VALUE, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(32)
+    public void testTreeWalkInterpreter_RightAssignment_Booleans() {
+        String sourceString = """
+                a
+                b
+                c:Boolean
+                d:Boolean
+                e:AtonementCrystal
+                f:AtonementCrystal
+                g:Value
+                h:Value
+
+                true >> a
+                false >> b
+                true >> c
+                false >> d
+                true >> e
+                false >> f
+                true >> g
+                false >> h
+                """;
+
+        lexParseAndInterpret(sourceString);
+
+        testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("c", VikariType.BOOLEAN, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.BOOLEAN, VikariType.BOOLEAN, false);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("g", VikariType.VALUE, VikariType.BOOLEAN, true);
+        testVariable("h", VikariType.VALUE, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(33)
+    public void testTreeWalkInterpreter_LeftAssignment_FromVariable() {
+        String sourceString = """
+                foo:Boolean << true
+                bar:Boolean << false
+
+                a
+                b
+                c:Boolean
+                d:Boolean
+                e:AtonementCrystal
+                f:AtonementCrystal
+                g:Value
+                h:Value
+
+                a << foo
+                b << bar
+                c << foo
+                d << bar
+                e << foo
+                f << bar
+                g << foo
+                h << bar
+                """;
+
+        lexParseAndInterpret(sourceString);
+
+        testVariable("foo", VikariType.BOOLEAN, VikariType.BOOLEAN, true);
+        testVariable("bar", VikariType.BOOLEAN, VikariType.BOOLEAN, false);
+
+        testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("c", VikariType.BOOLEAN, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.BOOLEAN, VikariType.BOOLEAN, false);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("g", VikariType.VALUE, VikariType.BOOLEAN, true);
+        testVariable("h", VikariType.VALUE, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(34)
+    public void testTreeWalkInterpreter_RightAssignment_FromVariable() {
+        String sourceString = """
+                foo:Boolean << true
+                bar:Boolean << false
+
+                a
+                b
+                c:Boolean
+                d:Boolean
+                e:AtonementCrystal
+                f:AtonementCrystal
+                g:Value
+                h:Value
+
+                foo >> a
+                bar >> b
+                foo >> c
+                bar >> d
+                foo >> e
+                bar >> f
+                foo >> g
+                bar >> h
+                """;
+
+        lexParseAndInterpret(sourceString);
+
+        testVariable("foo", VikariType.BOOLEAN, VikariType.BOOLEAN, true);
+        testVariable("bar", VikariType.BOOLEAN, VikariType.BOOLEAN, false);
+
+        testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("c", VikariType.BOOLEAN, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.BOOLEAN, VikariType.BOOLEAN, false);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("g", VikariType.VALUE, VikariType.BOOLEAN, true);
+        testVariable("h", VikariType.VALUE, VikariType.BOOLEAN, false);
     }
 }

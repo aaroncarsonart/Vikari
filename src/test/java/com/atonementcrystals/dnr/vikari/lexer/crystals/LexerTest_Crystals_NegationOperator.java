@@ -4,7 +4,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonementcrystals.dnr.vikari.core.crystal.keyword.control.flow.ConditionalBranchCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanLiteralCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.SwordCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigDecimalCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigIntegerCrystal;
@@ -213,7 +213,7 @@ public class LexerTest_Crystals_NegationOperator {
 
         testCrystal(statement.get(0), ConditionalBranchCrystal.class, "??", location(0, 0));
         testCrystal(statement.get(1), LeftSquareBracketCrystal.class, "[", location(0, 3));
-        testCrystal(statement.get(2), BooleanLiteralCrystal.class, "true", location(0, 4));
+        testCrystal(statement.get(2), BooleanCrystal.class, "true", location(0, 4));
         testCrystal(statement.get(3), RightSquareBracketCrystal.class, "]", location(0, 8));
         testCrystal(statement.get(4), RegionOperatorCrystal.class, "::", location(0, 10));
         testCrystal(statement.get(5), SwordCrystal.class, "_", location(0, 13));

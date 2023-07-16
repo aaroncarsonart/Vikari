@@ -78,6 +78,7 @@ public class TypeCrystal extends AtonementCrystal {
     }
 
     private static TypeCrystal walkTree(TypeCrystal current, Predicate<TypeCrystal> predicate) {
+        // TODO: Fix NullPointerException on current for using an invalid reference identifier with a type label.
         for (TypeCrystal child : current.children) {
             if (predicate.test(child)) {
                 return child;

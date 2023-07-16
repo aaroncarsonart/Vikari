@@ -5,7 +5,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.LeftAssignmentOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.RightAssignmentOperatorCrystal;
@@ -35,7 +34,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.List;
 
-import static com.atonementcrystals.dnr.vikari.TestUtils.location;
+import static com.atonementcrystals.dnr.vikari.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -145,7 +144,7 @@ public class ParserTest_Assignment {
         assertEquals(LiteralExpression.class, rvalueExpression.getClass(), "Unexpected rvalue expression type.");
 
         AtonementCrystal rvalue = ((LiteralExpression) rvalueExpression).getValue();
-        TestUtils.testNumberCrystal(rvalue, value, (Class<? extends NumberCrystal>) instantiatedType.getJavaType());
+        testRvalue(value, rvalue, instantiatedType);
     }
 
     /**
@@ -175,7 +174,40 @@ public class ParserTest_Assignment {
         assertEquals(LiteralExpression.class, rvalueExpression.getClass(), "Unexpected rvalue expression type.");
 
         AtonementCrystal rvalue = ((LiteralExpression) rvalueExpression).getValue();
-        TestUtils.testNumberCrystal(rvalue, value, (Class<? extends NumberCrystal>) instantiatedType.getJavaType());
+        testRvalue(value, rvalue, instantiatedType);
+    }
+
+    /**
+     * Type errors expect a null instantiated type on the lvalue. But the type of the rvalue still needs to be checked.
+     */
+    private void testLeftAssignment_FromVariable_TypeError(Statement statement, String lvalueIdentifier,
+                                                           VikariType declaredType, CoordinatePair lvalueLocation,
+                                                           String rvalueIdentifier, VikariType rvalueDeclaredType,
+                                                           VikariType rvalueInstantiatedType,
+                                                           CoordinatePair rvalueLocation) {
+
+        assertEquals(lvalueLocation, statement.getLocation(), "Unexpected statement location.");
+
+        assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
+        Expression expression = ((ExpressionStatement) statement).getExpression();
+
+        assertEquals(LeftAssignmentExpression.class, expression.getClass(), "Unexpected statement type.");
+        LeftAssignmentExpression assignmentExpression = (LeftAssignmentExpression) expression;
+
+        Expression lvalueExpression = assignmentExpression.getLvalue();
+        assertEquals(VariableExpression.class, lvalueExpression.getClass(), "Unexpected lvalue type.");
+
+        AtonementCrystal lvalue = ((VariableExpression) lvalueExpression).getReference();
+        testVariableCrystal(lvalue, lvalueIdentifier, declaredType, null, lvalueLocation);
+
+        BinaryOperatorCrystal operator = assignmentExpression.getOperator();
+        assertEquals(LeftAssignmentOperatorCrystal.class, operator.getClass(), "Unexpected operator type.");
+
+        Expression rvalueExpression = assignmentExpression.getRvalue();
+        assertEquals(VariableExpression.class, rvalueExpression.getClass(), "Unexpected rvalue expression type.");
+
+        AtonementCrystal rvalue = ((VariableExpression) rvalueExpression).getReference();
+        testVariableCrystal(rvalue, rvalueIdentifier, rvalueDeclaredType, rvalueInstantiatedType, rvalueLocation);
     }
 
     private void testSimpleRightAssignment(Statement statement, CoordinatePair statementLocation, String identifier,
@@ -203,7 +235,7 @@ public class ParserTest_Assignment {
         assertEquals(LiteralExpression.class, rvalueExpression.getClass(), "Unexpected rvalue expression type.");
 
         AtonementCrystal rvalue = ((LiteralExpression) rvalueExpression).getValue();
-        TestUtils.testNumberCrystal(rvalue, value, (Class<? extends NumberCrystal>) instantiatedType.getJavaType());
+        testRvalue(value, rvalue, instantiatedType);
     }
 
     /**
@@ -235,7 +267,37 @@ public class ParserTest_Assignment {
         assertEquals(LiteralExpression.class, rvalueExpression.getClass(), "Unexpected rvalue expression type.");
 
         AtonementCrystal rvalue = ((LiteralExpression) rvalueExpression).getValue();
-        TestUtils.testNumberCrystal(rvalue, value, (Class<? extends NumberCrystal>) instantiatedType.getJavaType());
+        testRvalue(value, rvalue, instantiatedType);
+    }
+
+    private void testRightAssignment_FromVariable_TypeError(Statement statement, String lvalueIdentifier,
+                                                            VikariType declaredType, CoordinatePair lvalueLocation,
+                                                            String rvalueIdentifier, VikariType rvalueDeclaredType,
+                                                            VikariType rvalueInstantiatedType,
+                                                            CoordinatePair rvalueLocation) {
+
+        assertEquals(rvalueLocation, statement.getLocation(), "Unexpected statement location.");
+
+        assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
+        Expression expression = ((ExpressionStatement) statement).getExpression();
+
+        assertEquals(RightAssignmentExpression.class, expression.getClass(), "Unexpected statement type.");
+        RightAssignmentExpression assignmentExpression = (RightAssignmentExpression) expression;
+
+        Expression lvalueExpression = assignmentExpression.getLvalue();
+        assertEquals(VariableExpression.class, lvalueExpression.getClass(), "Unexpected lvalue type.");
+
+        AtonementCrystal lvalue = ((VariableExpression) lvalueExpression).getReference();
+        testVariableCrystal(lvalue, lvalueIdentifier, declaredType, null, lvalueLocation);
+
+        BinaryOperatorCrystal operator = assignmentExpression.getOperator();
+        assertEquals(RightAssignmentOperatorCrystal.class, operator.getClass(), "Unexpected operator type.");
+
+        Expression rvalueExpression = assignmentExpression.getRvalue();
+        assertEquals(VariableExpression.class, rvalueExpression.getClass(), "Unexpected rvalue expression type.");
+
+        AtonementCrystal rvalue = ((VariableExpression) rvalueExpression).getReference();
+        testVariableCrystal(rvalue, rvalueIdentifier, rvalueDeclaredType, rvalueInstantiatedType, rvalueLocation);
     }
 
     // -------------------------------
@@ -518,7 +580,7 @@ public class ParserTest_Assignment {
                 bigDecimal3:BigDecimal
                 bigDecimal4:BigDecimal
                 bigDecimal5:BigDecimal
-                
+
                 long1 << 1
                 bigInteger1 << 2
                 bigInteger2 << 3L
@@ -1353,5 +1415,184 @@ public class ParserTest_Assignment {
 
         rvalue = ((LiteralExpression) rvalueExpression).getValue();
         TestUtils.testNumberCrystal(rvalue, 7, IntegerCrystal.class);
+    }
+
+    // ---------------
+    // Boolean values.
+    // ---------------
+
+    @Test
+    @Order(32)
+    public void testParser_Expression_LeftAssignment_BooleanValues() {
+        String sourceString = """
+                a
+                b:AtonementCrystal
+                c:Value
+                d:Boolean
+
+                a << true
+                b << true
+                c << true
+                d << true
+                """;
+        List<Statement> statements = lexAndParse(sourceString);
+
+        int expectedStatementCount = 8;
+        int actualStatementCount = statements.size();
+        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
+
+        // variable declarations
+        assertEquals(VariableDeclarationStatement.class, statements.get(0).getClass(), "Unexpected statement type.");
+        assertEquals(VariableDeclarationStatement.class, statements.get(1).getClass(), "Unexpected statement type.");
+        assertEquals(VariableDeclarationStatement.class, statements.get(2).getClass(), "Unexpected statement type.");
+        assertEquals(VariableDeclarationStatement.class, statements.get(3).getClass(), "Unexpected statement type.");
+
+        // left assignments
+        testSimpleLeftAssignment(statements.get(4), "a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, location(5, 0), true);
+        testSimpleLeftAssignment(statements.get(5), "b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, location(6, 0), true);
+        testSimpleLeftAssignment(statements.get(6), "c", VikariType.VALUE, VikariType.BOOLEAN, location(7, 0), true);
+        testSimpleLeftAssignment(statements.get(7), "d", VikariType.BOOLEAN, VikariType.BOOLEAN, location(8, 0), true);
+    }
+
+    @Test
+    @Order(33)
+    public void testParser_Expression_RightAssignment_BooleanValues() {
+        String sourceString = """
+                a
+                b:AtonementCrystal
+                c:Value
+                d:Boolean
+
+                false >> a
+                false >> b
+                false >> c
+                false >> d
+                """;
+        List<Statement> statements = lexAndParse(sourceString);
+
+        int expectedStatementCount = 8;
+        int actualStatementCount = statements.size();
+        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
+
+        // variable declarations
+        assertEquals(VariableDeclarationStatement.class, statements.get(0).getClass(), "Unexpected statement type.");
+        assertEquals(VariableDeclarationStatement.class, statements.get(1).getClass(), "Unexpected statement type.");
+        assertEquals(VariableDeclarationStatement.class, statements.get(2).getClass(), "Unexpected statement type.");
+        assertEquals(VariableDeclarationStatement.class, statements.get(3).getClass(), "Unexpected statement type.");
+
+        // left assignments
+        testSimpleRightAssignment(statements.get(4), location(5, 0), "a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, location(5, 9), false);
+        testSimpleRightAssignment(statements.get(5), location(6, 0), "b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, location(6, 9), false);
+        testSimpleRightAssignment(statements.get(6), location(7, 0), "c", VikariType.VALUE, VikariType.BOOLEAN, location(7, 9), false);
+        testSimpleRightAssignment(statements.get(7), location(8, 0), "d", VikariType.BOOLEAN, VikariType.BOOLEAN, location(8, 9), false);
+    }
+
+    @Test
+    @Order(34)
+    public void testParser_Expression_Assignment_SyntaxError_BooleanValues() {
+        String sourceString = """
+                foo:Integer
+                foo << false
+                true >> foo
+
+                bar:Boolean
+                bar << 2
+                3.14 >> bar
+                """;
+        List<Statement> statements = lexAndParse_WithErrors(sourceString, 4);
+
+        int expectedStatementCount = 6;
+        int actualStatementCount = statements.size();
+        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
+
+        // variable declarations
+        assertEquals(VariableDeclarationStatement.class, statements.get(0).getClass(), "Unexpected statement type.");
+        assertEquals(VariableDeclarationStatement.class, statements.get(3).getClass(), "Unexpected statement type.");
+
+        // error assignments
+        testSimpleLeftAssignment_TypeError(statements.get(1), "foo", VikariType.INTEGER, VikariType.BOOLEAN, location(1, 0), false);
+        testSimpleRightAssignment_TypeError(statements.get(2), location(2, 0), "foo", VikariType.INTEGER, VikariType.BOOLEAN, location(2, 8), true);
+
+        testSimpleLeftAssignment_TypeError(statements.get(4), "bar", VikariType.BOOLEAN, VikariType.INTEGER, location(5, 0), 2);
+        testSimpleRightAssignment_TypeError(statements.get(5), location(6, 0), "bar", VikariType.BOOLEAN, VikariType.DOUBLE, location(6, 8), 3.14D);
+
+        // syntax errors
+        assertSyntaxErrors(syntaxErrorReporter, 4);
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+
+        testSyntaxError(syntaxErrors.get(0), location(1, 0), "foo << false", "Variable with type Integer cannot be assigned a value of type Boolean.");
+        testSyntaxError(syntaxErrors.get(1), location(2, 8), "true >> foo", "Variable with type Integer cannot be assigned a value of type Boolean.");
+        testSyntaxError(syntaxErrors.get(2), location(5, 0), "bar << 2", "Variable with type Boolean cannot be assigned a value of type Integer.");
+        testSyntaxError(syntaxErrors.get(3), location(6, 8), "3.14 >> bar", "Variable with type Boolean cannot be assigned a value of type Double.");
+    }
+
+    @Test
+    @Order(35)
+    public void testParser_Expression_Assignment_SyntaxError_BooleanValues_AssignmentFromVariable() {
+        String sourceString = """
+                bool:Boolean
+                int:Integer << 2
+                float:Float << 3.14F
+                bool << int
+                float >> bool
+                """;
+        List<Statement> statements = lexAndParse_WithErrors(sourceString, 2);
+
+        int expectedStatementCount = 5;
+        int actualStatementCount = statements.size();
+        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
+
+        // variable declarations
+        assertEquals(VariableDeclarationStatement.class, statements.get(0).getClass(), "Unexpected statement type.");
+        assertEquals(VariableDeclarationStatement.class, statements.get(1).getClass(), "Unexpected statement type.");
+        assertEquals(VariableDeclarationStatement.class, statements.get(2).getClass(), "Unexpected statement type.");
+
+        // error assignments
+        testLeftAssignment_FromVariable_TypeError(statements.get(3), "bool", VikariType.BOOLEAN, location(3, 0), "int",
+                VikariType.INTEGER, VikariType.INTEGER, location(3, 8));
+
+        testRightAssignment_FromVariable_TypeError(statements.get(4), "bool", VikariType.BOOLEAN, location(4, 9),
+                "float", VikariType.FLOAT, VikariType.FLOAT, location(4, 0));
+
+        // syntax errors
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+
+        testSyntaxError(syntaxErrors.get(0), location(3, 0), "bool << int", "Variable with type Boolean cannot be assigned a value of type Integer.");
+        testSyntaxError(syntaxErrors.get(1), location(4, 9), "float >> bool", "Variable with type Boolean cannot be assigned a value of type Float.");
+    }
+
+    @Test
+    @Order(36)
+    public void testParser_Expression_Assignment_SyntaxError_BooleanValues_AssignmentFromBooleanVariable() {
+        String sourceString = """
+                bool:Boolean << true
+                int:Integer
+                float:Float
+                int << bool
+                bool >> float
+                """;
+        List<Statement> statements = lexAndParse_WithErrors(sourceString, 2);
+
+        int expectedStatementCount = 5;
+        int actualStatementCount = statements.size();
+        assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
+
+        // variable declarations
+        assertEquals(VariableDeclarationStatement.class, statements.get(0).getClass(), "Unexpected statement type.");
+        assertEquals(VariableDeclarationStatement.class, statements.get(1).getClass(), "Unexpected statement type.");
+        assertEquals(VariableDeclarationStatement.class, statements.get(2).getClass(), "Unexpected statement type.");
+
+        // error assignments
+        testLeftAssignment_FromVariable_TypeError(statements.get(3), "int", VikariType.INTEGER, location(3, 0), "bool",
+                VikariType.BOOLEAN, VikariType.BOOLEAN, location(3, 7));
+
+        testRightAssignment_FromVariable_TypeError(statements.get(4), "float", VikariType.FLOAT, location(4, 8),
+                "bool", VikariType.BOOLEAN, VikariType.BOOLEAN, location(4, 0));
+
+        // syntax errors
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+
+        testSyntaxError(syntaxErrors.get(0), location(3, 0), "int << bool", "Variable with type Integer cannot be assigned a value of type Boolean.");
+        testSyntaxError(syntaxErrors.get(1), location(4, 8), "bool >> float", "Variable with type Float cannot be assigned a value of type Boolean.");
     }
 }

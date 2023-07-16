@@ -1,5 +1,7 @@
 package com.atonementcrystals.dnr.vikari;
 
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
@@ -73,6 +75,16 @@ public class TestUtils {
         assertEquals(expectedWarningCount, actualWarningCountCount, "Unexpected number of compilation warnings.");
     }
 
+    public static void testRvalue(Object value, AtonementCrystal rvalue, VikariType instantiatedType) {
+        if (value instanceof Number) {
+            TestUtils.testNumberCrystal(rvalue, value, (Class<? extends NumberCrystal>) instantiatedType.getJavaType());
+        } else if (value instanceof Boolean) {
+            TestUtils.testBooleanCrystal(rvalue, value);
+        } else {
+            fail("Malformed test. Unexpected value type for rvalue: " + value.getClass().getSimpleName());
+        }
+    }
+
     public static void testNumberCrystal(AtonementCrystal crystal, Object expectedValue, Class<? extends NumberCrystal> expectedClass) {
         Class<? extends AtonementCrystal> actualClass = crystal.getClass();
         assertEquals(expectedClass, actualClass, "Unexpected type.");
@@ -80,6 +92,15 @@ public class TestUtils {
         NumberCrystal numberCrystal = expectedClass.cast(crystal);
         Object actualValue = numberCrystal.getValue();
         assertEquals(expectedValue, actualValue, "Unexpected value for NumberCrystal.");
+    }
+
+    public static void testBooleanCrystal(AtonementCrystal crystal, Object expectedValue) {
+        if (crystal instanceof BooleanCrystal booleanCrystal) {
+            Boolean actualValue = booleanCrystal.getValue();
+            assertEquals(expectedValue, actualValue, "Unexpected value for BooleanCrystal.");
+        } else {
+            fail("Unexpected type for BooleanCrystal: " + crystal.getClass().getSimpleName());
+        }
     }
 
     public static AtonementCrystal testCrystal(AtonementCrystal crystal, Class<? extends AtonementCrystal> expectedClass,

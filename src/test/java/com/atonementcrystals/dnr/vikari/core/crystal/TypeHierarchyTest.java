@@ -40,7 +40,7 @@ class TypeHierarchyTest {
     }
 
     /**
-     * Test that all TypeCrysals created by VikariType have a properly-instantiated type hierarchy.
+     * Test that all TypeCrystals created by VikariType have a properly-instantiated type hierarchy.
      */
     @Test
     @Order(1)
@@ -49,6 +49,7 @@ class TypeHierarchyTest {
 
         testInheritance(VikariType.TYPE, VikariType.ATONEMENT_CRYSTAL);
         testInheritance(VikariType.VALUE, VikariType.ATONEMENT_CRYSTAL);
+        testInheritance(VikariType.BOOLEAN, VikariType.ATONEMENT_CRYSTAL);
         testInheritance(VikariType.NUMBER, VikariType.ATONEMENT_CRYSTAL);
         testInheritance(VikariType.INTEGER, VikariType.ATONEMENT_CRYSTAL);
         testInheritance(VikariType.LONG, VikariType.ATONEMENT_CRYSTAL);
@@ -57,6 +58,7 @@ class TypeHierarchyTest {
         testInheritance(VikariType.DOUBLE, VikariType.ATONEMENT_CRYSTAL);
         testInheritance(VikariType.BIG_DECIMAL, VikariType.ATONEMENT_CRYSTAL);
 
+        testInheritance(VikariType.BOOLEAN, VikariType.VALUE);
         testInheritance(VikariType.NUMBER, VikariType.VALUE);
         testInheritance(VikariType.INTEGER, VikariType.VALUE);
         testInheritance(VikariType.LONG, VikariType.VALUE);
@@ -86,6 +88,7 @@ class TypeHierarchyTest {
         testChildren(VikariType.TYPE);
 
         testChildren(VikariType.VALUE,
+                VikariType.BOOLEAN,
                 VikariType.NUMBER);
 
         testChildren(VikariType.NUMBER,

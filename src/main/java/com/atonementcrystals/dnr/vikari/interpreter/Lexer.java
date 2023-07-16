@@ -5,7 +5,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.keyword.error.ThrowCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanLiteralCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.StringLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.SwordCrystal;
@@ -777,10 +777,7 @@ public class Lexer {
                 }
 
                 if (Utils.isBooleanLiteral(stringToken)) {
-                    // TODO: Change to BooleanCrystal and add Type info.
-                    BooleanLiteralCrystal booleanCrystal = new BooleanLiteralCrystal(stringToken);
-                    Boolean booleanValue = Boolean.valueOf(stringToken);
-                    booleanCrystal.setValue(booleanValue);
+                    BooleanCrystal booleanCrystal = new BooleanCrystal(stringToken, stringToken);
                     booleanCrystal.setCoordinates(tokenCoordinates);
                     statementOfCrystals.add(booleanCrystal);
                     continue;

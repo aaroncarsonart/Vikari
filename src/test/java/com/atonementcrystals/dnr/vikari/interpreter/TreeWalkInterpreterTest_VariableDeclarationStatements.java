@@ -5,7 +5,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.NullCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
-import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.value.ValueCrystal;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.MethodOrderer;
@@ -74,10 +74,9 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
             assertEquals(expectedLength, actualLength, "Unexpected length for null crystal.");
         }
 
-        // TODO: Change to ValueCrystal once it is refactored to contain the <V> value reference.
-        else if (variable instanceof NumberCrystal) {
-            NumberCrystal numberCrystal = (NumberCrystal) variable;
-            Object actualvalue = numberCrystal.getValue();
+        else if (variable instanceof ValueCrystal) {
+            ValueCrystal valueCrystal = (ValueCrystal) variable;
+            Object actualvalue = valueCrystal.getValue();
             assertEquals(expectedValue, actualvalue, "Unexpected value.");
         } else {
             TypeCrystal typeCrystal = variable.getInstantiatedType();
@@ -429,5 +428,64 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
         testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, 2);
         testVariable("c", VikariType.VALUE, VikariType.INTEGER, 3);
         testVariable("d", VikariType.NUMBER, VikariType.INTEGER, 4);
+    }
+
+    @Test
+    @Order(20)
+    public void testTreeWalkInterpreter_VariableDeclaration_Booleans() {
+        String sourceString = """
+                a << true
+                b << false
+                c:Boolean
+                d:Boolean << true
+                e:Boolean << false
+                f:AtonementCrystal << true
+                g:AtonementCrystal << false
+                h:Value << true
+                i:Value << false
+                """;
+
+        lexParseAndInterpret(sourceString);
+
+        testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("c", VikariType.BOOLEAN, null, null);
+        testVariable("d", VikariType.BOOLEAN, VikariType.BOOLEAN, true);
+        testVariable("e", VikariType.BOOLEAN, VikariType.BOOLEAN, false);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("g", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("h", VikariType.VALUE, VikariType.BOOLEAN, true);
+        testVariable("i", VikariType.VALUE, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(21)
+    public void testTreeWalkInterpreter_VariableDeclaration_Booleans_FromVariable() {
+        String sourceString = """
+                foo:Boolean << true
+                bar:Boolean << false
+
+                a << foo
+                b << bar
+                c:Boolean
+                d:Boolean << foo
+                e:Boolean << bar
+                f:AtonementCrystal << foo
+                g:AtonementCrystal << bar
+                h:Value << true
+                i:Value << bar
+                """;
+
+        lexParseAndInterpret(sourceString);
+
+        testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("c", VikariType.BOOLEAN, null, null);
+        testVariable("d", VikariType.BOOLEAN, VikariType.BOOLEAN, true);
+        testVariable("e", VikariType.BOOLEAN, VikariType.BOOLEAN, false);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("g", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("h", VikariType.VALUE, VikariType.BOOLEAN, true);
+        testVariable("i", VikariType.VALUE, VikariType.BOOLEAN, false);
     }
 }

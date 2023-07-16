@@ -4,11 +4,11 @@ import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
-import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.LeftAssignmentOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.VariableExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.core.statement.VariableDeclarationStatement;
 import com.atonementcrystals.dnr.vikari.error.VikariError;
@@ -28,7 +28,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.List;
 
-import static com.atonementcrystals.dnr.vikari.TestUtils.location;
+import static com.atonementcrystals.dnr.vikari.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -140,7 +140,7 @@ public class ParserTest_VariableDeclarationStatements {
                 "type.");
 
         AtonementCrystal literal = ((LiteralExpression) initializerExpression).getValue();
-        TestUtils.testNumberCrystal(literal, value, (Class<? extends NumberCrystal>) instantiatedType.getJavaType());
+        testRvalue(value, literal, instantiatedType);
     }
 
     /**
@@ -168,7 +168,7 @@ public class ParserTest_VariableDeclarationStatements {
                 "type.");
 
         AtonementCrystal literal = ((LiteralExpression) initializerExpression).getValue();
-        TestUtils.testNumberCrystal(literal, value, (Class<? extends NumberCrystal>) instantiatedType.getJavaType());
+        testRvalue(value, literal, instantiatedType);
     }
 
     /**
@@ -197,7 +197,42 @@ public class ParserTest_VariableDeclarationStatements {
                 "type.");
 
         AtonementCrystal literal = ((LiteralExpression) initializerExpression).getValue();
-        TestUtils.testNumberCrystal(literal, value, (Class<? extends NumberCrystal>) instantiatedType.getJavaType());
+        testRvalue(value, literal, instantiatedType);
+    }
+
+    /**
+     * Test a declaration where the assignment does not match the type of the declared variable.
+     */
+    public void testDeclaration_FromVariable_TypeError(Statement statement, String identifier, VikariType declaredType,
+                                                       CoordinatePair location, String initializerIdentifier,
+                                                       VikariType initializerDeclaredType,
+                                                       VikariType initializerInstantiatedType,
+                                                       CoordinatePair initializerLocation) {
+
+        assertEquals(VariableDeclarationStatement.class, statement.getClass(), "Unexpected statement type.");
+        VariableDeclarationStatement declarationStatement = (VariableDeclarationStatement) statement;
+
+        assertEquals(location, statement.getLocation(), "Unexpected location.");
+
+        // test variable
+        AtonementCrystal variable = declarationStatement.getDeclaredVariable();
+        VikariType variableInstantiatedType = null;
+        testVariableCrystal(variable, identifier, declaredType, variableInstantiatedType, location, null);
+
+        // test operator
+        BinaryOperatorCrystal expectedOperator = declarationStatement.getAssignmentOperator();
+        assertEquals(LeftAssignmentOperatorCrystal.class, expectedOperator.getClass(), "Unexpected operator type.");
+
+        // test initializer
+        Expression initializerExpression = declarationStatement.getInitializerExpression();
+        assertEquals(VariableExpression.class, initializerExpression.getClass(), "Unexpected initializer expression " +
+                "type.");
+
+        // NOTE: The parameter localEnvironment is null because the variable is not tested for existing
+        //       in the localEnvironment as each unique variable reference is a different instance.
+        AtonementCrystal initializerVariable = ((VariableExpression) initializerExpression).getReference();
+        testVariableCrystal(initializerVariable, initializerIdentifier, initializerDeclaredType,
+                initializerInstantiatedType, initializerLocation, null);
     }
 
     @Test
@@ -540,7 +575,7 @@ public class ParserTest_VariableDeclarationStatements {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), location(1, 0), "a:Integer << 2", "Variable is already defined.");
+        testSyntaxError(syntaxErrors.get(0), location(1, 0), "a:Integer << 2", "Variable is already defined.");
 
         int expectedSize = 2;
         int actualSize = statements.size();
@@ -562,8 +597,8 @@ public class ParserTest_VariableDeclarationStatements {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), "foo:Foo", "Unknown Type.");
-        TestUtils.testSyntaxError(syntaxErrors.get(1), location(1, 4), "bar:Bar", "Unknown Type.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 4), "foo:Foo", "Unknown Type.");
+        testSyntaxError(syntaxErrors.get(1), location(1, 4), "bar:Bar", "Unknown Type.");
 
         int expectedSize = 2;
         int actualSize = statements.size();
@@ -585,8 +620,8 @@ public class ParserTest_VariableDeclarationStatements {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), "foo:Foo << 22", "Unknown Type.");
-        TestUtils.testSyntaxError(syntaxErrors.get(1), location(1, 4), "bar:Bar << 7L", "Unknown Type.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 4), "foo:Foo << 22", "Unknown Type.");
+        testSyntaxError(syntaxErrors.get(1), location(1, 4), "bar:Bar << 7L", "Unknown Type.");
 
         int expectedSize = 2;
         int actualSize = statements.size();
@@ -605,7 +640,7 @@ public class ParserTest_VariableDeclarationStatements {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 0), "foo:Type << 2", "Variable with " +
+        testSyntaxError(syntaxErrors.get(0), location(0, 0), "foo:Type << 2", "Variable with " +
                 "type Type cannot be assigned a value of type Integer.");
 
         int expectedSize = 1;
@@ -615,5 +650,96 @@ public class ParserTest_VariableDeclarationStatements {
         testDeclaration_TypeError(statements.get(0), "foo", VikariType.TYPE, VikariType.INTEGER, location(0, 0), 2);
     }
 
-    // TODO: Test initializing declared variables with previously declared variables.
+    @Test
+    @Order(22)
+    public void testParser_Statement_VariableDeclaration_BooleanValues() {
+        String sourceString = """
+                ~:1. no declared type.:~
+                a << true
+                b << false
+
+                ~:2. No initializer expression.:~
+                c:Boolean
+
+                ~:3. With initializer expression.:~
+                d:Boolean << true
+                e:Boolean << false
+
+                ~:4. Assignment to parent types.:~
+                f:AtonementCrystal << true
+                g:Value << false
+                """;
+
+        List<Statement> statements = lexAndParse(sourceString);
+
+        int expectedSize = 7;
+        int actualSize = statements.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+        testDeclaration(statements.get(0), "a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, location(1, 0), true);
+        testDeclaration(statements.get(1), "b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, location(2, 0), false);
+        testDeclaration(statements.get(2), "c", VikariType.BOOLEAN, null, location(5, 0));
+        testDeclaration(statements.get(3), "d", VikariType.BOOLEAN, VikariType.BOOLEAN, location(8, 0), true);
+        testDeclaration(statements.get(4), "e", VikariType.BOOLEAN, VikariType.BOOLEAN, location(9, 0), false);
+        testDeclaration(statements.get(5), "f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, location(12, 0), true);
+        testDeclaration(statements.get(6), "g", VikariType.VALUE, VikariType.BOOLEAN, location(13, 0), false);
+    }
+
+    @Test
+    @Order(23)
+    public void testParser_Statement_VariableDeclaration_SyntaxError_InvalidTypeAssignment_BooleanValues() {
+        String sourceString = """
+                a:Boolean << 2
+                b:Integer << true
+                c:Type << false
+                """;
+
+        int expectedErrorCount = 3;
+        List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
+
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        testSyntaxError(syntaxErrors.get(0), location(0, 0), "a:Boolean << 2", "Variable with type Boolean cannot be assigned a value of type Integer.");
+        testSyntaxError(syntaxErrors.get(1), location(1, 0), "b:Integer << true", "Variable with type Integer cannot be assigned a value of type Boolean.");
+        testSyntaxError(syntaxErrors.get(2), location(2, 0), "c:Type << false", "Variable with type Type cannot be assigned a value of type Boolean.");
+
+        int expectedSize = 3;
+        int actualSize = statements.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+        testDeclaration_TypeError(statements.get(0), "a", VikariType.BOOLEAN, VikariType.INTEGER, location(0, 0), 2);
+        testDeclaration_TypeError(statements.get(1), "b", VikariType.INTEGER, VikariType.BOOLEAN, location(1, 0), true);
+        testDeclaration_TypeError(statements.get(2), "c", VikariType.TYPE, VikariType.BOOLEAN, location(2, 0), false);
+    }
+
+    @Test
+    @Order(24)
+    public void testParser_Statement_VariableDeclaration_SyntaxError_InvalidTypeAssignment_BooleanValues_FromVariable() {
+        String sourceString = """
+                bool_1:Boolean << true
+                int_1:Integer << 2
+
+                bool_2:Boolean << int_1
+                int_2:Integer << bool_1
+                """;
+
+        int expectedErrorCount = 2;
+        List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
+
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        testSyntaxError(syntaxErrors.get(0), location(3, 0), "bool_2:Boolean << int_1", "Variable with type Boolean cannot be assigned a value of type Integer.");
+        testSyntaxError(syntaxErrors.get(1), location(4, 0), "int_2:Integer << bool_1", "Variable with type Integer cannot be assigned a value of type Boolean.");
+
+        int expectedSize = 4;
+        int actualSize = statements.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+        testDeclaration(statements.get(0), "bool_1", VikariType.BOOLEAN, VikariType.BOOLEAN, location(0, 0), true);
+        testDeclaration(statements.get(1), "int_1", VikariType.INTEGER, VikariType.INTEGER, location(1, 0), 2);
+
+        testDeclaration_FromVariable_TypeError(statements.get(2), "bool_2", VikariType.BOOLEAN, location(3, 0), "int_1",
+                VikariType.INTEGER, VikariType.INTEGER, location(3, 18));
+
+        testDeclaration_FromVariable_TypeError(statements.get(3), "int_2", VikariType.INTEGER, location(4, 0), "bool_1",
+                VikariType.BOOLEAN, VikariType.BOOLEAN, location(4, 17));
+    }
 }

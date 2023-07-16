@@ -19,6 +19,7 @@ public class TypeHierarchy {
         init(VikariType.ATONEMENT_CRYSTAL,
                 init(VikariType.TYPE),
                 init(VikariType.VALUE,
+                        init(VikariType.BOOLEAN),
                         init(VikariType.NUMBER,
                                 init(VikariType.INTEGER),
                                 init(VikariType.LONG),

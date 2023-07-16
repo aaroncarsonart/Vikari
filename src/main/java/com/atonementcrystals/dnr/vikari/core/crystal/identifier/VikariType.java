@@ -3,6 +3,7 @@ package com.atonementcrystals.dnr.vikari.core.crystal.identifier;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeHierarchy;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigDecimalCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigIntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.DoubleCrystal;
@@ -37,7 +38,10 @@ public enum VikariType {
     BIG_INTEGER(BigIntegerCrystal.class),
     FLOAT(FloatCrystal.class),
     DOUBLE(DoubleCrystal.class),
-    BIG_DECIMAL(BigDecimalCrystal.class);
+    BIG_DECIMAL(BigDecimalCrystal.class),
+
+    // other types
+    BOOLEAN(BooleanCrystal.class);
 
     public static final String LANG_PACKAGE = "dnr::vikari::lang";
     public static final EnumSet<VikariType> LANG_TYPES = initLangTypes();
@@ -59,7 +63,7 @@ public enum VikariType {
      */
     public static EnumSet<VikariType> initTypeTypes() {
         return EnumSet.of(ATONEMENT_CRYSTAL, VALUE, TYPE, NUMBER, INTEGER, LONG, BIG_INTEGER, FLOAT, DOUBLE,
-                BIG_DECIMAL);
+                BIG_DECIMAL, BOOLEAN);
     }
 
     /*
@@ -75,7 +79,7 @@ public enum VikariType {
     }
 
     private final Class<? extends AtonementCrystal> javaType;
-    private TypeCrystal typeCrystal;
+    private final TypeCrystal typeCrystal;
 
     VikariType(String packageName, Class<? extends AtonementCrystal> javaType, String typeName) {
         this.javaType = javaType;

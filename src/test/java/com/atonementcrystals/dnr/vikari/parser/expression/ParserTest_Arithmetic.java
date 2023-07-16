@@ -1,9 +1,13 @@
 package com.atonementcrystals.dnr.vikari.parser.expression;
 
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
+import com.atonementcrystals.dnr.vikari.core.expression.VariableExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
+import com.atonementcrystals.dnr.vikari.core.statement.VariableDeclarationStatement;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import com.atonementcrystals.dnr.vikari.interpreter.Parser;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
@@ -496,5 +500,117 @@ public class ParserTest_Arithmetic {
         assertEquals(1, syntaxErrors.size(), "Unexpected number of syntax errors.");
 
         testSyntaxError(syntaxErrors.get(0), location(0, 2), sourceString, "Expected expression.");
+    }
+
+    @Test
+    @Order(11)
+    public void testParser_Expression_ArithmeticOperators_InvalidOperand() {
+        String sourceString = "5 + true";
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+
+        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
+        parser.setSyntaxErrorReporter(syntaxErrorReporter);
+
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
+        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
+
+        int expectedSize = 1;
+        int actualSize = parsedStatements.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+        // statement 1
+        Statement statement = parsedStatements.get(0);
+        assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
+        ExpressionStatement expressionStatement = (ExpressionStatement) statement;
+
+        // first expression
+        Expression expression = expressionStatement.getExpression();
+        assertEquals(BinaryExpression.class, expression.getClass(), "Unexpected expression type.");
+
+        BinaryExpression binaryExpression = (BinaryExpression) expression;
+        Expression left = binaryExpression.getLeft();
+        BinaryOperatorCrystal operator = binaryExpression.getOperator();
+        Expression right = binaryExpression.getRight();
+
+        assertEquals(LiteralExpression.class, left.getClass(), "Unexpected expression type.");
+        assertEquals(AddOperatorCrystal.class, operator.getClass(), "Unexpected operator type.");
+        assertEquals(LiteralExpression.class, right.getClass(), "Unexpected expression type.");
+
+        AtonementCrystal leftOperand = ((LiteralExpression) left).getValue();
+        AtonementCrystal rightOperand = ((LiteralExpression) right).getValue();
+
+        assertEquals(IntegerCrystal.class, leftOperand.getClass(), "Unexpected literal type.");
+        assertEquals(BooleanCrystal.class, rightOperand.getClass(), "Unexpected literal type.");
+
+        IntegerCrystal leftNumber = (IntegerCrystal) leftOperand;
+        BooleanCrystal rightBoolean = (BooleanCrystal) rightOperand;
+
+        assertEquals(5, leftNumber.getValue(), "Unexpected literal value.");
+        assertEquals(true, rightBoolean.getValue(), "Unexpected literal value.");
+
+        // syntax errors
+        assertSyntaxErrors(syntaxErrorReporter, 1);
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+
+        testSyntaxError(syntaxErrors.get(0), location(0, 4), sourceString, "Arithmetic expression expects a Number for operands.");
+    }
+
+    @Test
+    @Order(12)
+    public void testParser_Expression_ArithmeticOperators_InvalidOperand_FromVariable() {
+        String sourceString = "bool << true, 5 + bool";
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+
+        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
+        parser.setSyntaxErrorReporter(syntaxErrorReporter);
+
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
+        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
+
+        int expectedSize = 2;
+        int actualSize = parsedStatements.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+        // statement 1
+        Statement statement = parsedStatements.get(0);
+        assertEquals(VariableDeclarationStatement.class, statement.getClass(), "Unexpected statement type.");
+
+        // statement 2
+        statement = parsedStatements.get(1);
+        assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
+        ExpressionStatement expressionStatement = (ExpressionStatement) statement;
+
+        // first expression
+        Expression expression = expressionStatement.getExpression();
+        assertEquals(BinaryExpression.class, expression.getClass(), "Unexpected expression type.");
+
+        BinaryExpression binaryExpression = (BinaryExpression) expression;
+        Expression left = binaryExpression.getLeft();
+        BinaryOperatorCrystal operator = binaryExpression.getOperator();
+        Expression right = binaryExpression.getRight();
+
+        assertEquals(LiteralExpression.class, left.getClass(), "Unexpected expression type.");
+        assertEquals(AddOperatorCrystal.class, operator.getClass(), "Unexpected operator type.");
+        assertEquals(VariableExpression.class, right.getClass(), "Unexpected expression type.");
+
+        AtonementCrystal leftOperand = ((LiteralExpression) left).getValue();
+        assertEquals(IntegerCrystal.class, leftOperand.getClass(), "Unexpected literal type.");
+        IntegerCrystal leftNumber = (IntegerCrystal) leftOperand;
+        assertEquals(5, leftNumber.getValue(), "Unexpected literal value.");
+
+        AtonementCrystal rightOperand = ((VariableExpression) right).getReference();
+        assertEquals(ReferenceCrystal.class, rightOperand.getClass(), "Unexpected crystal type.");
+
+        // syntax errors
+        assertSyntaxErrors(syntaxErrorReporter, 1);
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+
+        testSyntaxError(syntaxErrors.get(0), location(0, 18), sourceString, "Arithmetic expression expects a Number for operands.");
     }
 }

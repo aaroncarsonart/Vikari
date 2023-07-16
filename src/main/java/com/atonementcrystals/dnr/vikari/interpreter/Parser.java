@@ -3,6 +3,7 @@ package com.atonementcrystals.dnr.vikari.interpreter;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
@@ -401,13 +402,14 @@ public class Parser {
     }
 
     private Expression primary() {
-        // Number literal
-        if (match(NumberCrystal.class)) {
+        // Literal value
+        if (match(NumberCrystal.class, BooleanCrystal.class)) {
             AtonementCrystal previous = previous();
             LiteralExpression literalExpression = new LiteralExpression(previous);
             literalExpression.setLocation(previous.getCoordinates());
             return literalExpression;
         }
+
 
         // Grouping expression
         if (match(TokenType.LEFT_SQUARE_BRACKET)) {
@@ -479,7 +481,8 @@ public class Parser {
         return false;
     }
 
-    public boolean match(Class<? extends AtonementCrystal>... crystalTypes) {
+    @SafeVarargs
+    public final boolean match(Class<? extends AtonementCrystal>... crystalTypes) {
         for (Class<? extends AtonementCrystal> crystalType : crystalTypes) {
             if (check(crystalType)) {
                 advance();
