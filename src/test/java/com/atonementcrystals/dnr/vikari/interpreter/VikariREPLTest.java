@@ -534,6 +534,6 @@ class VikariREPLTest {
 
         // 3. Execute another statement with the variable. Ensure the ResolverError has been cleared.
         repl.lexParseAndInterpret("a");
-        originalOut.println("{0}");
+        testOutput("{0}");
     }
 }
