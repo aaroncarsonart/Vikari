@@ -1,5 +1,12 @@
 package com.atonementcrystals.dnr.vikari.parser.expression;
 
+import com.atonementcrystals.dnr.vikari.core.crystal.number.BigDecimalCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.number.BigIntegerCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.number.DoubleCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.number.FloatCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.number.LongCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
@@ -249,10 +256,11 @@ public class ParserTest_Literals {
         testNullSwordLiteral(expression, location(0, 0), 1);
     }
 
-    @Test
-    @Order(9)
-    public void testParser_Expression_Literals_NullLiteralExpression() {
-        List<Statement> parsedStatements = lexAndParse("__[-1]__");
+    private void testNullLiteralExpression(String sourceString,
+                                           Class<? extends NumberCrystal<? extends Number>> valueType,
+                                           Number numericValue) {
+
+        List<Statement> parsedStatements = lexAndParse(sourceString);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -265,6 +273,25 @@ public class ParserTest_Literals {
 
         // first expression
         Expression expression = expressionStatement.getExpression();
-        testNullLiteralExpression_SingleIntegerOperand(expression, location(0, 0), location(0, 4), -1);
+        boolean isNegative = numericValue.toString().charAt(0) == '-';
+        int column = isNegative ? 4 : 3;
+        testNullLiteralExpression_SingleNumberOperand(expression, location(0, 0), location(0, column), valueType, numericValue);
+    }
+
+    @Test
+    @Order(9)
+    public void testParser_Expression_Literals_NullLiteralExpression() {
+        testNullLiteralExpression("__[-1]__", IntegerCrystal.class, -1);
+    }
+
+    @Test
+    @Order(10)
+    public void testParser_Expression_Literals_NullLiteralExpression_AllNumericTypes() {
+        testNullLiteralExpression("__[5]__", IntegerCrystal.class, 5);
+        testNullLiteralExpression("__[5L]__", LongCrystal.class, 5L);
+        testNullLiteralExpression("__[5B]__", BigIntegerCrystal.class, new BigInteger("5"));
+        testNullLiteralExpression("__[5.0F]__", FloatCrystal.class, 5F);
+        testNullLiteralExpression("__[5.0D]__", DoubleCrystal.class, 5D);
+        testNullLiteralExpression("__[5.0B]__", BigDecimalCrystal.class, new BigDecimal("5.0", Arithmetic.getMathContext()));
     }
 }

@@ -2,6 +2,7 @@ package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeHierarchy;
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullKeywordCrystal;
@@ -326,12 +327,14 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     public AtonementCrystal visit(NullLiteralExpression expr) {
         AtonementCrystal expressionResult = evaluate(expr.getExpression());
 
-        if (expressionResult instanceof IntegerCrystal integerCrystal) {
-            Integer length = integerCrystal.getValue();
+        if (expressionResult instanceof NumberCrystal numberCrystal) {
+            TypeCrystal integerType = VikariType.INTEGER.getTypeCrystal();
+            IntegerCrystal integerCrystal = (IntegerCrystal) Arithmetic.maybeUpcastOrDowncast(numberCrystal, integerType);
+            int length = integerCrystal.getValue();
             return new NullCrystal(length);
         } else {
             CoordinatePair errorLocation = expr.getExpression().getLocation();
-            throw internalRuntimeError(errorLocation, "Null literal expression expects an Integer as its operand.");
+            throw internalRuntimeError(errorLocation, "Null literal expression expects a Number as its operand.");
         }
     }
 

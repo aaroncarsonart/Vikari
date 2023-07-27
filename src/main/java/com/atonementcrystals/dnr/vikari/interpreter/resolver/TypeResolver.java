@@ -237,9 +237,9 @@ public class TypeResolver extends Resolver<TypeCrystal> {
         Expression innerExpression = expr.getExpression();
         TypeCrystal innerExpressionType = innerExpression.accept(this);
 
-        if (!innerExpressionType.isEqual(VikariType.INTEGER)) {
+        if (!innerExpressionType.hasType(VikariType.NUMBER)) {
             CoordinatePair errorLocation = innerExpression.getLocation();
-            error(errorLocation, "Null literal expression expects an Integer as an operand.");
+            error(errorLocation, "Null literal expression expects a Number as its operand.");
         }
 
         return TypeHierarchy.getNullTypeFor(VikariType.NULL);

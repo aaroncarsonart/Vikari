@@ -20,18 +20,16 @@ import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.NullLiteralExpression;
-import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import com.atonementcrystals.dnr.vikari.interpreter.Parser;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
+import static com.atonementcrystals.dnr.vikari.TestUtils.testNumberCrystal;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -73,7 +71,6 @@ public class ParserTest_Utils {
 
         NumberCrystal number = clazz.cast(value);
         assertEquals(expectedValue, number.getValue(), "Unexpected literal value.");
-
     }
 
     public static void testIntegerLiteralExpression(Expression expr, Object expectedValue) {
@@ -178,6 +175,16 @@ public class ParserTest_Utils {
                                                                       CoordinatePair expectedOperandLocation,
                                                                       int expectedLength) {
 
+        testNullLiteralExpression_SingleNumberOperand(expression, expectedExpressionLocation, expectedOperandLocation,
+                IntegerCrystal.class, expectedLength);
+    }
+
+    public static void testNullLiteralExpression_SingleNumberOperand(Expression expression,
+                                                                     CoordinatePair expectedExpressionLocation,
+                                                                     CoordinatePair expectedOperandLocation,
+                                                                     Class<? extends NumberCrystal<? extends Number>> numberType,
+                                                                     Number expectedLength) {
+
         assertEquals(expectedExpressionLocation, expression.getLocation(), "Unexpected location.");
         assertEquals(NullLiteralExpression.class, expression.getClass(), "Unexpected expression type.");
 
@@ -189,9 +196,6 @@ public class ParserTest_Utils {
         AtonementCrystal literal = literalExpression.getValue();
 
         assertEquals(expectedOperandLocation, literal.getCoordinates(), "Unexpected location.");
-        assertEquals(IntegerCrystal.class, literal.getClass(), "Unexpected crystal type.");
-
-        IntegerCrystal integerCrystal = (IntegerCrystal) literal;
-        assertEquals(expectedLength, integerCrystal.getValue(), "Unexpected integer value.");
+        testNumberCrystal(literal, expectedLength, numberType);
     }
 }
