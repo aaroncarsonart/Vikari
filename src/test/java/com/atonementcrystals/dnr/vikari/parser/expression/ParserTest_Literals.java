@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
+import static com.atonementcrystals.dnr.vikari.TestUtils.location;
 import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -208,5 +209,62 @@ public class ParserTest_Literals {
         // first expression
         Expression expression = expressionStatement.getExpression();
         testBigDecimalLiteralExpression(expression, new BigDecimal("9.42", Arithmetic.getMathContext()));
+    }
+
+    @Test
+    @Order(7)
+    public void testParser_Expression_Literals_NullKeyword() {
+        List<Statement> parsedStatements = lexAndParse("null");
+
+        int expectedSize = 1;
+        int actualSize = parsedStatements.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+        // statement 1
+        Statement statement = parsedStatements.get(0);
+        assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
+        ExpressionStatement expressionStatement = (ExpressionStatement) statement;
+
+        // first expression
+        Expression expression = expressionStatement.getExpression();
+        testNullKeyword(expression, location(0, 0));
+    }
+
+    @Test
+    @Order(8)
+    public void testParser_Expression_Literals_NullLiteral_Sword() {
+        List<Statement> parsedStatements = lexAndParse("_");
+
+        int expectedSize = 1;
+        int actualSize = parsedStatements.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+        // statement 1
+        Statement statement = parsedStatements.get(0);
+        assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
+        ExpressionStatement expressionStatement = (ExpressionStatement) statement;
+
+        // first expression
+        Expression expression = expressionStatement.getExpression();
+        testNullSwordLiteral(expression, location(0, 0), 1);
+    }
+
+    @Test
+    @Order(9)
+    public void testParser_Expression_Literals_NullLiteralExpression() {
+        List<Statement> parsedStatements = lexAndParse("__[-1]__");
+
+        int expectedSize = 1;
+        int actualSize = parsedStatements.size();
+        assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
+
+        // statement 1
+        Statement statement = parsedStatements.get(0);
+        assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
+        ExpressionStatement expressionStatement = (ExpressionStatement) statement;
+
+        // first expression
+        Expression expression = expressionStatement.getExpression();
+        testNullLiteralExpression_SingleIntegerOperand(expression, location(0, 0), location(0, 4), -1);
     }
 }

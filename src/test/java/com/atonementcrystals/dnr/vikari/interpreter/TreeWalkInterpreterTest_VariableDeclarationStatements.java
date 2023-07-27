@@ -1,13 +1,6 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
-import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
-import com.atonementcrystals.dnr.vikari.core.crystal.NullCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
-import com.atonementcrystals.dnr.vikari.core.crystal.value.ValueCrystal;
-import com.atonementcrystals.dnr.vikari.core.statement.Statement;
-import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -16,76 +9,9 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TreeWalkInterpreterTest_VariableDeclarationStatements {
-    private final AtonementField globalAtonementField = VikariProgram.initGlobalAtonementField();
-    private AtonementField currentEnvironment;
-
-    private void lexParseAndInterpret(String sourceString) {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-        TreeWalkInterpreter interpreter = new TreeWalkInterpreter();
-
-        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
-        parser.setSyntaxErrorReporter(syntaxErrorReporter);
-        interpreter.setGetLineFunction(syntaxErrorReporter::getLineFromCache);
-
-        parser.setGlobalAtonementField(globalAtonementField);
-        interpreter.setGlobalAtonementField(globalAtonementField);
-
-        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
-        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
-        interpreter.interpret(null, parsedStatements);
-
-        currentEnvironment = interpreter.getCurrentEnvironment();
-    }
-
-    private void testVariable(String identifier, VikariType declaredType) {
-        testVariable(identifier, declaredType, null, null);
-    }
-
-    private void testVariable(String identifier, VikariType declaredType, VikariType instantiatedType,
-                              Object expectedValue) {
-
-        assertTrue(currentEnvironment.isDefined(identifier), "Expected variable to be defined.");
-        AtonementCrystal variable = currentEnvironment.get(identifier);
-
-        // 1: Check types.
-        assertEquals(declaredType.getTypeCrystal(), variable.getDeclaredType(), "Unexpected declared type.");
-
-        if (instantiatedType != null) {
-            assertEquals(instantiatedType.getTypeCrystal(), variable.getInstantiatedType(), "Unexpected instantiated type.");
-        } else {
-            assertNull(variable.getInstantiatedType(), "Unexpected instantiated type.");
-        }
-
-        // 2: Check value.
-        if (expectedValue == null) {
-            assertEquals(NullCrystal.class, variable.getClass(), "Unexpected type for declaration result.");
-            NullCrystal nullCrystal = (NullCrystal) variable;
-
-            int expectedLength = 0;
-            int actualLength = nullCrystal.getLength();
-            assertEquals(expectedLength, actualLength, "Unexpected length for null crystal.");
-        }
-
-        else if (variable instanceof ValueCrystal) {
-            ValueCrystal valueCrystal = (ValueCrystal) variable;
-            Object actualvalue = valueCrystal.getValue();
-            assertEquals(expectedValue, actualvalue, "Unexpected value.");
-        } else {
-            TypeCrystal typeCrystal = variable.getInstantiatedType();
-            if (typeCrystal == null) {
-                typeCrystal = variable.getDeclaredType();
-            }
-            fail("Malformed test. Unhandled type in declaration: " + typeCrystal);
-        }
-    }
+public class TreeWalkInterpreterTest_VariableDeclarationStatements extends TreeWalkInterpreterTest_Base {
 
     @Test
     @Order(1)
@@ -449,7 +375,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
         testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
         testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
-        testVariable("c", VikariType.BOOLEAN, null, null);
+        testVariable("c", VikariType.BOOLEAN);
         testVariable("d", VikariType.BOOLEAN, VikariType.BOOLEAN, true);
         testVariable("e", VikariType.BOOLEAN, VikariType.BOOLEAN, false);
         testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
@@ -480,12 +406,134 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements {
 
         testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
         testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
-        testVariable("c", VikariType.BOOLEAN, null, null);
+        testVariable("c", VikariType.BOOLEAN);
         testVariable("d", VikariType.BOOLEAN, VikariType.BOOLEAN, true);
         testVariable("e", VikariType.BOOLEAN, VikariType.BOOLEAN, false);
         testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
         testVariable("g", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
         testVariable("h", VikariType.VALUE, VikariType.BOOLEAN, true);
         testVariable("i", VikariType.VALUE, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(22)
+    public void testTreeWalkInterpreter_VariableDeclaration_Nulls_LengthZero() {
+        String sourceString = """
+                a
+                b << null
+                c << _[0]_
+                d:Integer
+                e:Integer << null
+                f:Integer << __[0]__
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("a", VikariType.ATONEMENT_CRYSTAL, 0);
+        testNullVariable("b", VikariType.ATONEMENT_CRYSTAL, 0);
+        testNullVariable("c", VikariType.ATONEMENT_CRYSTAL, 0);
+        testNullVariable("d", VikariType.INTEGER, 0);
+        testNullVariable("e", VikariType.INTEGER, 0);
+        testNullVariable("f", VikariType.INTEGER, 0);
+    }
+
+    @Test
+    @Order(23)
+    public void testTreeWalkInterpreter_VariableDeclaration_Nulls_PositiveLength() {
+        String sourceString = """
+                a << _
+                b << __
+                c << ___
+                d << ____
+                e << _____
+                f << _[1]_
+                g << _[2]_
+                h << _[3]_
+                i << _[4]_
+                j << _[5]_
+                k:Integer << _
+                l:Integer << __
+                m:Integer << ___
+                n:Integer << ____
+                o:Integer << _____
+                p:Integer << _[1]_
+                q:Integer << _[2]_
+                r:Integer << _[3]_
+                s:Integer << _[4]_
+                t:Integer << _[5]_
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("a", VikariType.ATONEMENT_CRYSTAL, 1);
+        testNullVariable("b", VikariType.ATONEMENT_CRYSTAL, 2);
+        testNullVariable("c", VikariType.ATONEMENT_CRYSTAL, 3);
+        testNullVariable("d", VikariType.ATONEMENT_CRYSTAL, 4);
+        testNullVariable("e", VikariType.ATONEMENT_CRYSTAL, 5);
+        testNullVariable("f", VikariType.ATONEMENT_CRYSTAL, 1);
+        testNullVariable("g", VikariType.ATONEMENT_CRYSTAL, 2);
+        testNullVariable("h", VikariType.ATONEMENT_CRYSTAL, 3);
+        testNullVariable("i", VikariType.ATONEMENT_CRYSTAL, 4);
+        testNullVariable("j", VikariType.ATONEMENT_CRYSTAL, 5);
+        testNullVariable("k", VikariType.INTEGER, 1);
+        testNullVariable("l", VikariType.INTEGER, 2);
+        testNullVariable("m", VikariType.INTEGER, 3);
+        testNullVariable("n", VikariType.INTEGER, 4);
+        testNullVariable("o", VikariType.INTEGER, 5);
+        testNullVariable("p", VikariType.INTEGER, 1);
+        testNullVariable("q", VikariType.INTEGER, 2);
+        testNullVariable("r", VikariType.INTEGER, 3);
+        testNullVariable("s", VikariType.INTEGER, 4);
+        testNullVariable("t", VikariType.INTEGER, 5);
+    }
+
+    @Test
+    @Order(23)
+    public void testTreeWalkInterpreter_VariableDeclaration_Nulls_NegativeLength() {
+        String sourceString = """
+                a << _[-1]_
+                b << _[-2]_
+                c << _[-3]_
+                d << _[-4]_
+                e << _[-5]_
+                f:Integer << _[-1]_
+                g:Integer << _[-2]_
+                h:Integer << _[-3]_
+                i:Integer << _[-4]_
+                j:Integer << _[-5]_
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("a", VikariType.ATONEMENT_CRYSTAL, -1);
+        testNullVariable("b", VikariType.ATONEMENT_CRYSTAL, -2);
+        testNullVariable("c", VikariType.ATONEMENT_CRYSTAL, -3);
+        testNullVariable("d", VikariType.ATONEMENT_CRYSTAL, -4);
+        testNullVariable("e", VikariType.ATONEMENT_CRYSTAL, -5);
+        testNullVariable("f", VikariType.INTEGER, -1);
+        testNullVariable("g", VikariType.INTEGER, -2);
+        testNullVariable("h", VikariType.INTEGER, -3);
+        testNullVariable("i", VikariType.INTEGER, -4);
+        testNullVariable("j", VikariType.INTEGER, -5);
+    }
+
+    @Test
+    @Order(24)
+    public void testTreeWalkInterpreter_VariableDeclaration_Nulls_NullLiteralExpression_WithVariable() {
+        String sourceString = """
+                int:Integer << 2
+                foo << __[int]__
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("foo", VikariType.ATONEMENT_CRYSTAL, 2);
+    }
+
+    @Test
+    @Order(25)
+    public void testTreeWalkInterpreter_VariableDeclaration_Nulls_NullLiteralExpression_WithArithmeticExpression() {
+        String sourceString = """
+                foo << __[5 + 7]__
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("foo", VikariType.ATONEMENT_CRYSTAL, 12);
     }
 }

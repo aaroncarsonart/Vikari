@@ -2,7 +2,6 @@ package com.atonementcrystals.dnr.vikari.parser.expression;
 
 import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
@@ -16,11 +15,7 @@ import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.core.statement.VariableDeclarationStatement;
 import com.atonementcrystals.dnr.vikari.error.VikariError;
-import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
-import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
-import com.atonementcrystals.dnr.vikari.interpreter.Parser;
-import com.atonementcrystals.dnr.vikari.interpreter.VikariProgram;
-import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
+import com.atonementcrystals.dnr.vikari.parser.ParserTest_Base;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -30,114 +25,9 @@ import java.util.List;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.location;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ParserTest_Variables {
-    private final AtonementField globalAtonementField = VikariProgram.initGlobalAtonementField();
-    private AtonementField rootEnvironment;
-    SyntaxErrorReporter syntaxErrorReporter;
-
-    public List<Statement> lexAndParse(String sourceString) {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-
-        parser.setGlobalAtonementField(globalAtonementField);
-
-        syntaxErrorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
-        parser.setSyntaxErrorReporter(syntaxErrorReporter);
-
-        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
-        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
-
-        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
-        rootEnvironment = parser.getRootEnvironment();
-
-        return parsedStatements;
-    }
-
-    public List<Statement> lexAndParse_WithErrors(String sourceString, int expectedErrorCount) {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-
-        parser.setGlobalAtonementField(globalAtonementField);
-
-        syntaxErrorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
-        parser.setSyntaxErrorReporter(syntaxErrorReporter);
-
-        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
-        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
-
-        TestUtils.assertSyntaxErrors(syntaxErrorReporter, expectedErrorCount);
-        rootEnvironment = parser.getRootEnvironment();
-
-        return parsedStatements;
-    }
-
-    public void testDeclaration(Statement statement,
-                                String identifier, VikariType declaredType, VikariType instantiatedType, CoordinatePair location) {
-
-        assertEquals(VariableDeclarationStatement.class, statement.getClass(), "Unexpected statement type.");
-        VariableDeclarationStatement declarationStatement = (VariableDeclarationStatement) statement;
-
-        assertEquals(location, statement.getLocation(), "Unexpected location.");
-
-        AtonementCrystal variable = declarationStatement.getDeclaredVariable();
-        testVariableCrystal(variable, identifier, declaredType, instantiatedType, location, rootEnvironment);
-        assertNull(declarationStatement.getAssignmentOperator(), "Expected operator to be null.");
-        assertNull(declarationStatement.getInitializerExpression(), "Expected initializer expression to be null.");
-    }
-
-    /**
-     * Set localEnvironment to null for the redefined variable error case.
-     */
-    public void testVariableCrystal(AtonementCrystal variable, String expectedIdentifier,
-                                    VikariType expectedDeclaredType, VikariType expectedInstantiatedType,
-                                    CoordinatePair expectedCoordinates, AtonementField localEnvironment) {
-        // Check variable from expression
-        assertEquals(expectedIdentifier, variable.getIdentifier(), "Unexpected variable identifier.");
-        assertEquals(expectedDeclaredType.getTypeCrystal(), variable.getDeclaredType(), "Unexpected declared type.");
-
-        if (expectedInstantiatedType == null) {
-            assertNull(variable.getInstantiatedType(), "Expected instantiated type to be null.");
-        } else{
-            assertEquals(expectedInstantiatedType.getTypeCrystal(), variable.getInstantiatedType(), "Unexpected instantiated type.");
-        }
-
-        assertEquals(expectedCoordinates, variable.getCoordinates(), "Unexpected coordinates.");
-
-        // Check variable exists in local environment
-        if (localEnvironment != null) {
-            assertTrue(localEnvironment.isDefined(expectedIdentifier), "Expected variable to be defined in local " +
-                    "environment.");
-            assertTrue(localEnvironment.hasFieldMember(expectedIdentifier), "Expected variable to be a field member " +
-                    "of the local environment.");
-
-            AtonementCrystal fieldMember = localEnvironment.get(expectedIdentifier);
-            assertEquals(variable.getIdentifier(), fieldMember.getIdentifier(), "Expected variable to be equal to " +
-                    "field member of the local environment.");
-
-            assertEquals(variable.getDeclaredType(), fieldMember.getDeclaredType(), "Expected variable to be equal " +
-                    "to field member of the local environment.");
-        }
-    }
-
-    public void testVariableExpression(Statement statement, String identifier, VikariType declaredType,
-                                       VikariType instantiatedType, CoordinatePair location) {
-
-        assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
-        ExpressionStatement expressionStatement = (ExpressionStatement) statement;
-
-        assertEquals(location, statement.getLocation(), "Unexpected location.");
-
-        Expression innerExpression = expressionStatement.getExpression();
-        assertEquals(VariableExpression.class, innerExpression.getClass(), "Unexpected expression type.");
-
-        AtonementCrystal variable = ((VariableExpression) innerExpression).getReference();
-        testVariableCrystal(variable, identifier, declaredType, instantiatedType, location, rootEnvironment);
-    }
+public class ParserTest_Variables extends ParserTest_Base {
 
     /**
      * This is a strange error case. Bare expression statements like this will never be used in production code except
@@ -223,8 +113,8 @@ public class ParserTest_Variables {
         int actualStatementCount = statements.size();
         assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
 
-        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, null, location(0, 0));
-        testVariableExpression(statements.get(1), "foo", VikariType.ATONEMENT_CRYSTAL, null, location(0, 4));
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.NULL, location(0, 0));
+        testVariableExpression(statements.get(1), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.NULL, location(0, 4));
     }
 
     @Test
@@ -250,7 +140,7 @@ public class ParserTest_Variables {
         assertEquals(expectedStatementCount, actualStatementCount, "Unexpected statement count.");
 
         // declaration
-        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, null, location(0, 0));
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.NULL, location(0, 0));
 
         // arithmetic expressions
 

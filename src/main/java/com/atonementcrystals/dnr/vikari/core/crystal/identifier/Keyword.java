@@ -16,7 +16,8 @@ public enum Keyword {
 
     // literals
     TRUE("true"),
-    FALSE("false");
+    FALSE("false"),
+    NULL("null");
 
     /**
      * Create A new Keyword.

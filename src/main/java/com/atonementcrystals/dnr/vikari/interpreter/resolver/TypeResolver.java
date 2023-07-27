@@ -1,7 +1,9 @@
 package com.atonementcrystals.dnr.vikari.interpreter.resolver;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.NullTypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.TypeHierarchy;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.UnaryOperatorCrystal;
@@ -16,6 +18,7 @@ import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.NullLiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.PrintExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.RightAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.UnaryExpression;
@@ -36,7 +39,7 @@ import java.util.Set;
  */
 public class TypeResolver extends Resolver<TypeCrystal> {
     /** Need a concrete, non-null TypeCrystal instance for type resolution errors. */
-    private static final TypeCrystal INVALID_TYPE = new TypeCrystal("Invalid Type", "Invalid Type");
+    private static final TypeCrystal INVALID_TYPE = VikariType.INVALID.getTypeCrystal();
 
     /** The set of all basic arithmetic operators handled by the same type resolving logic rules. */
     private static final Set<Class<? extends BinaryOperatorCrystal>> ARITHMETIC_OPERATORS = Set.of(
@@ -144,14 +147,19 @@ public class TypeResolver extends Resolver<TypeCrystal> {
         if (initializerExpression != null) {
             TypeCrystal initializerType = initializerExpression.accept(this);
 
-            if (initializerType.hasType(declaredType) || allowNumericAssignment(declaredType, initializerType)) {
+            if (initializerType instanceof NullTypeCrystal initializerNullType) {
+                return handleNullType(declaredVariable, declaredType, initializerNullType);
+            } else if (initializerType.hasType(declaredType) || allowNumericAssignment(declaredType, initializerType)) {
                 declaredVariable.setInstantiatedType(initializerType);
-                return initializerType;
             } else {
+                declaredVariable.setInstantiatedType(INVALID_TYPE);
                 assignmentError(declaredVariable.getCoordinates(), declaredType, initializerType);
             }
 
             return initializerType;
+        } else {
+            TypeCrystal nullType = TypeHierarchy.getNullTypeFor(declaredType);
+            declaredVariable.setInstantiatedType(nullType);
         }
 
         return declaredType;
@@ -172,9 +180,12 @@ public class TypeResolver extends Resolver<TypeCrystal> {
             return expr.getLvalue().accept(this);
         }
 
-        if (rvalueType.hasType(lvalueDeclaredType) || allowNumericAssignment(lvalueDeclaredType, rvalueType)) {
+        if (rvalueType instanceof NullTypeCrystal rvalueNullType) {
+            return handleNullType(lvalue, lvalueDeclaredType, rvalueNullType);
+        } else if (rvalueType.hasType(lvalueDeclaredType) || allowNumericAssignment(lvalueDeclaredType, rvalueType)) {
             lvalue.setInstantiatedType(rvalueType);
         } else {
+            lvalue.setInstantiatedType(INVALID_TYPE);
             assignmentError(expr.getLvalue().getLocation(), lvalueDeclaredType, rvalueType);
         }
 
@@ -196,13 +207,42 @@ public class TypeResolver extends Resolver<TypeCrystal> {
             return expr.getLvalue().accept(this);
         }
 
-        if (rvalueType.hasType(lvalueDeclaredType) || allowNumericAssignment(lvalueDeclaredType, rvalueType)) {
+        if (rvalueType instanceof NullTypeCrystal rvalueNullType) {
+            return handleNullType(lvalue, lvalueDeclaredType, rvalueNullType);
+        } else if (rvalueType.hasType(lvalueDeclaredType) || allowNumericAssignment(lvalueDeclaredType, rvalueType)) {
             lvalue.setInstantiatedType(rvalueType);
         } else {
+            lvalue.setInstantiatedType(INVALID_TYPE);
             assignmentError(expr.getLvalue().getLocation(), lvalueDeclaredType, rvalueType);
         }
 
         return rvalueType;
+    }
+
+    private TypeCrystal handleNullType(AtonementCrystal lvalue, TypeCrystal lvalueDeclaredType,
+                                NullTypeCrystal rvalueNullType) {
+        TypeCrystal rvalueParentType = rvalueNullType.getParent();
+        if (rvalueParentType.hasType(lvalueDeclaredType) || rvalueParentType == VikariType.NULL.getTypeCrystal()) {
+            NullTypeCrystal lvalueNullType = TypeHierarchy.getNullTypeFor(lvalueDeclaredType);
+            lvalue.setInstantiatedType(lvalueNullType);
+            return lvalueNullType;
+        } else {
+            assignmentError(lvalue.getCoordinates(), lvalueDeclaredType, rvalueParentType);
+            return rvalueNullType;
+        }
+    }
+
+    @Override
+    public TypeCrystal visit(NullLiteralExpression expr) {
+        Expression innerExpression = expr.getExpression();
+        TypeCrystal innerExpressionType = innerExpression.accept(this);
+
+        if (!innerExpressionType.isEqual(VikariType.INTEGER)) {
+            CoordinatePair errorLocation = innerExpression.getLocation();
+            error(errorLocation, "Null literal expression expects an Integer as an operand.");
+        }
+
+        return TypeHierarchy.getNullTypeFor(VikariType.NULL);
     }
 
     @Override

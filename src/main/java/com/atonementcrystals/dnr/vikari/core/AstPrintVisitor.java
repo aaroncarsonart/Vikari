@@ -7,6 +7,7 @@ import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.NullLiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.PrintExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.RightAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.UnaryExpression;
@@ -143,6 +144,18 @@ public class AstPrintVisitor implements Statement.Visitor<String>, Expression.Vi
         String lvalue = expr.getLvalue().accept(this);
         String descriptor = Utils.getSimpleClassName(expr.getOperator());
         return group(descriptor, rvalue, operator, lvalue);
+    }
+
+    @Override
+    public String visit(NullLiteralExpression expr) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("_[");
+
+        String expressionResult = expr.getExpression().accept(this);
+        sb.append(expressionResult);
+
+        sb.append("]_");
+        return sb.toString();
     }
 
     @Override

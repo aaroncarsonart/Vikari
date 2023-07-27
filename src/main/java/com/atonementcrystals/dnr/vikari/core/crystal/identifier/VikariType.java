@@ -4,6 +4,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeHierarchy;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigDecimalCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigIntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.DoubleCrystal;
@@ -26,6 +27,8 @@ import java.util.stream.Collectors;
  */
 public enum VikariType {
     ATONEMENT_CRYSTAL(AtonementCrystal.class, "AtonementCrystal"),
+    NULL(NullCrystal.class),
+    INVALID(null, "InvalidType"),
 
     // base types
     TYPE(TypeCrystal.class),
@@ -55,6 +58,7 @@ public enum VikariType {
     public static EnumSet<VikariType> initLangTypes() {
         return Arrays.stream(values())
                 .filter(vikariType -> vikariType.typeCrystal.getPackageName().equals(LANG_PACKAGE))
+                .filter(vikariType -> vikariType != INVALID)
                 .collect(Collectors.toCollection(() -> EnumSet.noneOf(VikariType.class)));
     }
 
@@ -62,8 +66,8 @@ public enum VikariType {
      * @return The set of all types with type Type.
      */
     public static EnumSet<VikariType> initTypeTypes() {
-        return EnumSet.of(ATONEMENT_CRYSTAL, VALUE, TYPE, NUMBER, INTEGER, LONG, BIG_INTEGER, FLOAT, DOUBLE,
-                BIG_DECIMAL, BOOLEAN);
+        return EnumSet.of(ATONEMENT_CRYSTAL, NULL, INVALID, VALUE, TYPE, NUMBER, INTEGER, LONG, BIG_INTEGER, FLOAT,
+                DOUBLE, BIG_DECIMAL, BOOLEAN);
     }
 
     /*

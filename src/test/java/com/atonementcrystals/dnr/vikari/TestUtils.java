@@ -1,6 +1,5 @@
 package com.atonementcrystals.dnr.vikari;
 
-import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
@@ -73,16 +72,6 @@ public class TestUtils {
     public static void assertWarnings(SyntaxErrorReporter syntaxErrorReporter, int expectedWarningCount) {
         int actualWarningCountCount = syntaxErrorReporter.getCompilationWarnings().size();
         assertEquals(expectedWarningCount, actualWarningCountCount, "Unexpected number of compilation warnings.");
-    }
-
-    public static void testRvalue(Object value, AtonementCrystal rvalue, VikariType instantiatedType) {
-        if (value instanceof Number) {
-            TestUtils.testNumberCrystal(rvalue, value, (Class<? extends NumberCrystal>) instantiatedType.getJavaType());
-        } else if (value instanceof Boolean) {
-            TestUtils.testBooleanCrystal(rvalue, value);
-        } else {
-            fail("Malformed test. Unexpected value type for rvalue: " + value.getClass().getSimpleName());
-        }
     }
 
     public static void testNumberCrystal(AtonementCrystal crystal, Object expectedValue, Class<? extends NumberCrystal> expectedClass) {

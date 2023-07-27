@@ -1,12 +1,16 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
-import com.atonementcrystals.dnr.vikari.core.crystal.NullCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.TypeHierarchy;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullKeywordCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.NullLiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.PrintExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.RightAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.VariableExpression;
@@ -240,15 +244,20 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
 
         if (value instanceof NumberCrystal) {
             declaredVariable = Arithmetic.maybeUpcastOrDowncast((NumberCrystal) value, declaredType);
-        } else if (value != null) {
-            declaredVariable = value.copy();
-        } else {
+        } else if (value == null || value instanceof NullKeywordCrystal) {
             declaredVariable = new NullCrystal(0);
+        } else {
+            declaredVariable = value.copy();
         }
 
         declaredVariable.setIdentifier(identifier);
         declaredVariable.setDeclaredType(declaredType);
-        // NOTE: The initializedType is already set!
+
+        // NOTE: The initializedType is already set! (Unless it is a NullCrystal.)
+        if (declaredVariable instanceof NullCrystal) {
+            TypeCrystal nullType = TypeHierarchy.getNullTypeFor(declaredType);
+            declaredVariable.setInstantiatedType(nullType);
+        }
 
         return declaredVariable;
     }
@@ -259,13 +268,20 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
 
         if (value instanceof NumberCrystal) {
             variable = Arithmetic.maybeUpcastOrDowncast((NumberCrystal) value, declaredType);
+        } else if (value instanceof NullKeywordCrystal) {
+            variable = new NullCrystal(0);
         } else {
             variable = value.copy();
         }
 
         variable.setIdentifier(identifier);
         variable.setDeclaredType(declaredType);
-        // NOTE: The initializedType is already set!
+
+        // NOTE: The initializedType is already set! (Unless it is a NullCrystal.)
+        if (variable instanceof NullCrystal) {
+            TypeCrystal nullType = TypeHierarchy.getNullTypeFor(declaredType);
+            variable.setInstantiatedType(nullType);
+        }
 
         return variable;
     }
@@ -304,6 +320,19 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
             return variableToAssign;
         }
         throw internalRuntimeErrorForUndefinedVariable(lvalue);
+    }
+
+    @Override
+    public AtonementCrystal visit(NullLiteralExpression expr) {
+        AtonementCrystal expressionResult = evaluate(expr.getExpression());
+
+        if (expressionResult instanceof IntegerCrystal integerCrystal) {
+            Integer length = integerCrystal.getValue();
+            return new NullCrystal(length);
+        } else {
+            CoordinatePair errorLocation = expr.getExpression().getLocation();
+            throw internalRuntimeError(errorLocation, "Null literal expression expects an Integer as its operand.");
+        }
     }
 
     @Override

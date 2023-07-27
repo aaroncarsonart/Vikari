@@ -1,8 +1,13 @@
 package com.atonementcrystals.dnr.vikari.parser;
 
+import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.TypeHierarchy;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullKeywordCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigDecimalCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigIntegerCrystal;
@@ -14,13 +19,40 @@ import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.NullLiteralExpression;
+import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
+import com.atonementcrystals.dnr.vikari.core.statement.Statement;
+import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
+import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
+import com.atonementcrystals.dnr.vikari.interpreter.Parser;
+import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
+import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Helper methods for Parser tests.
  */
 public class ParserTest_Utils {
+    public static List<Statement> lexAndParse(String sourceString) {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+
+        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
+        parser.setSyntaxErrorReporter(syntaxErrorReporter);
+
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
+        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
+
+        assertNoSyntaxErrors(syntaxErrorReporter);
+        return parsedStatements;
+    }
+
     private static void testTypeCrystalsOfLiteral(AtonementCrystal literalCrystal, VikariType vikariType) {
         TypeCrystal expectedType = vikariType.getTypeCrystal();
 
@@ -99,5 +131,67 @@ public class ParserTest_Utils {
         assertEquals(expectedOperatorClass, operator.getClass(), "Unexpected operator type.");
         testIntegerLiteralExpression(left, expectedLeft);
         testIntegerLiteralExpression(right, expectedRight);
+    }
+
+    public static void testRvalue(Object value, AtonementCrystal rvalue, VikariType instantiatedType) {
+        if (value instanceof Number) {
+            TestUtils.testNumberCrystal(rvalue, value, (Class<? extends NumberCrystal>) instantiatedType.getJavaType());
+        } else if (value instanceof Boolean) {
+            TestUtils.testBooleanCrystal(rvalue, value);
+        } else {
+            fail("Malformed test. Unexpected value type for rvalue: " + value.getClass().getSimpleName());
+        }
+    }
+
+    public static void testNullKeyword(Expression expression, CoordinatePair expectedLocation) {
+        assertEquals(expectedLocation, expression.getLocation(), "Unexpected location.");
+        assertEquals(LiteralExpression.class, expression.getClass(), "Unexpected expression type.");
+
+        LiteralExpression literalExpression = (LiteralExpression) expression;
+        AtonementCrystal literal = literalExpression.getValue();
+
+        assertEquals(expectedLocation, literal.getCoordinates(), "Unexpected location.");
+        assertEquals(NullKeywordCrystal.class, literal.getClass(), "Unexpected crystal type.");
+
+        NullKeywordCrystal nullKeywordCrystal = (NullKeywordCrystal) literal;
+        assertEquals(0, nullKeywordCrystal.getLength(), "Unexpected length.");
+    }
+
+    public static void testNullSwordLiteral(Expression expression, CoordinatePair expectedLocation,
+                                            int expectedLength) {
+
+        assertEquals(expectedLocation, expression.getLocation(), "Unexpected location.");
+        assertEquals(LiteralExpression.class, expression.getClass(), "Unexpected expression type.");
+
+        LiteralExpression literalExpression = (LiteralExpression) expression;
+        AtonementCrystal literal = literalExpression.getValue();
+
+        assertEquals(expectedLocation, literal.getCoordinates(), "Unexpected location.");
+        assertEquals(NullCrystal.class, literal.getClass(), "Unexpected crystal type.");
+
+        NullCrystal nullCrystal = (NullCrystal) literal;
+        assertEquals(expectedLength, nullCrystal.getLength(), "Unexpected length.");
+    }
+
+    public static void testNullLiteralExpression_SingleIntegerOperand(Expression expression,
+                                                                      CoordinatePair expectedExpressionLocation,
+                                                                      CoordinatePair expectedOperandLocation,
+                                                                      int expectedLength) {
+
+        assertEquals(expectedExpressionLocation, expression.getLocation(), "Unexpected location.");
+        assertEquals(NullLiteralExpression.class, expression.getClass(), "Unexpected expression type.");
+
+        NullLiteralExpression nullLiteralExpression = (NullLiteralExpression) expression;
+        Expression innerExpression = nullLiteralExpression.getExpression();
+        assertEquals(LiteralExpression.class, innerExpression.getClass(), "Unexpected expression type.");
+
+        LiteralExpression literalExpression = (LiteralExpression) innerExpression;
+        AtonementCrystal literal = literalExpression.getValue();
+
+        assertEquals(expectedOperandLocation, literal.getCoordinates(), "Unexpected location.");
+        assertEquals(IntegerCrystal.class, literal.getClass(), "Unexpected crystal type.");
+
+        IntegerCrystal integerCrystal = (IntegerCrystal) literal;
+        assertEquals(expectedLength, integerCrystal.getValue(), "Unexpected integer value.");
     }
 }

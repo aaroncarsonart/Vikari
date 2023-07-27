@@ -2,7 +2,7 @@ package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
-import com.atonementcrystals.dnr.vikari.core.crystal.NullCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;

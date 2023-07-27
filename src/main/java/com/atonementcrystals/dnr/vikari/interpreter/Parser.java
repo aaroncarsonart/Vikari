@@ -2,8 +2,11 @@ package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.TypeHierarchy;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullKeywordCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
@@ -12,6 +15,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.RightAs
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.NullLiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.PrintExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.RightAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.VariableExpression;
@@ -403,25 +407,19 @@ public class Parser {
 
     private Expression primary() {
         // Literal value
-        if (match(NumberCrystal.class, BooleanCrystal.class)) {
+        if (match(NumberCrystal.class, BooleanCrystal.class, NullKeywordCrystal.class)) {
             AtonementCrystal previous = previous();
             LiteralExpression literalExpression = new LiteralExpression(previous);
             literalExpression.setLocation(previous.getCoordinates());
             return literalExpression;
         }
 
+        if (match(TokenType.SWORD)) {
+            return nullLiteral();
+        }
 
-        // Grouping expression
         if (match(TokenType.LEFT_SQUARE_BRACKET)) {
-            AtonementCrystal bracket = previous();
-            CoordinatePair location = bracket.getCoordinates();
-
-            Expression expression = expression();
-            consume(TokenType.RIGHT_SQUARE_BRACKET, "Expected `]` after expression.");
-
-            GroupingExpression groupingExpression = new GroupingExpression(expression);
-            groupingExpression.setLocation(location);
-            return groupingExpression;
+            return groupingExpression();
         }
 
         // Variable reference
@@ -447,6 +445,55 @@ public class Parser {
         }
 
         throw error(errorCrystal, "Expected expression.");
+    }
+
+    private Expression nullLiteral() {
+        AtonementCrystal firstSword = previous();
+        GroupingExpression groupingExpression = null;
+        AtonementCrystal secondCrystal = null;
+
+        if (match(TokenType.LEFT_SQUARE_BRACKET)) {
+            groupingExpression = groupingExpression();
+            secondCrystal = consume(TokenType.SWORD, "Expected second sword in null literal expression.");
+        }
+
+        CoordinatePair location = firstSword.getCoordinates();
+
+        // NullLiteralExpression of the form: "__[n]__".
+        if (groupingExpression != null && secondCrystal != null) {
+            Expression innerExpression = groupingExpression.getExpression();
+            NullLiteralExpression nullLiteralExpression = new NullLiteralExpression(innerExpression);
+            nullLiteralExpression.setLocation(location);
+            return nullLiteralExpression;
+        }
+
+        // Null expression consisting of a single sword: "__".
+        else {
+            String identifier = firstSword.getIdentifier();
+            int length = identifier.length();
+            NullCrystal nullCrystal = new NullCrystal(identifier, length);
+            nullCrystal.setCoordinates(location);
+
+            TypeCrystal nullType = TypeHierarchy.getNullTypeFor(VikariType.NULL);
+            nullCrystal.setDeclaredType(nullType);
+            nullCrystal.setInstantiatedType(nullType);
+
+            LiteralExpression literalExpression = new LiteralExpression(nullCrystal);
+            literalExpression.setLocation(location);
+            return literalExpression;
+        }
+    }
+
+    private GroupingExpression groupingExpression() {
+        AtonementCrystal bracket = previous();
+        CoordinatePair location = bracket.getCoordinates();
+
+        Expression expression = expression();
+        consume(TokenType.RIGHT_SQUARE_BRACKET, "Expected `]` after expression.");
+
+        GroupingExpression groupingExpression = new GroupingExpression(expression);
+        groupingExpression.setLocation(location);
+        return groupingExpression;
     }
 
     public boolean isAtEndOfStatement(int tokenNumber) {

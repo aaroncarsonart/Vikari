@@ -1,41 +1,20 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
-import com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.List;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
 import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoWarnings;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TreeWalkInterpreterTest_LineContinuations {
-
-    private final PrintStream originalOut = System.out;
-    private final ByteArrayOutputStream testOut = new ByteArrayOutputStream();
-    private final AtonementField globalAtonementField = VikariProgram.initGlobalAtonementField();
-
-    @BeforeEach
-    public void setupPrintStream() {
-        System.setOut(new PrintStream(testOut));
-    }
-
-    @AfterEach
-    public void restorePrintStream() {
-        System.setOut(originalOut);
-    }
+public class TreeWalkInterpreterTest_LineContinuations extends TreeWalkInterpreterPrintTest_Base {
 
     /**
      * Helper method to efficiently test Vikari print statements.
@@ -68,10 +47,7 @@ public class TreeWalkInterpreterTest_LineContinuations {
             assertNoWarnings(syntaxErrorReporter);
             interpreter.interpret(null, parsedStatements);
 
-            String actualOutput = testOut.toString();
-            assertEquals(expectedOutput, actualOutput, "Unexpected output of print statement.");
-
-            testOut.reset();
+            testOutput(expectedOutput);
         }
     }
 

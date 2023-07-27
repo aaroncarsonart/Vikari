@@ -1,12 +1,17 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.TypeHierarchy;
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.Keyword;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.crystal.keyword.error.ThrowCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullKeywordCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.StringLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.SwordCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigDecimalCrystal;
@@ -982,6 +987,18 @@ public class Lexer {
                     TypeReferenceCrystal any = new TypeReferenceCrystal(stringToken);
                     any.setCoordinates(tokenCoordinates);
                     statementOfCrystals.add(any);
+                    continue;
+                }
+
+                if (Keyword.NULL.getIdentifier().equals(stringToken)) {
+                    NullKeywordCrystal nullKeywordCrystal = new NullKeywordCrystal();
+                    nullKeywordCrystal.setCoordinates(tokenCoordinates);
+
+                    TypeCrystal nullType = TypeHierarchy.getNullTypeFor(VikariType.NULL);
+                    nullKeywordCrystal.setDeclaredType(nullType);
+                    nullKeywordCrystal.setInstantiatedType(nullType);
+
+                    statementOfCrystals.add(nullKeywordCrystal);
                     continue;
                 }
 

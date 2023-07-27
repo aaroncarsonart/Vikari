@@ -61,7 +61,7 @@ class VikariREPLTest {
     @Order(2)
     public void testDeclaration_NullInitializer() {
         repl.lexParseAndInterpret("foo");
-        testOutput("foo:AtonementCrystal = {0}");
+        testOutput("foo:AtonementCrystal = null");
     }
 
     @Test
@@ -101,10 +101,10 @@ class VikariREPLTest {
         repl.lexParseAndInterpret("a, b, c, d");
 
         String expectedOutput = """
-            a:AtonementCrystal = {0}
-            b:AtonementCrystal = {0}
-            c:AtonementCrystal = {0}
-            d:AtonementCrystal = {0}
+            a:AtonementCrystal = null
+            b:AtonementCrystal = null
+            c:AtonementCrystal = null
+            d:AtonementCrystal = null
             """;
 
         testOutput(expectedOutput);
@@ -126,7 +126,7 @@ class VikariREPLTest {
     @Order(6)
     public void testDeclaration_MultipleAssignments_SameVariable() {
         repl.lexParseAndInterpret("a");
-        testOutput("a:AtonementCrystal = {0}");
+        testOutput("a:AtonementCrystal = null");
 
         repl.lexParseAndInterpret("a << [a << 7] * [a << 6L] / [a << 22F]");
         testOutput("a:Float = 1.9090909");
@@ -161,7 +161,7 @@ class VikariREPLTest {
     @Order(8)
     public void testExpression_ContainingAssignment() {
         repl.lexParseAndInterpret("foo:Integer");
-        testOutput("foo:Integer = {0}");
+        testOutput("foo:Integer = null");
 
         repl.lexParseAndInterpret("6 + [foo << 2]");
 
@@ -190,7 +190,7 @@ class VikariREPLTest {
 
         // Containing assignment
         repl.lexParseAndInterpret("foo");
-        testOutput("foo:AtonementCrystal = {0}");
+        testOutput("foo:AtonementCrystal = null");
 
         repl.lexParseAndInterpret(":foo << 2:4:6:");
 
@@ -404,7 +404,7 @@ class VikariREPLTest {
         testOutput(expectedErrorReport);
 
         repl.lexParseAndInterpret("foo");
-        testOutput("foo:AtonementCrystal = {0}");
+        testOutput("foo:AtonementCrystal = null");
     }
 
     @Test
@@ -412,7 +412,7 @@ class VikariREPLTest {
     public void testSyntaxError_VariableIsAlreadyDefined() {
         // 1. Define a variable.
         repl.lexParseAndInterpret("a");
-        testOutput("a:AtonementCrystal = {0}");
+        testOutput("a:AtonementCrystal = null");
 
         // 2. Attempt to redefine it.
         repl.lexParseAndInterpret("a:Integer");
@@ -522,7 +522,7 @@ class VikariREPLTest {
     public void testSyntaxError_TypeResolver_EnsureResolverErrorsAreClearedBetweenCalls() {
         // 1. Declare a variable.
         repl.lexParseAndInterpret("a");
-        testOutput("a:AtonementCrystal = {0}");
+        testOutput("a:AtonementCrystal = null");
 
         // 2. Cause a ResolverError in the TypeResolver.
         repl.lexParseAndInterpret("[a + 2]");
@@ -534,6 +534,6 @@ class VikariREPLTest {
 
         // 3. Execute another statement with the variable. Ensure the ResolverError has been cleared.
         repl.lexParseAndInterpret("a");
-        testOutput("{0}");
+        testOutput("null");
     }
 }

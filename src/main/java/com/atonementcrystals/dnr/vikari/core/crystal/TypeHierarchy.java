@@ -2,13 +2,19 @@ package com.atonementcrystals.dnr.vikari.core.crystal;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Encapsulates logic for initializing the Type hierarchy for built-in types.
  */
 public class TypeHierarchy {
 
-    /** Insure init method is not executed multiple times for test cases. */
+    /** Ensure init method is not executed multiple times for test cases. */
     private static boolean initialized = false;
+
+    /** Map of Null types. Only instantiated on an as-needed basis. */
+    private static final Map<TypeCrystal, NullTypeCrystal> nullTypes = new HashMap<>();
 
     /**
      * Call once before referencing type hierarchy info in TypeCrystal.
@@ -42,5 +48,17 @@ public class TypeHierarchy {
         TypeCrystal parentTypeCrystal = parent.getTypeCrystal();
         parentTypeCrystal.addChildren(children);
         return parentTypeCrystal;
+    }
+
+    public static NullTypeCrystal getNullTypeFor(VikariType type) {
+        return getNullTypeFor(type.getTypeCrystal());
+    }
+
+    public static NullTypeCrystal getNullTypeFor(TypeCrystal typeCrystal) {
+        return nullTypes.computeIfAbsent(typeCrystal, t -> {
+            NullTypeCrystal nullTypeCrystal = new NullTypeCrystal(t);
+            nullTypeCrystal.setType(VikariType.TYPE);
+            return nullTypeCrystal;
+        });
     }
 }

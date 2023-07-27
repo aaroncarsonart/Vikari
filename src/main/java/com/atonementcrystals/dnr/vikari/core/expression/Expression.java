@@ -23,6 +23,7 @@ public abstract class Expression {
         E visit(VariableExpression expr);
         E visit(LeftAssignmentExpression expr);
         E visit(RightAssignmentExpression expr);
+        E visit(NullLiteralExpression expr);
     }
 
     public abstract <E> E accept(Visitor<E> visitor);

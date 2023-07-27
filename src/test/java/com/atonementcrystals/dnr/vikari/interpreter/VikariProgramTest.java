@@ -81,7 +81,7 @@ class VikariProgramTest {
                 :a
                 """;
         runVikariProgram(sourceString);
-        assertOutput("{0}");
+        assertOutput("null");
     }
 
     @Test
@@ -171,8 +171,6 @@ class VikariProgramTest {
         runMain(args);
         assertOutput("2\n");
     }
-
-    //TODO: Fix 4 test expectations.
 
     @Test
     @Order(10)

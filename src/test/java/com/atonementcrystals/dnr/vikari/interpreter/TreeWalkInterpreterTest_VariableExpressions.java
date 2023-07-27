@@ -2,7 +2,7 @@ package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
-import com.atonementcrystals.dnr.vikari.core.crystal.NullCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
@@ -70,7 +70,6 @@ public class TreeWalkInterpreterTest_VariableExpressions {
             assertEquals(expectedLength, actualLength, "Unexpected length for null crystal.");
         }
 
-        // TODO: Change to ValueCrystal once it is refactored to contain the <V> value reference.
         else if (variable instanceof NumberCrystal) {
             NumberCrystal numberCrystal = (NumberCrystal) variable;
             Object actualvalue = numberCrystal.getValue();

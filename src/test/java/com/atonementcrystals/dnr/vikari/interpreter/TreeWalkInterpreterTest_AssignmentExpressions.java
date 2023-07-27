@@ -1,13 +1,6 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
-import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
-import com.atonementcrystals.dnr.vikari.core.crystal.NullCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
-import com.atonementcrystals.dnr.vikari.core.crystal.value.ValueCrystal;
-import com.atonementcrystals.dnr.vikari.core.statement.Statement;
-import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -16,72 +9,9 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TreeWalkInterpreterTest_AssignmentExpressions {
-    private final AtonementField globalAtonementField = VikariProgram.initGlobalAtonementField();
-    private AtonementField currentEnvironment;
-
-    private void lexParseAndInterpret(String sourceString) {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-        TreeWalkInterpreter interpreter = new TreeWalkInterpreter();
-
-        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
-        parser.setSyntaxErrorReporter(syntaxErrorReporter);
-        interpreter.setGetLineFunction(syntaxErrorReporter::getLineFromCache);
-
-        parser.setGlobalAtonementField(globalAtonementField);
-        interpreter.setGlobalAtonementField(globalAtonementField);
-
-        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
-        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
-        interpreter.interpret(null, parsedStatements);
-
-        currentEnvironment = interpreter.getCurrentEnvironment();
-    }
-
-    private void testVariable(String identifier, VikariType declaredType, VikariType instantiatedType,
-                              Object expectedValue) {
-
-        assertTrue(currentEnvironment.isDefined(identifier), "Expected variable to be defined.");
-        AtonementCrystal variable = currentEnvironment.get(identifier);
-
-        // 1: Check types.
-        assertEquals(declaredType.getTypeCrystal(), variable.getDeclaredType(), "Unexpected declared type.");
-
-        if (instantiatedType != null) {
-            assertEquals(instantiatedType.getTypeCrystal(), variable.getInstantiatedType(), "Unexpected instantiated type.");
-        } else {
-            assertNull(variable.getInstantiatedType(), "Unexpected instantiated type.");
-        }
-
-        // 2: Check value.
-        if (expectedValue == null) {
-            assertEquals(NullCrystal.class, variable.getClass(), "Unexpected type for declaration result.");
-            NullCrystal nullCrystal = (NullCrystal) variable;
-
-            int expectedLength = 0;
-            int actualLength = nullCrystal.getLength();
-            assertEquals(expectedLength, actualLength, "Unexpected length for null crystal.");
-        }
-
-        else if (variable instanceof ValueCrystal) {
-            ValueCrystal valueCrystal = (ValueCrystal) variable;
-            Object actualvalue = valueCrystal.getValue();
-            assertEquals(expectedValue, actualvalue, "Unexpected value.");
-        } else {
-            TypeCrystal typeCrystal = variable.getInstantiatedType();
-            if (typeCrystal == null) {
-                typeCrystal = variable.getDeclaredType();
-            }
-            fail("Malformed test. Unhandled type in declaration: " + typeCrystal);
-        }
-    }
+public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInterpreterTest_Base {
 
     // -------------------------------
     // Left assignment operator tests.
@@ -1022,5 +952,329 @@ public class TreeWalkInterpreterTest_AssignmentExpressions {
         testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
         testVariable("g", VikariType.VALUE, VikariType.BOOLEAN, true);
         testVariable("h", VikariType.VALUE, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(35)
+    public void testTreeWalkInterpreter_LeftAssignment_Nulls_LengthZero() {
+        String sourceString = """
+                a, b
+                a << null, b << _[0]_
+
+                c:Integer, d:Integer
+                c << null, d << __[0]__
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("a", VikariType.ATONEMENT_CRYSTAL, 0);
+        testNullVariable("b", VikariType.ATONEMENT_CRYSTAL, 0);
+        testNullVariable("c", VikariType.INTEGER, 0);
+        testNullVariable("d", VikariType.INTEGER, 0);
+    }
+
+    @Test
+    @Order(36)
+    public void testTreeWalkInterpreter_LeftAssignment_Nulls_PositiveLength() {
+        String sourceString = """
+                a, b, c, d, e
+
+                a << _
+                b << __
+                c << ___
+                d << ____
+                e << _____
+
+                f, g, h, i, j
+
+                f << _[1]_
+                g << _[2]_
+                h << _[3]_
+                i << _[4]_
+                j << _[5]_
+
+                k:Integer
+                l:Integer
+                m:Integer
+                n:Integer
+                o:Integer
+
+                k << _
+                l << __
+                m << ___
+                n << ____
+                o << _____
+
+                p:Integer
+                q:Integer
+                r:Integer
+                s:Integer
+                t:Integer
+
+                p << _[1]_
+                q << _[2]_
+                r << _[3]_
+                s << _[4]_
+                t << _[5]_
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("a", VikariType.ATONEMENT_CRYSTAL, 1);
+        testNullVariable("b", VikariType.ATONEMENT_CRYSTAL, 2);
+        testNullVariable("c", VikariType.ATONEMENT_CRYSTAL, 3);
+        testNullVariable("d", VikariType.ATONEMENT_CRYSTAL, 4);
+        testNullVariable("e", VikariType.ATONEMENT_CRYSTAL, 5);
+        testNullVariable("f", VikariType.ATONEMENT_CRYSTAL, 1);
+        testNullVariable("g", VikariType.ATONEMENT_CRYSTAL, 2);
+        testNullVariable("h", VikariType.ATONEMENT_CRYSTAL, 3);
+        testNullVariable("i", VikariType.ATONEMENT_CRYSTAL, 4);
+        testNullVariable("j", VikariType.ATONEMENT_CRYSTAL, 5);
+        testNullVariable("k", VikariType.INTEGER, 1);
+        testNullVariable("l", VikariType.INTEGER, 2);
+        testNullVariable("m", VikariType.INTEGER, 3);
+        testNullVariable("n", VikariType.INTEGER, 4);
+        testNullVariable("o", VikariType.INTEGER, 5);
+        testNullVariable("p", VikariType.INTEGER, 1);
+        testNullVariable("q", VikariType.INTEGER, 2);
+        testNullVariable("r", VikariType.INTEGER, 3);
+        testNullVariable("s", VikariType.INTEGER, 4);
+        testNullVariable("t", VikariType.INTEGER, 5);
+    }
+
+    @Test
+    @Order(37)
+    public void testTreeWalkInterpreter_LeftAssignment_Nulls_NegativeLength() {
+        String sourceString = """
+                a, b, c, d, e
+
+                a << _[-1]_
+                b << _[-2]_
+                c << _[-3]_
+                d << _[-4]_
+                e << _[-5]_
+
+                f:Integer
+                g:Integer
+                h:Integer
+                i:Integer
+                j:Integer
+
+                f << _[-1]_
+                g << _[-2]_
+                h << _[-3]_
+                i << _[-4]_
+                j << _[-5]_
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("a", VikariType.ATONEMENT_CRYSTAL, -1);
+        testNullVariable("b", VikariType.ATONEMENT_CRYSTAL, -2);
+        testNullVariable("c", VikariType.ATONEMENT_CRYSTAL, -3);
+        testNullVariable("d", VikariType.ATONEMENT_CRYSTAL, -4);
+        testNullVariable("e", VikariType.ATONEMENT_CRYSTAL, -5);
+        testNullVariable("f", VikariType.INTEGER, -1);
+        testNullVariable("g", VikariType.INTEGER, -2);
+        testNullVariable("h", VikariType.INTEGER, -3);
+        testNullVariable("i", VikariType.INTEGER, -4);
+        testNullVariable("j", VikariType.INTEGER, -5);
+    }
+
+    @Test
+    @Order(38)
+    public void testTreeWalkInterpreter_LeftAssignment_Nulls_NullLiteralExpression_WithVariable() {
+        String sourceString = """
+                int:Integer << 2, foo
+                foo << __[int]__
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("foo", VikariType.ATONEMENT_CRYSTAL, 2);
+    }
+
+    @Test
+    @Order(39)
+    public void testTreeWalkInterpreter_LeftAssignment_Nulls_NullLiteralExpression_WithArithmeticExpression() {
+        String sourceString = """
+                foo, foo << __[5 + 7]__
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("foo", VikariType.ATONEMENT_CRYSTAL, 12);
+    }
+
+    @Test
+    @Order(40)
+    public void testTreeWalkInterpreter_LeftAssignment_Nulls_FromVariable() {
+        String sourceString = """
+                foo:Integer
+                bar:Integer << 2
+                bar << foo
+                """;
+
+        lexParseAndInterpret(sourceString);
+
+        testVariable("foo", VikariType.INTEGER, VikariType.NULL, 0);
+        testVariable("bar", VikariType.INTEGER, VikariType.NULL, 0);
+    }
+
+    @Test
+    @Order(41)
+    public void testTreeWalkInterpreter_RightAssignment_Nulls_LengthZero() {
+        String sourceString = """
+                a, b
+                null >> a, _[0]_ >> b
+
+                c:Integer, d:Integer
+                null >> c, __[0]__ >> d
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("a", VikariType.ATONEMENT_CRYSTAL, 0);
+        testNullVariable("b", VikariType.ATONEMENT_CRYSTAL, 0);
+        testNullVariable("c", VikariType.INTEGER, 0);
+        testNullVariable("d", VikariType.INTEGER, 0);
+    }
+
+    @Test
+    @Order(42)
+    public void testTreeWalkInterpreter_RightAssignment_Nulls_PositiveLength() {
+        String sourceString = """
+                a, b, c, d, e
+
+                _ >> a
+                __ >> b
+                ___ >> c
+                ____ >> d
+                _____ >> e
+
+                f, g, h, i, j
+
+                _[1]_ >> f
+                _[2]_ >> g
+                _[3]_ >> h
+                _[4]_ >> i
+                _[5]_ >> j
+
+                k:Integer
+                l:Integer
+                m:Integer
+                n:Integer
+                o:Integer
+
+                _ >> k
+                __ >> l
+                ___ >> m
+                ____ >> n
+                _____ >> o
+
+                p:Integer
+                q:Integer
+                r:Integer
+                s:Integer
+                t:Integer
+
+                _[1]_ >> p
+                _[2]_ >> q
+                _[3]_ >> r
+                _[4]_ >> s
+                _[5]_ >> t
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("a", VikariType.ATONEMENT_CRYSTAL, 1);
+        testNullVariable("b", VikariType.ATONEMENT_CRYSTAL, 2);
+        testNullVariable("c", VikariType.ATONEMENT_CRYSTAL, 3);
+        testNullVariable("d", VikariType.ATONEMENT_CRYSTAL, 4);
+        testNullVariable("e", VikariType.ATONEMENT_CRYSTAL, 5);
+        testNullVariable("f", VikariType.ATONEMENT_CRYSTAL, 1);
+        testNullVariable("g", VikariType.ATONEMENT_CRYSTAL, 2);
+        testNullVariable("h", VikariType.ATONEMENT_CRYSTAL, 3);
+        testNullVariable("i", VikariType.ATONEMENT_CRYSTAL, 4);
+        testNullVariable("j", VikariType.ATONEMENT_CRYSTAL, 5);
+        testNullVariable("k", VikariType.INTEGER, 1);
+        testNullVariable("l", VikariType.INTEGER, 2);
+        testNullVariable("m", VikariType.INTEGER, 3);
+        testNullVariable("n", VikariType.INTEGER, 4);
+        testNullVariable("o", VikariType.INTEGER, 5);
+        testNullVariable("p", VikariType.INTEGER, 1);
+        testNullVariable("q", VikariType.INTEGER, 2);
+        testNullVariable("r", VikariType.INTEGER, 3);
+        testNullVariable("s", VikariType.INTEGER, 4);
+        testNullVariable("t", VikariType.INTEGER, 5);
+    }
+
+    @Test
+    @Order(43)
+    public void testTreeWalkInterpreter_RightAssignment_Nulls_NegativeLength() {
+        String sourceString = """
+                a, b, c, d, e
+
+                _[-1]_ >> a
+                _[-2]_ >> b
+                _[-3]_ >> c
+                _[-4]_ >> d
+                _[-5]_ >> e
+
+                f:Integer
+                g:Integer
+                h:Integer
+                i:Integer
+                j:Integer
+
+                _[-1]_ >> f
+                _[-2]_ >> g
+                _[-3]_ >> h
+                _[-4]_ >> i
+                _[-5]_ >> j
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("a", VikariType.ATONEMENT_CRYSTAL, -1);
+        testNullVariable("b", VikariType.ATONEMENT_CRYSTAL, -2);
+        testNullVariable("c", VikariType.ATONEMENT_CRYSTAL, -3);
+        testNullVariable("d", VikariType.ATONEMENT_CRYSTAL, -4);
+        testNullVariable("e", VikariType.ATONEMENT_CRYSTAL, -5);
+        testNullVariable("f", VikariType.INTEGER, -1);
+        testNullVariable("g", VikariType.INTEGER, -2);
+        testNullVariable("h", VikariType.INTEGER, -3);
+        testNullVariable("i", VikariType.INTEGER, -4);
+        testNullVariable("j", VikariType.INTEGER, -5);
+    }
+
+    @Test
+    @Order(44)
+    public void testTreeWalkInterpreter_RightAssignment_Nulls_NullLiteralExpression_WithVariable() {
+        String sourceString = """
+                int:Integer << 2, foo
+                __[int]__ >> foo
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("foo", VikariType.ATONEMENT_CRYSTAL, 2);
+    }
+
+    @Test
+    @Order(45)
+    public void testTreeWalkInterpreter_RightAssignment_Nulls_NullLiteralExpression_WithArithmeticExpression() {
+        String sourceString = """
+                foo, __[5 + 7]__ >> foo
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testNullVariable("foo", VikariType.ATONEMENT_CRYSTAL, 12);
+    }
+
+    @Test
+    @Order(46)
+    public void testTreeWalkInterpreter_RightAssignment_Nulls_FromVariable() {
+        String sourceString = """
+                foo:Integer
+                bar:Integer << 2
+                foo >> bar
+                """;
+
+        lexParseAndInterpret(sourceString);
+
+        testVariable("foo", VikariType.INTEGER, VikariType.NULL, 0);
+        testVariable("bar", VikariType.INTEGER, VikariType.NULL, 0);
     }
 }
