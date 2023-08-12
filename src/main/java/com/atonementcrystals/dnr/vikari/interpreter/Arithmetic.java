@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.function.BiFunction;
 
 public class Arithmetic {
     private static final MathContext DEFAULT_MATH_CONTEXT = MathContext.DECIMAL128;
@@ -37,46 +38,61 @@ public class Arithmetic {
     }
 
     /**
-     * Add the left and right operands. Peforms type promotion of integers or longs if the result
-     * would overflow or underflow beyond the maximum and minimum values of said types, respectively.
+     * Evaluate the left and right operands according to the desired arithmetic operation. Performs type promotion of
+     * integers or longs if the result would overflow or underflow beyond the maximum and minimum values of said types,
+     * respectively.
      * @param left The left operand.
      * @param right The right operand.
-     * @return The result of adding the left and right operands.
+     * @param evaluateIntegers The function to evaluate Integer operands.
+     * @param evaluateLongs The function to evaluate Long operands.
+     * @param evaluateBigIntegers The function to evaluate BigInteger operands.
+     * @param evaluateFloats The function to evaluate Float operands.
+     * @param evaluateDoubles The function to evaluate Double operands.
+     * @param evaluateBigDecimals The function to evaluate BigDecimal operands.
+     * @return The result of evaluating the left and right operands.
      */
-    public static AtonementCrystal add(NumberCrystal left, NumberCrystal right) {
+    public static AtonementCrystal evaluate(NumberCrystal<?> left, NumberCrystal<?> right,
+                                            BiFunction<Integer, Integer, Integer> evaluateIntegers,
+                                            BiFunction<Long, Long, Long> evaluateLongs,
+                                            BiFunction<BigInteger, BigInteger, BigInteger> evaluateBigIntegers,
+                                            BiFunction<Float, Float, Float> evaluateFloats,
+                                            BiFunction<Double, Double, Double> evaluateDoubles,
+                                            BiFunction<BigDecimal, BigDecimal, BigDecimal> evaluateBigDecimals) {
         // ------------------------------------
         // 1. Both operands are integral types.
         // ------------------------------------
         if (left instanceof IntegerCrystal && right instanceof IntegerCrystal) {
-            int leftValue = ((IntegerCrystal) left).getValue();
-            int rightValue = ((IntegerCrystal) right).getValue();
+            Integer leftValue = ((IntegerCrystal) left).getValue();
+            Integer rightValue = ((IntegerCrystal) right).getValue();
             try {
-                int result = Math.addExact(leftValue, rightValue);
+                Integer result = evaluateIntegers.apply(leftValue, rightValue);
                 IntegerCrystal resultCrystal = new IntegerCrystal(null, result);
                 return resultCrystal;
             } catch (ArithmeticException e) {
                 LongCrystal left2 = new LongCrystal(left.getIdentifier(), Long.valueOf(leftValue));
                 LongCrystal right2 = new LongCrystal(right.getIdentifier(), Long.valueOf(rightValue));
-                return add(left2, right2);
+                return evaluate(left2, right2, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
+                        evaluateDoubles, evaluateBigDecimals);
             }
         }
         if (left instanceof LongCrystal && right instanceof LongCrystal) {
-            long leftValue = ((LongCrystal) left).getValue();
-            long rightValue = ((LongCrystal) right).getValue();
+            Long leftValue = ((LongCrystal) left).getValue();
+            Long rightValue = ((LongCrystal) right).getValue();
             try {
-                long result = Math.addExact(leftValue, rightValue);
+                Long result = evaluateLongs.apply(leftValue, rightValue);
                 LongCrystal resultCrystal = new LongCrystal(null, result);
                 return resultCrystal;
             } catch (ArithmeticException e) {
                 BigIntegerCrystal left2 = new BigIntegerCrystal(left.getIdentifier(), BigInteger.valueOf(leftValue));
                 BigIntegerCrystal right2 = new BigIntegerCrystal(right.getIdentifier(), BigInteger.valueOf(rightValue));
-                return add(left2, right2);
+                return evaluate(left2, right2, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
+                        evaluateDoubles, evaluateBigDecimals);
             }
         }
         if (left instanceof BigIntegerCrystal && right instanceof BigIntegerCrystal) {
             BigInteger leftValue = ((BigIntegerCrystal) left).getValue();
             BigInteger rightValue = ((BigIntegerCrystal) right).getValue();
-            BigInteger result = leftValue.add(rightValue);
+            BigInteger result = evaluateBigIntegers.apply(leftValue, rightValue);
             BigIntegerCrystal resultCrystal = new BigIntegerCrystal(null, result);
             return resultCrystal;
         }
@@ -84,18 +100,18 @@ public class Arithmetic {
         // 2. Both operands are decimal types.
         // -----------------------------------
         if (left instanceof FloatCrystal && right instanceof FloatCrystal) {
-            float leftValue = ((FloatCrystal) left).getValue();
-            float rightValue = ((FloatCrystal) right).getValue();
+            Float leftValue = ((FloatCrystal) left).getValue();
+            Float rightValue = ((FloatCrystal) right).getValue();
 
-            float result = leftValue + rightValue;
+            Float result = evaluateFloats.apply(leftValue, rightValue);
             FloatCrystal resultCrystal = new FloatCrystal(null, result);
             return resultCrystal;
         }
         if (left instanceof DoubleCrystal && right instanceof DoubleCrystal) {
-            double leftValue = ((DoubleCrystal) left).getValue();
-            double rightValue = ((DoubleCrystal) right).getValue();
+            Double leftValue = ((DoubleCrystal) left).getValue();
+            Double rightValue = ((DoubleCrystal) right).getValue();
 
-            double result = leftValue + rightValue;
+            Double result = evaluateDoubles.apply(leftValue, rightValue);
             DoubleCrystal resultCrystal = new DoubleCrystal(null, result);
             return resultCrystal;
 
@@ -104,7 +120,7 @@ public class Arithmetic {
             BigDecimal leftValue = ((BigDecimalCrystal) left).getValue();
             BigDecimal rightValue = ((BigDecimalCrystal) right).getValue();
 
-            BigDecimal result = leftValue.add(rightValue, mathContext);
+            BigDecimal result = evaluateBigDecimals.apply(leftValue, rightValue);
             BigDecimalCrystal resultCrystal = new BigDecimalCrystal(null, result);
             return resultCrystal;
         }
@@ -115,395 +131,112 @@ public class Arithmetic {
         if (left instanceof BigDecimalCrystal) {
             BigDecimal value = new BigDecimal(right.getValue().toString(), mathContext);
             BigDecimalCrystal right2 = new BigDecimalCrystal(right.getIdentifier(), value);
-            return add(left, right2);
+            return evaluate(left, right2, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
+                    evaluateDoubles, evaluateBigDecimals);
         } else if (right instanceof BigDecimalCrystal) {
             BigDecimal value = new BigDecimal(left.getValue().toString(), mathContext);
             BigDecimalCrystal left2 = new BigDecimalCrystal(left.getIdentifier(), value);
-            return add(left2, right);
+            return evaluate(left2, right, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
+                    evaluateDoubles, evaluateBigDecimals);
         }
         // Upcast to Double
         if (left instanceof DoubleCrystal) {
             DoubleCrystal right2 = new DoubleCrystal(right.getIdentifier(), right.getValue().toString());
-            return add(left, right2);
+            return evaluate(left, right2, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
+                    evaluateDoubles, evaluateBigDecimals);
         } else if (right instanceof DoubleCrystal) {
             DoubleCrystal left2 = new DoubleCrystal(left.getIdentifier(), left.getValue().toString());
-            return add(left2, right);
+            return evaluate(left2, right, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
+                    evaluateDoubles, evaluateBigDecimals);
         }
         // Upcast to Float
         if (left instanceof FloatCrystal) {
             FloatCrystal right2 = new FloatCrystal(right.getIdentifier(), right.getValue().toString());
-            return add(left, right2);
+            return evaluate(left, right2, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
+                    evaluateDoubles, evaluateBigDecimals);
         } else if (right instanceof FloatCrystal) {
             FloatCrystal left2 = new FloatCrystal(left.getIdentifier(), left.getValue().toString());
-            return add(left2, right);
+            return evaluate(left2, right, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
+                    evaluateDoubles, evaluateBigDecimals);
         }
         // Upcast to BigInteger
         if (left instanceof BigIntegerCrystal) {
             BigIntegerCrystal right2 = new BigIntegerCrystal(right.getIdentifier(), right.getValue().toString());
-            return add(left, right2);
+            return evaluate(left, right2, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
+                    evaluateDoubles, evaluateBigDecimals);
         } else if (right instanceof BigIntegerCrystal) {
             BigIntegerCrystal left2 = new BigIntegerCrystal(left.getIdentifier(), left.getValue().toString());
-            return add(left2, right);
+            return evaluate(left2, right, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
+                    evaluateDoubles, evaluateBigDecimals);
         }
         // Upcast to Long
         if (left instanceof LongCrystal) {
             LongCrystal right2 = new LongCrystal(right.getIdentifier(), right.getValue().toString());
-            return add(left, right2);
+            return evaluate(left, right2, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
+                    evaluateDoubles, evaluateBigDecimals);
         } else if (right instanceof LongCrystal) {
             LongCrystal left2 = new LongCrystal(left.getIdentifier(), left.getValue().toString());
-            return add(left2, right);
+            return evaluate(left2, right, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
+                    evaluateDoubles, evaluateBigDecimals);
         }
         throw new IllegalStateException("Unreachable code.");
     }
 
     /**
-     * Add the left and right operands. Peforms type promotion of integers or longs if the result
+     * divide the left and right operands. Performs type promotion of integers or longs if the result
      * would overflow or underflow beyond the maximum and minimum values of said types, respectively.
      * @param left The left operand.
      * @param right The right operand.
-     * @return The result of adding the left and right operands.
+     * @return The result of divideing the left and right operands.
      */
-    public static AtonementCrystal subtract(NumberCrystal left, NumberCrystal right) {
-        // ------------------------------------
-        // 1. Both operands are integral types.
-        // ------------------------------------
-        if (left instanceof IntegerCrystal && right instanceof IntegerCrystal) {
-            int leftValue = ((IntegerCrystal) left).getValue();
-            int rightValue = ((IntegerCrystal) right).getValue();
-            try {
-                int result = Math.subtractExact(leftValue, rightValue);
-                IntegerCrystal resultCrystal = new IntegerCrystal(null, result);
-                return resultCrystal;
-            } catch (ArithmeticException e) {
-                LongCrystal left2 = new LongCrystal(left.getIdentifier(), Long.valueOf(leftValue));
-                LongCrystal right2 = new LongCrystal(right.getIdentifier(), Long.valueOf(rightValue));
-                return subtract(left2, right2);
-            }
-        }
-        if (left instanceof LongCrystal && right instanceof LongCrystal) {
-            long leftValue = ((LongCrystal) left).getValue();
-            long rightValue = ((LongCrystal) right).getValue();
-            try {
-                long result = Math.subtractExact(leftValue, rightValue);
-                LongCrystal resultCrystal = new LongCrystal(null, result);
-                return resultCrystal;
-            } catch (ArithmeticException e) {
-                BigIntegerCrystal left2 = new BigIntegerCrystal(left.getIdentifier(), BigInteger.valueOf(leftValue));
-                BigIntegerCrystal right2 = new BigIntegerCrystal(right.getIdentifier(), BigInteger.valueOf(rightValue));
-                return subtract(left2, right2);
-            }
-        }
-        if (left instanceof BigIntegerCrystal && right instanceof BigIntegerCrystal) {
-            BigInteger leftValue = ((BigIntegerCrystal) left).getValue();
-            BigInteger rightValue = ((BigIntegerCrystal) right).getValue();
-            BigInteger result = leftValue.subtract(rightValue);
-            BigIntegerCrystal resultCrystal = new BigIntegerCrystal(null, result);
-            return resultCrystal;
-        }
-        // -----------------------------------
-        // 2. Both operands are decimal types.
-        // -----------------------------------
-        if (left instanceof FloatCrystal && right instanceof FloatCrystal) {
-            float leftValue = ((FloatCrystal) left).getValue();
-            float rightValue = ((FloatCrystal) right).getValue();
-
-            float result = leftValue - rightValue;
-            FloatCrystal resultCrystal = new FloatCrystal(null, result);
-            return resultCrystal;
-        }
-        if (left instanceof DoubleCrystal && right instanceof DoubleCrystal) {
-            double leftValue = ((DoubleCrystal) left).getValue();
-            double rightValue = ((DoubleCrystal) right).getValue();
-
-            double result = leftValue - rightValue;
-            DoubleCrystal resultCrystal = new DoubleCrystal(null, result);
-            return resultCrystal;
-
-        }
-        if (left instanceof BigDecimalCrystal && right instanceof BigDecimalCrystal) {
-            BigDecimal leftValue = ((BigDecimalCrystal) left).getValue();
-            BigDecimal rightValue = ((BigDecimalCrystal) right).getValue();
-
-            BigDecimal result = leftValue.subtract(rightValue, mathContext);
-            BigDecimalCrystal resultCrystal = new BigDecimalCrystal(null, result);
-            return resultCrystal;
-        }
-        // -------------------------------
-        // 3. Operands are a mix of types.
-        // -------------------------------
-        // Upcast to BigDecimal
-        if (left instanceof BigDecimalCrystal) {
-            BigDecimal value = new BigDecimal(right.getValue().toString(), mathContext);
-            BigDecimalCrystal right2 = new BigDecimalCrystal(right.getIdentifier(), value);
-            return subtract(left, right2);
-        } else if (right instanceof BigDecimalCrystal) {
-            BigDecimal value = new BigDecimal(left.getValue().toString(), mathContext);
-            BigDecimalCrystal left2 = new BigDecimalCrystal(left.getIdentifier(), value);
-            return subtract(left2, right);
-        }
-        // Upcast to Double
-        if (left instanceof DoubleCrystal) {
-            DoubleCrystal right2 = new DoubleCrystal(right.getIdentifier(), right.getValue().toString());
-            return subtract(left, right2);
-        } else if (right instanceof DoubleCrystal) {
-            DoubleCrystal left2 = new DoubleCrystal(left.getIdentifier(), left.getValue().toString());
-            return subtract(left2, right);
-        }
-        // Upcast to Float
-        if (left instanceof FloatCrystal) {
-            FloatCrystal right2 = new FloatCrystal(right.getIdentifier(), right.getValue().toString());
-            return subtract(left, right2);
-        } else if (right instanceof FloatCrystal) {
-            FloatCrystal left2 = new FloatCrystal(left.getIdentifier(), left.getValue().toString());
-            return subtract(left2, right);
-        }
-        // Upcast to BigInteger
-        if (left instanceof BigIntegerCrystal) {
-            BigIntegerCrystal right2 = new BigIntegerCrystal(right.getIdentifier(), right.getValue().toString());
-            return subtract(left, right2);
-        } else if (right instanceof BigIntegerCrystal) {
-            BigIntegerCrystal left2 = new BigIntegerCrystal(left.getIdentifier(), left.getValue().toString());
-            return subtract(left2, right);
-        }
-        // Upcast to Long
-        if (left instanceof LongCrystal) {
-            LongCrystal right2 = new LongCrystal(right.getIdentifier(), right.getValue().toString());
-            return subtract(left, right2);
-        } else if (right instanceof LongCrystal) {
-            LongCrystal left2 = new LongCrystal(left.getIdentifier(), left.getValue().toString());
-            return subtract(left2, right);
-        }
-        throw new IllegalStateException("Unreachable code.");
+    public static AtonementCrystal add(NumberCrystal<?> left, NumberCrystal<?> right) {
+        return evaluate(left, right, Math::addExact, Math::addExact, BigInteger::add, Float::sum, Double::sum,
+                (leftValue, rightValue) -> leftValue.add(rightValue, mathContext));
     }
 
     /**
-     * Add the left and right operands. Peforms type promotion of integers or longs if the result
+     * Subtract the left and right operands. Performs type promotion of integers or longs if the result
      * would overflow or underflow beyond the maximum and minimum values of said types, respectively.
      * @param left The left operand.
      * @param right The right operand.
-     * @return The result of adding the left and right operands.
+     * @return The result of subtracting the left and right operands.
      */
-    public static AtonementCrystal multiply(NumberCrystal left, NumberCrystal right) {
-        // ------------------------------------
-        // 1. Both operands are integral types.
-        // ------------------------------------
-        if (left instanceof IntegerCrystal && right instanceof IntegerCrystal) {
-            int leftValue = ((IntegerCrystal) left).getValue();
-            int rightValue = ((IntegerCrystal) right).getValue();
-            try {
-                int result = Math.multiplyExact(leftValue, rightValue);
-                IntegerCrystal resultCrystal = new IntegerCrystal(null, result);
-                return resultCrystal;
-            } catch (ArithmeticException e) {
-                LongCrystal left2 = new LongCrystal(left.getIdentifier(), Long.valueOf(leftValue));
-                LongCrystal right2 = new LongCrystal(right.getIdentifier(), Long.valueOf(rightValue));
-                return multiply(left2, right2);
-            }
-        }
-        if (left instanceof LongCrystal && right instanceof LongCrystal) {
-            long leftValue = ((LongCrystal) left).getValue();
-            long rightValue = ((LongCrystal) right).getValue();
-            try {
-                long result = Math.multiplyExact(leftValue, rightValue);
-                LongCrystal resultCrystal = new LongCrystal(null, result);
-                return resultCrystal;
-            } catch (ArithmeticException e) {
-                BigIntegerCrystal left2 = new BigIntegerCrystal(left.getIdentifier(), BigInteger.valueOf(leftValue));
-                BigIntegerCrystal right2 = new BigIntegerCrystal(right.getIdentifier(), BigInteger.valueOf(rightValue));
-                return multiply(left2, right2);
-            }
-        }
-        if (left instanceof BigIntegerCrystal && right instanceof BigIntegerCrystal) {
-            BigInteger leftValue = ((BigIntegerCrystal) left).getValue();
-            BigInteger rightValue = ((BigIntegerCrystal) right).getValue();
-            BigInteger result = leftValue.multiply(rightValue);
-            BigIntegerCrystal resultCrystal = new BigIntegerCrystal(null, result);
-            return resultCrystal;
-        }
-        // -----------------------------------
-        // 2. Both operands are decimal types.
-        // -----------------------------------
-        if (left instanceof FloatCrystal && right instanceof FloatCrystal) {
-            float leftValue = ((FloatCrystal) left).getValue();
-            float rightValue = ((FloatCrystal) right).getValue();
-
-            float result = leftValue * rightValue;
-            FloatCrystal resultCrystal = new FloatCrystal(null, result);
-            return resultCrystal;
-        }
-        if (left instanceof DoubleCrystal && right instanceof DoubleCrystal) {
-            double leftValue = ((DoubleCrystal) left).getValue();
-            double rightValue = ((DoubleCrystal) right).getValue();
-
-            double result = leftValue * rightValue;
-            DoubleCrystal resultCrystal = new DoubleCrystal(null, result);
-            return resultCrystal;
-
-        }
-        if (left instanceof BigDecimalCrystal && right instanceof BigDecimalCrystal) {
-            BigDecimal leftValue = ((BigDecimalCrystal) left).getValue();
-            BigDecimal rightValue = ((BigDecimalCrystal) right).getValue();
-
-            BigDecimal result = leftValue.multiply(rightValue, mathContext);
-            BigDecimalCrystal resultCrystal = new BigDecimalCrystal(null, result);
-            return resultCrystal;
-        }
-        // -------------------------------
-        // 3. Operands are a mix of types.
-        // -------------------------------
-        // Upcast to BigDecimal
-        if (left instanceof BigDecimalCrystal) {
-            BigDecimal value = new BigDecimal(right.getValue().toString(), mathContext);
-            BigDecimalCrystal right2 = new BigDecimalCrystal(right.getIdentifier(), value);
-            return multiply(left, right2);
-        } else if (right instanceof BigDecimalCrystal) {
-            BigDecimal value = new BigDecimal(left.getValue().toString(), mathContext);
-            BigDecimalCrystal left2 = new BigDecimalCrystal(left.getIdentifier(), value);
-            return multiply(left2, right);
-        }
-        // Upcast to Double
-        if (left instanceof DoubleCrystal) {
-            DoubleCrystal right2 = new DoubleCrystal(right.getIdentifier(), right.getValue().toString());
-            return multiply(left, right2);
-        } else if (right instanceof DoubleCrystal) {
-            DoubleCrystal left2 = new DoubleCrystal(left.getIdentifier(), left.getValue().toString());
-            return multiply(left2, right);
-        }
-        // Upcast to Float
-        if (left instanceof FloatCrystal) {
-            FloatCrystal right2 = new FloatCrystal(right.getIdentifier(), right.getValue().toString());
-            return multiply(left, right2);
-        } else if (right instanceof FloatCrystal) {
-            FloatCrystal left2 = new FloatCrystal(left.getIdentifier(), left.getValue().toString());
-            return multiply(left2, right);
-        }
-        // Upcast to BigInteger
-        if (left instanceof BigIntegerCrystal) {
-            BigIntegerCrystal right2 = new BigIntegerCrystal(right.getIdentifier(), right.getValue().toString());
-            return multiply(left, right2);
-        } else if (right instanceof BigIntegerCrystal) {
-            BigIntegerCrystal left2 = new BigIntegerCrystal(left.getIdentifier(), left.getValue().toString());
-            return multiply(left2, right);
-        }
-        // Upcast to Long
-        if (left instanceof LongCrystal) {
-            LongCrystal right2 = new LongCrystal(right.getIdentifier(), right.getValue().toString());
-            return multiply(left, right2);
-        } else if (right instanceof LongCrystal) {
-            LongCrystal left2 = new LongCrystal(left.getIdentifier(), left.getValue().toString());
-            return multiply(left2, right);
-        }
-        throw new IllegalStateException("Unreachable code.");
+    public static AtonementCrystal subtract(NumberCrystal<?> left, NumberCrystal<?> right) {
+        return evaluate(left, right, Math::subtractExact, Math::subtractExact, BigInteger::subtract,
+                (leftValue, rightValue) -> leftValue - rightValue,
+                (leftValue, rightValue) -> leftValue - rightValue,
+                (leftValue, rightValue) -> leftValue.subtract(rightValue, mathContext));
     }
 
     /**
-     * Add the left and right operands. Peforms type promotion of integers or longs if the result
+     * Multiply the left and right operands. Performs type promotion of integers or longs if the result
      * would overflow or underflow beyond the maximum and minimum values of said types, respectively.
      * @param left The left operand.
      * @param right The right operand.
-     * @return The result of adding the left and right operands.
+     * @return The result of multiplying the left and right operands.
      */
-    public static AtonementCrystal divide(NumberCrystal left, NumberCrystal right) {
-        // ------------------------------------
-        // 1. Both operands are integral types.
-        // ------------------------------------
-        if (left instanceof IntegerCrystal && right instanceof IntegerCrystal) {
-            int leftValue = ((IntegerCrystal) left).getValue();
-            int rightValue = ((IntegerCrystal) right).getValue();
+    public static AtonementCrystal multiply(NumberCrystal<?> left, NumberCrystal<?> right) {
+        return evaluate(left, right, Math::multiplyExact, Math::multiplyExact, BigInteger::multiply,
+                (leftValue, rightValue) -> leftValue * rightValue,
+                (leftValue, rightValue) -> leftValue * rightValue,
+                (leftValue, rightValue) -> leftValue.multiply(rightValue, mathContext));
+    }
 
-            int result = leftValue / rightValue;
-            IntegerCrystal resultCrystal = new IntegerCrystal(null, result);
-            return resultCrystal;
-        }
-        if (left instanceof LongCrystal && right instanceof LongCrystal) {
-            long leftValue = ((LongCrystal) left).getValue();
-            long rightValue = ((LongCrystal) right).getValue();
-
-            long result = leftValue / rightValue;
-            LongCrystal resultCrystal = new LongCrystal(null, result);
-            return resultCrystal;
-        }
-        if (left instanceof BigIntegerCrystal && right instanceof BigIntegerCrystal) {
-            BigInteger leftValue = ((BigIntegerCrystal) left).getValue();
-            BigInteger rightValue = ((BigIntegerCrystal) right).getValue();
-            BigInteger result = leftValue.divide(rightValue);
-            BigIntegerCrystal resultCrystal = new BigIntegerCrystal(null, result);
-            return resultCrystal;
-        }
-        // -----------------------------------
-        // 2. Both operands are decimal types.
-        // -----------------------------------
-        if (left instanceof FloatCrystal && right instanceof FloatCrystal) {
-            float leftValue = ((FloatCrystal) left).getValue();
-            float rightValue = ((FloatCrystal) right).getValue();
-
-            float result = leftValue / rightValue;
-            FloatCrystal resultCrystal = new FloatCrystal(null, result);
-            return resultCrystal;
-        }
-        if (left instanceof DoubleCrystal && right instanceof DoubleCrystal) {
-            double leftValue = ((DoubleCrystal) left).getValue();
-            double rightValue = ((DoubleCrystal) right).getValue();
-
-            double result = leftValue / rightValue;
-            DoubleCrystal resultCrystal = new DoubleCrystal(null, result);
-            return resultCrystal;
-
-        }
-        if (left instanceof BigDecimalCrystal && right instanceof BigDecimalCrystal) {
-            BigDecimal leftValue = ((BigDecimalCrystal) left).getValue();
-            BigDecimal rightValue = ((BigDecimalCrystal) right).getValue();
-
-            BigDecimal result = leftValue.divide(rightValue, mathContext);
-            BigDecimalCrystal resultCrystal = new BigDecimalCrystal(null, result);
-            return resultCrystal;
-        }
-        // -------------------------------
-        // 3. Operands are a mix of types.
-        // -------------------------------
-        // Upcast to BigDecimal
-        if (left instanceof BigDecimalCrystal) {
-            BigDecimal value = new BigDecimal(right.getValue().toString(), mathContext);
-            BigDecimalCrystal right2 = new BigDecimalCrystal(right.getIdentifier(), value);
-            return divide(left, right2);
-        } else if (right instanceof BigDecimalCrystal) {
-            BigDecimal value = new BigDecimal(left.getValue().toString(), mathContext);
-            BigDecimalCrystal left2 = new BigDecimalCrystal(left.getIdentifier(), value);
-            return divide(left2, right);
-        }
-        // Upcast to Double
-        if (left instanceof DoubleCrystal) {
-            DoubleCrystal right2 = new DoubleCrystal(right.getIdentifier(), right.getValue().toString());
-            return divide(left, right2);
-        } else if (right instanceof DoubleCrystal) {
-            DoubleCrystal left2 = new DoubleCrystal(left.getIdentifier(), left.getValue().toString());
-            return divide(left2, right);
-        }
-        // Upcast to Float
-        if (left instanceof FloatCrystal) {
-            FloatCrystal right2 = new FloatCrystal(right.getIdentifier(), right.getValue().toString());
-            return divide(left, right2);
-        } else if (right instanceof FloatCrystal) {
-            FloatCrystal left2 = new FloatCrystal(left.getIdentifier(), left.getValue().toString());
-            return divide(left2, right);
-        }
-        // Upcast to BigInteger
-        if (left instanceof BigIntegerCrystal) {
-            BigIntegerCrystal right2 = new BigIntegerCrystal(right.getIdentifier(), right.getValue().toString());
-            return divide(left, right2);
-        } else if (right instanceof BigIntegerCrystal) {
-            BigIntegerCrystal left2 = new BigIntegerCrystal(left.getIdentifier(), left.getValue().toString());
-            return divide(left2, right);
-        }
-        // Upcast to Long
-        if (left instanceof LongCrystal) {
-            LongCrystal right2 = new LongCrystal(right.getIdentifier(), right.getValue().toString());
-            return divide(left, right2);
-        } else if (right instanceof LongCrystal) {
-            LongCrystal left2 = new LongCrystal(left.getIdentifier(), left.getValue().toString());
-            return divide(left2, right);
-        }
-        throw new IllegalStateException("Unreachable code.");
+    /**
+     * Divide the left and right operands. Performs type promotion of integers or longs if the result
+     * would overflow or underflow beyond the maximum and minimum values of said types, respectively.
+     * @param left The left operand.
+     * @param right The right operand.
+     * @return The result of dividing the left and right operands.
+     */
+    public static AtonementCrystal divide(NumberCrystal<?> left, NumberCrystal<?> right) {
+        return evaluate(left, right,
+                (leftValue, rightValue) -> leftValue / rightValue,
+                (leftValue, rightValue) -> leftValue / rightValue,
+                BigInteger::divide,
+                (leftValue, rightValue) -> leftValue / rightValue,
+                (leftValue, rightValue) -> leftValue / rightValue,
+                (leftValue, rightValue) -> leftValue.divide(rightValue, mathContext));
     }
 
     /**
@@ -511,10 +244,10 @@ public class Arithmetic {
      * @param numberCrystal The NumberCrystal to negate.
      * @return The negated value of the NumberCrystal.
      */
-    public static NumberCrystal negate(NumberCrystal numberCrystal) {
+    public static NumberCrystal<?> negate(NumberCrystal<?> numberCrystal) {
         String identifier = null;
         Object value = numberCrystal.getValue();
-        NumberCrystal negatedCrystal = null;
+        NumberCrystal<?> negatedCrystal = null;
         if (numberCrystal instanceof IntegerCrystal) {
             negatedCrystal = new IntegerCrystal(identifier, -(int) value);
         } else if (numberCrystal instanceof LongCrystal) {
@@ -531,7 +264,7 @@ public class Arithmetic {
         return negatedCrystal;
     }
 
-    public static NumberCrystal maybeUpcastOrDowncast(NumberCrystal numberCrystal, TypeCrystal declaredType) {
+    public static NumberCrystal<?> maybeUpcastOrDowncast(NumberCrystal<?> numberCrystal, TypeCrystal declaredType) {
 
         if (declaredType.isEqual(VikariType.ATONEMENT_CRYSTAL, VikariType.VALUE, VikariType.NUMBER)) {
             return numberCrystal;

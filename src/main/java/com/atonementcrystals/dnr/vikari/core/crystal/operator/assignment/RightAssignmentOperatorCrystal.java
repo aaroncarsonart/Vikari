@@ -1,5 +1,6 @@
 package com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment;
 
+import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 
@@ -11,6 +12,11 @@ public class RightAssignmentOperatorCrystal extends BinaryOperatorCrystal {
 
     public RightAssignmentOperatorCrystal() {
         super(TokenType.RIGHT_ASSIGNMENT.getIdentifier());
+    }
+
+    @Override
+    public AtonementCrystal evaluate(AtonementCrystal left, AtonementCrystal right) {
+        throw new UnsupportedOperationException("Assignment operators are not evaluated using the evaluate() method.");
     }
 
 }

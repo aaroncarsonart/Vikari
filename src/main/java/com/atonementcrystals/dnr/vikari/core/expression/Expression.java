@@ -24,6 +24,7 @@ public abstract class Expression {
         E visit(LeftAssignmentExpression expr);
         E visit(RightAssignmentExpression expr);
         E visit(NullLiteralExpression expr);
+        E visit(BooleanLogicExpression expr);
     }
 
     public abstract <E> E accept(Visitor<E> visitor);

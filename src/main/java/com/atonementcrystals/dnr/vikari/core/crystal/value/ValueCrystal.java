@@ -42,4 +42,13 @@ public abstract class ValueCrystal<V> extends AtonementCrystal {
         throw new IllegalStateException("A ValueCrystal's value cannot be null.");
     }
 
+    @Override
+    public boolean isEqual(AtonementCrystal other) {
+        if (this.getField() == other.getField()) {
+            return true;
+        } else if (other instanceof ValueCrystal<?> valueCrystal) {
+            return this.value.equals(valueCrystal.value);
+        }
+        return false;
+    }
 }

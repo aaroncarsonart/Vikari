@@ -7,6 +7,9 @@ import com.atonementcrystals.dnr.vikari.core.crystal.TypeHierarchy;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.UnaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.comparison.EqualsOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.comparison.NotEqualsOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.logical.LogicalNotOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
@@ -14,6 +17,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.NegateCrystal
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.RightDivideOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.BooleanLogicExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;
@@ -60,6 +64,8 @@ public class TypeResolver extends Resolver<TypeCrystal> {
             CoordinatePair leftLocation = expr.getLeft().getLocation();
             CoordinatePair rightLocation = expr.getRight().getLocation();
             return resolveArithmeticExpression(leftType, rightType, leftLocation, rightLocation);
+        } else if (isEqualityOperator(operator)) {
+            return VikariType.BOOLEAN.getTypeCrystal();
         }
         throw new IllegalStateException("Unimplemented operator: " + Utils.getSimpleClassName(operator));
     }
@@ -97,6 +103,33 @@ public class TypeResolver extends Resolver<TypeCrystal> {
         throw new IllegalStateException("Bad internal state. Unimplemented Numeric type.");
     }
 
+    public boolean isEqualityOperator(BinaryOperatorCrystal operator) {
+        return operator instanceof EqualsOperatorCrystal || operator instanceof NotEqualsOperatorCrystal;
+    }
+
+    @Override
+    public TypeCrystal visit(BooleanLogicExpression expr) {
+        TypeCrystal leftType = expr.getLeft().accept(this);
+        TypeCrystal rightType = expr.getRight().accept(this);
+
+        boolean invalidOperands = false;
+        if (leftType != INVALID_TYPE && !leftType.hasType(VikariType.BOOLEAN)) {
+            CoordinatePair leftLocation = expr.getLeft().getLocation();
+            error(leftLocation, "Boolean logic expression expects a Boolean for operands.");
+            invalidOperands = true;
+        }
+        if (rightType != INVALID_TYPE && !rightType.hasType(VikariType.BOOLEAN)) {
+            CoordinatePair rightLocation = expr.getRight().getLocation();
+            error(rightLocation, "Boolean logic expression expects a Boolean for operands.");
+            invalidOperands = true;
+        }
+        if (invalidOperands) {
+            return INVALID_TYPE;
+        }
+
+        return VikariType.BOOLEAN.getTypeCrystal();
+    }
+
     @Override
     public TypeCrystal visit(GroupingExpression expr) {
         return expr.getExpression().accept(this);
@@ -118,8 +151,27 @@ public class TypeResolver extends Resolver<TypeCrystal> {
     @Override
     public TypeCrystal visit(UnaryExpression expr) {
         UnaryOperatorCrystal operator = expr.getOperator();
+        TypeCrystal operandType = expr.getOperand().accept(this);
+
+        // Don't report a cascade of errors for a single invalid type instance.
+        if (operandType == INVALID_TYPE) {
+            return INVALID_TYPE;
+        }
+
         if (operator instanceof NegateCrystal) {
-            return expr.getOperand().accept(this);
+            if (!operandType.hasType(VikariType.NUMBER)) {
+                CoordinatePair operandLocation = expr.getOperand().getLocation();
+                error(operandLocation, "Negate expression expects a Number as its operand.");
+                return INVALID_TYPE;
+            }
+            return operandType;
+        } else if (operator instanceof LogicalNotOperatorCrystal) {
+            if (!operandType.hasType(VikariType.BOOLEAN)) {
+                CoordinatePair operandLocation = expr.getOperand().getLocation();
+                error(operandLocation, "Logical not expression expects a Boolean as its operand.");
+                return INVALID_TYPE;
+            }
+            return VikariType.BOOLEAN.getTypeCrystal();
         }
         throw new IllegalStateException("Unimplemented operator: " + Utils.getSimpleClassName(operator));
     }
@@ -153,7 +205,9 @@ public class TypeResolver extends Resolver<TypeCrystal> {
                 declaredVariable.setInstantiatedType(initializerType);
             } else {
                 declaredVariable.setInstantiatedType(INVALID_TYPE);
-                assignmentError(declaredVariable.getCoordinates(), declaredType, initializerType);
+                if (initializerType != INVALID_TYPE) {
+                    assignmentError(declaredVariable.getCoordinates(), declaredType, initializerType);
+                }
             }
 
             return initializerType;
@@ -186,7 +240,9 @@ public class TypeResolver extends Resolver<TypeCrystal> {
             lvalue.setInstantiatedType(rvalueType);
         } else {
             lvalue.setInstantiatedType(INVALID_TYPE);
-            assignmentError(expr.getLvalue().getLocation(), lvalueDeclaredType, rvalueType);
+            if (rvalueType != INVALID_TYPE) {
+                assignmentError(expr.getLvalue().getLocation(), lvalueDeclaredType, rvalueType);
+            }
         }
 
         return rvalueType;
@@ -213,7 +269,9 @@ public class TypeResolver extends Resolver<TypeCrystal> {
             lvalue.setInstantiatedType(rvalueType);
         } else {
             lvalue.setInstantiatedType(INVALID_TYPE);
-            assignmentError(expr.getLvalue().getLocation(), lvalueDeclaredType, rvalueType);
+            if (rvalueType != INVALID_TYPE) {
+                assignmentError(expr.getLvalue().getLocation(), lvalueDeclaredType, rvalueType);
+            }
         }
 
         return rvalueType;

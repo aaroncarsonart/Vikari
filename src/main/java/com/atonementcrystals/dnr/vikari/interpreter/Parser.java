@@ -12,7 +12,10 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.RightAssignmentOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.logical.LogicalNotOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpressionConstructor;
+import com.atonementcrystals.dnr.vikari.core.expression.BooleanLogicExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.NullLiteralExpression;
@@ -48,6 +51,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -330,7 +334,7 @@ public class Parser {
     }
 
     private Expression assignment() {
-        Expression left = termExpression();
+        Expression left = orExpression();
 
         if (match(TokenType.LEFT_ASSIGNMENT)) {
             BinaryOperatorCrystal operator = (BinaryOperatorCrystal) previous();
@@ -361,32 +365,42 @@ public class Parser {
         return left;
     }
 
-    private Expression termExpression() {
-        Expression left = factorExpression();
+    private Expression binaryOperatorExpression(Supplier<Expression> nextExpression,
+                                                BinaryExpressionConstructor constructor, TokenType... tokenTypes) {
+        Expression left = nextExpression.get();
         CoordinatePair location = left.getLocation();
 
-        while (match(TokenType.ADD, TokenType.SUBTRACT)) {
+        while (match(tokenTypes)) {
             BinaryOperatorCrystal operator = (BinaryOperatorCrystal) previous();
-            Expression right = factorExpression();
-            left = new BinaryExpression(left, operator, right);
+            Expression right = nextExpression.get();
+            left = constructor.construct(left, operator, right);
             left.setLocation(location);
         }
 
         return left;
     }
 
+    private Expression orExpression() {
+        return binaryOperatorExpression(this::andExpression, BooleanLogicExpression::new, TokenType.LOGICAL_OR);
+    }
+
+    private Expression andExpression() {
+        return binaryOperatorExpression(this::equalityExpression, BooleanLogicExpression::new, TokenType.LOGICAL_AND);
+    }
+
+    private Expression equalityExpression() {
+        return binaryOperatorExpression(this::termExpression, BinaryExpression::new, TokenType.EQUALS,
+                TokenType.NOT_EQUALS);
+    }
+
+    private Expression termExpression() {
+        return binaryOperatorExpression(this::factorExpression, BinaryExpression::new, TokenType.ADD,
+                TokenType.SUBTRACT);
+    }
+
     private Expression factorExpression() {
-        Expression left = unaryExpression();
-        CoordinatePair location = left.getLocation();
-
-        while (match(TokenType.MULTIPLY, TokenType.LEFT_DIVIDE, TokenType.RIGHT_DIVIDE)) {
-            BinaryOperatorCrystal operator = (BinaryOperatorCrystal) previous();
-            Expression right = unaryExpression();
-            left = new BinaryExpression(left, operator, right);
-            left.setLocation(location);
-        }
-
-        return left;
+        return binaryOperatorExpression(this::unaryExpression, BinaryExpression::new, TokenType.MULTIPLY,
+                TokenType.LEFT_DIVIDE, TokenType.RIGHT_DIVIDE);
     }
 
     private Expression unaryExpression() {
@@ -394,6 +408,16 @@ public class Parser {
             AtonementCrystal previous = previous();
             NegateCrystal operator = new NegateCrystal();
             operator.setCoordinates(previous.getCoordinates());
+
+            Expression right = unaryExpression();
+            UnaryExpression unaryExpression = new UnaryExpression(operator, right);
+            unaryExpression.setLocation(operator.getCoordinates());
+
+            return unaryExpression;
+        }
+
+        if (match(TokenType.LOGICAL_NOT)) {
+            LogicalNotOperatorCrystal operator = (LogicalNotOperatorCrystal) previous();
 
             Expression right = unaryExpression();
             UnaryExpression unaryExpression = new UnaryExpression(operator, right);
@@ -427,6 +451,7 @@ public class Parser {
             AtonementCrystal reference = previous();
             String identifier = reference.getIdentifier();
             if (!currentEnvironment.isDefined(identifier)) {
+                reference.setType(VikariType.INVALID);
                 error(reference, "Undefined variable reference.");
             } else {
                 // Since assignments aren't processed yet, need to fetch the declared type.

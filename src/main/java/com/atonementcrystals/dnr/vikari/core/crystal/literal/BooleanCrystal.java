@@ -18,6 +18,10 @@ public class BooleanCrystal extends ValueCrystal<Boolean> {
         setType(VikariType.BOOLEAN);
     }
 
+    public BooleanCrystal(Boolean value) {
+        this(value.toString(), value);
+    }
+
     @Override
     public ValueCrystal<Boolean> copy() {
         BooleanCrystal copy = new BooleanCrystal(getIdentifier(), getValue());

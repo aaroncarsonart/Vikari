@@ -74,11 +74,11 @@ public class TestUtils {
         assertEquals(expectedWarningCount, actualWarningCountCount, "Unexpected number of compilation warnings.");
     }
 
-    public static void testNumberCrystal(AtonementCrystal crystal, Object expectedValue, Class<? extends NumberCrystal> expectedClass) {
+    public static void testNumberCrystal(AtonementCrystal crystal, Object expectedValue, Class<? extends NumberCrystal<?>> expectedClass) {
         Class<? extends AtonementCrystal> actualClass = crystal.getClass();
         assertEquals(expectedClass, actualClass, "Unexpected type.");
 
-        NumberCrystal numberCrystal = expectedClass.cast(crystal);
+        NumberCrystal<?> numberCrystal = expectedClass.cast(crystal);
         Object actualValue = numberCrystal.getValue();
         assertEquals(expectedValue, actualValue, "Unexpected value for NumberCrystal.");
     }

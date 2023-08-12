@@ -1,9 +1,7 @@
 package com.atonementcrystals.dnr.vikari.core.crystal.identifier;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.NullCoalesceOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.LeftNullCoalesceAssignmentOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.RightNullCoalesceAssignmentOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.ExistsOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.bool.LeftLogicalAndAssignmentOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.math.LeftMultiplyAssignmentOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.math.RightAddAssignmentOperatorCrystal;
@@ -42,6 +40,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.comparison.Greater
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.comparison.InstanceOfOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.comparison.LessThanOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.comparison.LessThanOrEqualsOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.comparison.NotEqualsOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.comparison.ReferenceEqualsOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.control.flow.BreakOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.control.flow.ContinueOperatorCrystal;
@@ -150,7 +149,7 @@ public enum TokenType {
     CONSTRUCTOR("*", ConstructorCrystal.class),
     SUBTRACT("-", SubtractOperatorCrystal.class),
     NEGATE("-", NegateCrystal.class),
-    NULL_COALESCE("?", NullCoalesceOperatorCrystal.class),
+    EXISTS("?", ExistsOperatorCrystal.class),
 
     // assignment operators
     LEFT_ASSIGNMENT("<<", LeftAssignmentOperatorCrystal.class),
@@ -158,14 +157,12 @@ public enum TokenType {
     LEFT_SUBTRACT_ASSIGNMENT("-<<", LeftSubtractAssignmentOperatorCrystal.class),
     LEFT_DIVIDE_ASSIGNMENT("/<<", LeftDivideAssignmentOperatorCrystal.class),
     LEFT_MULTIPLY_ASSIGNMENT("*<<", LeftMultiplyAssignmentOperatorCrystal.class),
-    LEFT_NULL_COALESCE_ASSIGNMENT("?<<", LeftNullCoalesceAssignmentOperatorCrystal.class),
 
     RIGHT_ASSIGNMENT(">>", RightAssignmentOperatorCrystal.class),
     RIGHT_ADD_ASSIGNMENT("+>>", RightAddAssignmentOperatorCrystal.class),
     RIGHT_SUBTRACT_ASSIGNMENT("->>", RightSubtractAssignmentOperatorCrystal.class),
     RIGHT_DIVIDE_ASSIGNMENT("\\>>", RightDivideAssignmentOperatorCrystal.class),
     RIGHT_MULTIPLY_ASSIGNMENT("*>>", RightMultiplyAssignmentOperatorCrystal.class),
-    RIGHT_NULL_COALESCE_ASSIGNMENT("?>>", RightNullCoalesceAssignmentOperatorCrystal.class),
 
     LEFT_LOGICAL_AND_ASSIGNMENT("^<<", LeftLogicalAndAssignmentOperatorCrystal.class),
     LEFT_LOGICAL_OR_ASSIGNMENT("\"<<", LeftLogicalOrAssignmentOperatorCrystal.class),
@@ -185,6 +182,7 @@ public enum TokenType {
     LOGICAL_OR("\"", LogicalOrOperatorCrystal.class),
     LOGICAL_NOT("'", LogicalNotOperatorCrystal.class),
     EQUALS("=", EqualsOperatorCrystal.class),
+    NOT_EQUALS("'=", NotEqualsOperatorCrystal.class),
 
     // TODO: Determine default behavior of reference equality for literal values.
     REFERENCE_EQUALS("<=>", ReferenceEqualsOperatorCrystal.class),

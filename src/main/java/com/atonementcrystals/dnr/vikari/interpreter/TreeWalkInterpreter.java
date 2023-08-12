@@ -3,12 +3,16 @@ package com.atonementcrystals.dnr.vikari.interpreter;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeHierarchy;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullKeywordCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.logical.LogicalAndOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.logical.LogicalOrOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.BooleanLogicExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.NullLiteralExpression;
@@ -24,12 +28,6 @@ import com.atonementcrystals.dnr.vikari.error.Vikari_RuntimeException;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.UnaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.NegateCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.RightDivideOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.UnaryExpression;
@@ -143,28 +141,11 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         AtonementCrystal right = evaluate(expr.getRight());
         BinaryOperatorCrystal operator = expr.getOperator();
 
-        AtonementCrystal result = null;
-        if (operator instanceof AddOperatorCrystal) {
-            if (left instanceof NumberCrystal && right instanceof NumberCrystal) {
-                result = Arithmetic.add((NumberCrystal) left, (NumberCrystal) right);
-            }
-        } else if (operator instanceof SubtractOperatorCrystal) {
-            if (left instanceof NumberCrystal && right instanceof NumberCrystal) {
-                result = Arithmetic.subtract((NumberCrystal) left, (NumberCrystal) right);
-            }
-        } else if (operator instanceof MultiplyOperatorCrystal) {
-            if (left instanceof NumberCrystal && right instanceof NumberCrystal) {
-                result = Arithmetic.multiply((NumberCrystal) left, (NumberCrystal) right);
-            }
-        } else if (operator instanceof LeftDivideOperatorCrystal) {
-            if (left instanceof NumberCrystal && right instanceof NumberCrystal) {
-                result = Arithmetic.divide((NumberCrystal) left, (NumberCrystal) right);
-            }
-        } else if (operator instanceof RightDivideOperatorCrystal) {
-            if (left instanceof NumberCrystal && right instanceof NumberCrystal) {
-                result = Arithmetic.divide((NumberCrystal) right, (NumberCrystal) left);
-            }
-        } else {
+        AtonementCrystal result;
+
+        try {
+            result = operator.evaluate(left, right);
+        } catch (UnsupportedOperationException e) {
             throw internalRuntimeErrorForUnexpectedOperator(operator);
         }
 
@@ -173,6 +154,23 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         }
 
         return result;
+    }
+
+    @Override
+    public AtonementCrystal visit(BooleanLogicExpression expr) {
+        AtonementCrystal left = evaluate(expr.getLeft());
+        BinaryOperatorCrystal operator = expr.getOperator();
+
+        if (left instanceof BooleanCrystal booleanCrystal) {
+            boolean isTrue = booleanCrystal.getValue();
+            if (operator instanceof LogicalAndOperatorCrystal) {
+                if (!isTrue) return left;
+            } else if (operator instanceof LogicalOrOperatorCrystal) {
+                if (isTrue) return left;
+            }
+        }
+
+        return evaluate(expr.getRight());
     }
 
     @Override
@@ -243,8 +241,8 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
                                                            TypeCrystal declaredType) {
         AtonementCrystal declaredVariable;
 
-        if (value instanceof NumberCrystal) {
-            declaredVariable = Arithmetic.maybeUpcastOrDowncast((NumberCrystal) value, declaredType);
+        if (value instanceof NumberCrystal<?> number) {
+            declaredVariable = Arithmetic.maybeUpcastOrDowncast(number, declaredType);
         } else if (value == null || value instanceof NullKeywordCrystal) {
             declaredVariable = new NullCrystal(0);
         } else {
@@ -267,8 +265,8 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
                                                           TypeCrystal declaredType) {
         AtonementCrystal variable;
 
-        if (value instanceof NumberCrystal) {
-            variable = Arithmetic.maybeUpcastOrDowncast((NumberCrystal) value, declaredType);
+        if (value instanceof NumberCrystal<?> number) {
+            variable = Arithmetic.maybeUpcastOrDowncast(number, declaredType);
         } else if (value instanceof NullKeywordCrystal) {
             variable = new NullCrystal(0);
         } else {
@@ -327,7 +325,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     public AtonementCrystal visit(NullLiteralExpression expr) {
         AtonementCrystal expressionResult = evaluate(expr.getExpression());
 
-        if (expressionResult instanceof NumberCrystal numberCrystal) {
+        if (expressionResult instanceof NumberCrystal<?> numberCrystal) {
             TypeCrystal integerType = VikariType.INTEGER.getTypeCrystal();
             IntegerCrystal integerCrystal = (IntegerCrystal) Arithmetic.maybeUpcastOrDowncast(numberCrystal, integerType);
             int length = integerCrystal.getValue();
@@ -342,15 +340,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     public AtonementCrystal visit(UnaryExpression expr) {
         AtonementCrystal operand = evaluate(expr.getOperand());
         UnaryOperatorCrystal operator = expr.getOperator();
-        AtonementCrystal result = null;
-
-        if (operator instanceof NegateCrystal) {
-            if (operand instanceof NumberCrystal) {
-                result = Arithmetic.negate((NumberCrystal) operand);
-            }
-        } else {
-            throw internalRuntimeErrorForUnexpectedOperator(operator);
-        }
+        AtonementCrystal result = operator.evaluate(operand);
 
         if (result == null) {
             throw internalRuntimeErrorForUnexpectedUnaryOperand(operator);

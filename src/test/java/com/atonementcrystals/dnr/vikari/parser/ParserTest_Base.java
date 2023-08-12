@@ -1,6 +1,5 @@
 package com.atonementcrystals.dnr.vikari.parser;
 
-import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
@@ -25,6 +24,8 @@ import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 
 import java.util.List;
 
+import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
+import static com.atonementcrystals.dnr.vikari.TestUtils.assertSyntaxErrors;
 import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,7 +48,26 @@ public class ParserTest_Base {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
+        assertNoSyntaxErrors(syntaxErrorReporter);
+        rootEnvironment = parser.getRootEnvironment();
+
+        return parsedStatements;
+    }
+
+    protected List<Statement> lexAndParse(String sourceString, int expectedErrorCount) {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+
+        parser.setGlobalAtonementField(globalAtonementField);
+
+        this.syntaxErrorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
+        parser.setSyntaxErrorReporter(syntaxErrorReporter);
+
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
+        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
+
+        assertSyntaxErrors(syntaxErrorReporter, expectedErrorCount);
         rootEnvironment = parser.getRootEnvironment();
 
         return parsedStatements;
@@ -66,7 +86,7 @@ public class ParserTest_Base {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        TestUtils.assertSyntaxErrors(syntaxErrorReporter, expectedErrorCount);
+        assertSyntaxErrors(syntaxErrorReporter, expectedErrorCount);
         rootEnvironment = parser.getRootEnvironment();
 
         return parsedStatements;
@@ -293,7 +313,7 @@ public class ParserTest_Base {
         assertEquals(expectedCoordinates, variable.getCoordinates(), "Unexpected coordinates.");
 
         // Check variable exists in local environment
-        if (localEnvironment != null) {
+        if (localEnvironment != null && expectedDeclaredType != VikariType.INVALID) {
             assertTrue(localEnvironment.isDefined(expectedIdentifier), "Expected variable to be defined in local environment.");
             assertTrue(localEnvironment.hasFieldMember(expectedIdentifier), "Expected variable to be a field member of the local environment.");
 
@@ -308,13 +328,18 @@ public class ParserTest_Base {
 
         assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
         ExpressionStatement expressionStatement = (ExpressionStatement) statement;
-
         assertEquals(location, statement.getLocation(), "Unexpected location.");
 
         Expression innerExpression = expressionStatement.getExpression();
-        assertEquals(VariableExpression.class, innerExpression.getClass(), "Unexpected expression type.");
+        testVariableExpression(innerExpression, identifier, declaredType, instantiatedType, location);
+    }
 
-        AtonementCrystal variable = ((VariableExpression) innerExpression).getReference();
+    public void testVariableExpression(Expression expression, String identifier, VikariType declaredType,
+                                       VikariType instantiatedType, CoordinatePair location) {
+
+        assertEquals(VariableExpression.class, expression.getClass(), "Unexpected expression type.");
+
+        AtonementCrystal variable = ((VariableExpression) expression).getReference();
         testVariableCrystal(variable, identifier, declaredType, instantiatedType, location);
     }
 

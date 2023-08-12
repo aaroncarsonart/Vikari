@@ -119,7 +119,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     private void testNegationOperatorLocation(AtonementCrystal crystal, CoordinatePair expectedLocation) {
-        if (crystal instanceof NumberCrystal numberCrystal) {
+        if (crystal instanceof NumberCrystal<?> numberCrystal) {
             CoordinatePair actualLocation = numberCrystal.getNegationOperatorLocation();
             assertEquals(expectedLocation, actualLocation, "Unexpected location for negation operator.");
         } else {

@@ -2,11 +2,14 @@ package com.atonementcrystals.dnr.vikari.parser.statement;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.LeftAssignmentOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.logical.LogicalAndOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.BooleanLogicExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.NullLiteralExpression;
@@ -28,6 +31,8 @@ import java.math.MathContext;
 import java.util.List;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.*;
+import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.*;
+import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.testOperator;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -761,5 +766,50 @@ public class ParserTest_VariableDeclarationStatements extends ParserTest_Base {
 
         testNumberCrystal(leftOperand, 5, IntegerCrystal.class);
         testNumberCrystal(rightOperand, 7, IntegerCrystal.class);
+    }
+
+    @Test
+    @Order(30)
+    public void testParser_Statement_VariableDeclaration_UndefinedVariableForInitializerValue() {
+        String sourceString = "foo << bar";
+        List<Statement> statements = lexAndParse(sourceString, 1);
+        assertStatementCount(statements, 1);
+
+        // statements
+        VariableDeclarationStatement declaration = assertVariableDeclaration(statements.get(0), location(0, 0));
+        testVariableCrystal(declaration.getDeclaredVariable(), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INVALID,
+                location(0, 0));
+        testOperator(declaration.getAssignmentOperator(), LeftAssignmentOperatorCrystal.class, location(0, 4));
+        testVariableExpression(declaration.getInitializerExpression(), "bar", VikariType.INVALID, VikariType.INVALID,
+                location(0, 7));
+
+        // errors
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        testSyntaxError(syntaxErrors.get(0), location(0, 7), sourceString, "Undefined variable reference.");
+    }
+
+    @Test
+    @Order(31)
+    public void testParser_Statement_VariableDeclaration_InvalidTypeForInitializerValue() {
+        String sourceString = "foo << false ^ bar";
+        List<Statement> statements = lexAndParse(sourceString, 1);
+        assertStatementCount(statements, 1);
+
+        // statements
+        VariableDeclarationStatement declaration = assertVariableDeclaration(statements.get(0), location(0, 0));
+        testVariableCrystal(declaration.getDeclaredVariable(), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN,
+                location(0, 0));
+        testOperator(declaration.getAssignmentOperator(), LeftAssignmentOperatorCrystal.class, location(0, 4));
+        BooleanLogicExpression initializerAndExpression = assertLogicalExpression(declaration.getInitializerExpression(),
+                location(0, 7));
+
+        testLiteralExpression(initializerAndExpression.getLeft(), BooleanCrystal.class, false, location(0, 7));
+        testOperator(initializerAndExpression.getOperator(), LogicalAndOperatorCrystal.class, location(0, 13));
+        testVariableExpression(initializerAndExpression.getRight(), "bar", VikariType.INVALID, VikariType.INVALID,
+                location(0, 15));
+
+        // errors
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        testSyntaxError(syntaxErrors.get(0), location(0, 15), sourceString, "Undefined variable reference.");
     }
 }

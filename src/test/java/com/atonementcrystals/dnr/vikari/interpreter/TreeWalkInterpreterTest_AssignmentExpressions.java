@@ -1277,4 +1277,162 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
         testVariable("foo", VikariType.INTEGER, VikariType.NULL, 0);
         testVariable("bar", VikariType.INTEGER, VikariType.NULL, 0);
     }
+
+    @Test
+    @Order(47)
+    public void testTreeWalkInterpreter_LeftAssignment_BooleanLogicExpressions_WithLiterals() {
+        String sourceString = """
+                a, b, c, d, e, f, g
+
+                a << 'true
+                b << true " false
+                c << true ^ true
+                d << [true " true] ^ 'false
+                e << true = false
+                f << false '= true
+                g << [false = '[false " true]] ^ [false '= [false ^ true]]
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("c", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("g", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(48)
+    public void testTreeWalkInterpreter_LeftAssignment_BooleanLogicExpressions_WithVariables() {
+        String sourceString = """
+                foo:Boolean << true
+                bar:Boolean << false
+
+                a, b, c, d, e, f, g
+
+                a << 'foo
+                b << foo " bar
+                c << foo ^ foo
+                d << [foo " foo] ^ 'bar
+                e << foo = bar
+                f << bar '= foo
+                g << [bar = '[bar " foo]] ^ [bar '= [bar ^ foo]]
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("c", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("g", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(49)
+    public void testTreeWalkInterpreter_LeftAssignment_BooleanLogicExpressions_WithLiteralsAndVariables() {
+        String sourceString = """
+                foo:Boolean << true
+                bar:Boolean << false
+
+                a, b, c, d, e, f, g
+
+                b << foo " false
+                c << true ^ foo
+                d << [foo " true] ^ 'bar
+                e << true = bar
+                f << false '= foo
+                g << [bar = '[false " foo]] ^ [bar '= [bar ^ true]]
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("c", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("g", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(50)
+    public void testTreeWalkInterpreter_RightAssignment_BooleanLogicExpressions_WithLiterals() {
+        String sourceString = """
+                a, b, c, d, e, f, g
+
+                a << 'true
+                b << true " false
+                c << true ^ true
+                d << [true " true] ^ 'false
+                e << true = false
+                f << false '= true
+                g << [false = '[false " true]] ^ [false '= [false ^ true]]
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("c", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("g", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(51)
+    public void testTreeWalkInterpreter_RightAssignment_BooleanLogicExpressions_WithVariables() {
+        String sourceString = """
+                foo:Boolean << true
+                bar:Boolean << false
+
+                a, b, c, d, e, f, g
+
+                'foo >> a
+                foo " bar >> b
+                foo ^ foo >> c
+                [foo " foo] ^ 'bar >> d
+                foo = bar >> e
+                bar '= foo >> f
+                [bar = '[bar " foo]] ^ [bar '= [bar ^ foo]] >> g
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("c", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("g", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(52)
+    public void testTreeWalkInterpreter_RightAssignment_BooleanLogicExpressions_WithLiteralsAndVariables() {
+        String sourceString = """
+                foo:Boolean << true
+                bar:Boolean << false
+
+                b, c, d, e, f, g
+
+                foo " false >> b
+                true ^ foo >> c
+                [foo " true] ^ 'bar >> d
+                true = bar >> e
+                false '= foo >> f
+                [bar = '[false " foo]] ^ [bar '= [bar ^ true]] >> g
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("c", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("g", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+    }
 }

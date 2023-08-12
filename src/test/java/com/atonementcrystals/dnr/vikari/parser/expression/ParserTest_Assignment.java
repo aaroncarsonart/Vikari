@@ -3,12 +3,15 @@ package com.atonementcrystals.dnr.vikari.parser.expression;
 import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.LeftAssignmentOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.RightAssignmentOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.logical.LogicalAndOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.BooleanLogicExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;
@@ -34,6 +37,8 @@ import java.math.MathContext;
 import java.util.List;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.*;
+import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.*;
+import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.testOperator;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -2069,5 +2074,137 @@ public class ParserTest_Assignment extends ParserTest_Base {
         assertEquals(VariableExpression.class, lvalue.getClass(), "Unexpected expression type.");
         AtonementCrystal rvalueVariable = ((VariableExpression) rvalue).getReference();
         testVariableCrystal(rvalueVariable, "foo", VikariType.INTEGER, VikariType.NULL, location(2, 0));
+    }
+
+    @Test
+    @Order(49)
+    public void testParser_Expression_LeftAssignment_UndefinedVariableReferenceForRValue() {
+        String sourceString = "foo, foo << bar";
+        List<Statement> statements = lexAndParse(sourceString, 1);
+        assertStatementCount(statements, 2);
+
+        // statements
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INVALID, location(0, 0));
+
+        LeftAssignmentExpression assignmentExpression = assertLeftAssignment(statements.get(1), location(0, 5));
+        testVariableExpression(assignmentExpression.getLvalue(), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INVALID,
+                location(0, 5));
+        testOperator(assignmentExpression.getOperator(), LeftAssignmentOperatorCrystal.class, location(0, 9));
+        testVariableExpression(assignmentExpression.getRvalue(), "bar", VikariType.INVALID, VikariType.INVALID,
+                location(0, 12));
+
+        // errors
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        testSyntaxError(syntaxErrors.get(0), location(0, 12), sourceString, "Undefined variable reference.");
+    }
+
+    /**
+     * NOTE: An raw, undefined variable reference for a right assignment statement is impossible, since an undeclared
+     * variable at the beginning of a statement is assumed to be, and therefore always parsed as, the beginning of a new
+     * variable declaration statement. So this simply tests for that error case being formed as it so should be expected.
+     */
+    @Test
+    @Order(50)
+    public void testParser_Expression_RightAssignment_UndefinedVariableReferenceForRValue() {
+        String sourceString = "foo, bar >> foo";
+        List<Statement> statements = lexAndParse(sourceString, 1);
+        assertStatementCount(statements, 2);
+
+        // statements
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.NULL, location(0, 0));
+
+        VariableDeclarationStatement declaration = assertVariableDeclaration(statements.get(1), location(0, 5));
+        testVariableCrystal(declaration.getDeclaredVariable(), "bar", VikariType.ATONEMENT_CRYSTAL, VikariType.NULL,
+                location(0, 5));
+        assertNull(declaration.getAssignmentOperator(), "Expected operator of variable declaration to be null.");
+        assertNull(declaration.getInitializerExpression(), "Expected initializer expression of variable declaration " +
+                "to be null.");
+
+        // errors
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        testSyntaxError(syntaxErrors.get(0), location(0, 9), sourceString, "Unexpected token(s) in variable " +
+                "declaration statement.");
+    }
+
+    /**
+     * NOTE: A right assignment expression statement with an undefined variable reference as an rvalue can be forced to
+     * be interpreted in this way and not as a variable delaration statement by closing the expression in a grouping.
+     */
+    @Test
+    @Order(51)
+    public void testParser_Expression_RightAssignment_UndefinedVariableReferenceForRValue_InGrouping() {
+        String sourceString = "foo, [bar >> foo]";
+        List<Statement> statements = lexAndParse(sourceString, 1);
+        assertStatementCount(statements, 2);
+
+        // statements
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INVALID, location(0, 0));
+
+        GroupingExpression groupingExpression = assertGroupingExpression(statements.get(1), location(0, 5));
+        RightAssignmentExpression assignmentExpression = assertRightAssignment(groupingExpression.getExpression(),
+                location(0, 6));
+        testVariableExpression(assignmentExpression.getLvalue(), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INVALID,
+                location(0, 13));
+        testOperator(assignmentExpression.getOperator(), RightAssignmentOperatorCrystal.class, location(0, 10));
+        testVariableExpression(assignmentExpression.getRvalue(), "bar", VikariType.INVALID, VikariType.INVALID,
+                location(0, 6));
+
+        // errors
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        testSyntaxError(syntaxErrors.get(0), location(0, 6), sourceString, "Undefined variable reference.");
+    }
+
+    @Test
+    @Order(52)
+    public void testParser_Expression_LeftAssignment_InvalidTypeForRValue() {
+        String sourceString = "foo, foo << false ^ bar";
+        List<Statement> statements = lexAndParse(sourceString, 1);
+        assertStatementCount(statements, 2);
+
+        // statements
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, location(0, 0));
+
+        LeftAssignmentExpression assignmentExpression = assertLeftAssignment(statements.get(1), location(0, 5));
+        testVariableExpression(assignmentExpression.getLvalue(), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN,
+                location(0, 5));
+        testOperator(assignmentExpression.getOperator(), LeftAssignmentOperatorCrystal.class, location(0, 9));
+        BooleanLogicExpression rValueAndExpression = assertLogicalExpression(assignmentExpression.getRvalue(),
+                location(0, 12));
+
+        testLiteralExpression(rValueAndExpression.getLeft(), BooleanCrystal.class, false, location(0, 12));
+        testOperator(rValueAndExpression.getOperator(), LogicalAndOperatorCrystal.class, location(0, 18));
+        testVariableExpression(rValueAndExpression.getRight(), "bar", VikariType.INVALID, VikariType.INVALID,
+                location(0, 20));
+
+        // errors
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        testSyntaxError(syntaxErrors.get(0), location(0, 20), sourceString, "Undefined variable reference.");
+    }
+
+    @Test
+    @Order(53)
+    public void testParser_Expression_RightAssignment_InvalidTypeForRValue() {
+        String sourceString = "foo, false ^ bar >> foo";
+        List<Statement> statements = lexAndParse(sourceString, 1);
+        assertStatementCount(statements, 2);
+
+        // statements
+        testDeclaration(statements.get(0), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, location(0, 0));
+
+        RightAssignmentExpression assignmentExpression = assertRightAssignment(statements.get(1), location(0, 5));
+        testVariableExpression(assignmentExpression.getLvalue(), "foo", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN,
+                location(0, 20));
+        testOperator(assignmentExpression.getOperator(), RightAssignmentOperatorCrystal.class, location(0, 17));
+        BooleanLogicExpression rValueAndExpression = assertLogicalExpression(assignmentExpression.getRvalue(),
+                location(0, 5));
+
+        testLiteralExpression(rValueAndExpression.getLeft(), BooleanCrystal.class, false, location(0, 5));
+        testOperator(rValueAndExpression.getOperator(), LogicalAndOperatorCrystal.class, location(0, 11));
+        testVariableExpression(rValueAndExpression.getRight(), "bar", VikariType.INVALID, VikariType.INVALID,
+                location(0, 13));
+
+        // errors
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        testSyntaxError(syntaxErrors.get(0), location(0, 13), sourceString, "Undefined variable reference.");
     }
 }

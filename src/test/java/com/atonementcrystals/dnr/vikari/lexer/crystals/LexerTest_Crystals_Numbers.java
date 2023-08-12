@@ -31,7 +31,7 @@ public class LexerTest_Crystals_Numbers {
     private void lexAndTestNumberCrystal(String sourceString, Class<? extends AtonementCrystal> expectedClass,
                                          Object expectedValue) {
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 1);
-        if (statement.get(0) instanceof NumberCrystal numberCrystal) {
+        if (statement.get(0) instanceof NumberCrystal<?> numberCrystal) {
             testCrystal(numberCrystal, expectedClass, sourceString, location(0, 0));
             assertEquals(expectedValue, numberCrystal.getValue(), "Unexpected value for NumberCrystal.");
         } else {

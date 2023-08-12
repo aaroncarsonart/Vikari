@@ -486,7 +486,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements extends TreeW
     }
 
     @Test
-    @Order(23)
+    @Order(24)
     public void testTreeWalkInterpreter_VariableDeclaration_Nulls_NegativeLength() {
         String sourceString = """
                 a << _[-1]_
@@ -515,7 +515,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements extends TreeW
     }
 
     @Test
-    @Order(24)
+    @Order(25)
     public void testTreeWalkInterpreter_VariableDeclaration_Nulls_NullLiteralExpression_WithVariable() {
         String sourceString = """
                 int:Integer << 2
@@ -527,7 +527,7 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements extends TreeW
     }
 
     @Test
-    @Order(25)
+    @Order(26)
     public void testTreeWalkInterpreter_VariableDeclaration_Nulls_NullLiteralExpression_WithArithmeticExpression() {
         String sourceString = """
                 foo << __[5 + 7]__
@@ -535,5 +535,78 @@ public class TreeWalkInterpreterTest_VariableDeclarationStatements extends TreeW
         lexParseAndInterpret(sourceString);
 
         testNullVariable("foo", VikariType.ATONEMENT_CRYSTAL, 12);
+    }
+
+    @Test
+    @Order(27)
+    public void testTreeWalkInterpreter_VariableDeclaration_BooleanLogicExpressions_WithLiterals() {
+        String sourceString = """
+                a << 'true
+                b << true " false
+                c << true ^ true
+                d << [true " true] ^ 'false
+                e << true = false
+                f << false '= true
+                g << [false = '[false " true]] ^ [false '= [false ^ true]]
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("c", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("g", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(28)
+    public void testTreeWalkInterpreter_VariableDeclaration_BooleanLogicExpressions_WithVariables() {
+        String sourceString = """
+                foo:Boolean << true
+                bar:Boolean << false
+
+                a << 'foo
+                b << foo " bar
+                c << foo ^ foo
+                d << [foo " foo] ^ 'bar
+                e << foo = bar
+                f << bar '= foo
+                g << [bar = '[bar " foo]] ^ [bar '= [bar ^ foo]]
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("c", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("g", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+    }
+
+    @Test
+    @Order(29)
+    public void testTreeWalkInterpreter_VariableDeclaration_BooleanLogicExpressions_WithLiteralsAndVariables() {
+        String sourceString = """
+                foo:Boolean << true
+                bar:Boolean << false
+
+                b << foo " false
+                c << true ^ foo
+                d << [foo " true] ^ 'bar
+                e << true = bar
+                f << false '= foo
+                g << [bar = '[false " foo]] ^ [bar '= [bar ^ true]]
+                """;
+        lexParseAndInterpret(sourceString);
+
+        testVariable("b", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("c", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("d", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
+        testVariable("g", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, false);
     }
 }

@@ -19,7 +19,7 @@ public class InterpreterTest_Utils {
      * @param expectedClass The expected type of the result.
      */
     public static void testVikariExpression(String sourceString, Object expectedValue,
-                                            Class<? extends NumberCrystal> expectedClass) {
+                                            Class<? extends NumberCrystal<?>> expectedClass) {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
         TreeWalkInterpreter interpreter = new TreeWalkInterpreter();

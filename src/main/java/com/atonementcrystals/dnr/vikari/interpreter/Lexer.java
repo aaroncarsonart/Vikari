@@ -239,7 +239,6 @@ public class Lexer {
                     case '$':
                     case '%':
                     case '&':
-                    case '\'':
                     case '(':
                     case ')':
                     case ',':
@@ -250,6 +249,10 @@ public class Lexer {
                     case '{':
                     case '}':
                         token();
+                        break;
+
+                    case '\'':
+                        tryMatchAndGetToken("=");
                         break;
 
                     case '"':
@@ -290,7 +293,7 @@ public class Lexer {
                         break;
 
                     case '?':
-                        tryMatchAndGetToken("<<", ">>", "?");
+                        tryMatchAndGetToken("?");
                         break;
 
                     case '\\':

@@ -8,22 +8,22 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrys
 import com.atonementcrystals.dnr.vikari.interpreter.NumericComparisons;
 
 /**
- * The equals operator = checks if the left operand is equal to
- * the right operand by calling <code>left.equals!(right)</code>
+ * The not equals operator '= checks if the left operand is equal
+ * to the right operand by calling <code>'left.equals!(right)</code>
  * as a null-safe operation.
  */
-public class EqualsOperatorCrystal extends BinaryOperatorCrystal {
+public class NotEqualsOperatorCrystal extends BinaryOperatorCrystal {
 
-    public EqualsOperatorCrystal() {
-        super(TokenType.EQUALS.getIdentifier());
+    public NotEqualsOperatorCrystal() {
+        super(TokenType.NOT_EQUALS.getIdentifier());
     }
 
     @Override
     public AtonementCrystal evaluate(AtonementCrystal left, AtonementCrystal right) {
         if (left instanceof NumberCrystal<?> leftNumber && right instanceof NumberCrystal<?> rightNumber) {
-            return NumericComparisons.isEqual(leftNumber, rightNumber);
+            return NumericComparisons.isNotEqual(leftNumber, rightNumber);
         } else {
-            BooleanCrystal result = new BooleanCrystal(left.isEqual(right));
+            BooleanCrystal result = new BooleanCrystal(!left.isEqual(right));
             result.setCoordinates(left.getCoordinates());
             return result;
         }

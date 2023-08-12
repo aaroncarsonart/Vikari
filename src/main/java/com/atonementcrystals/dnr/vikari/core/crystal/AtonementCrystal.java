@@ -100,4 +100,8 @@ public class AtonementCrystal {
         // NOTE: A copied crystal's declared type will always be overridden.
         // NOTE: A copied crystal's instantiated type is located in its AtonementField.
     }
+
+    public boolean isEqual(AtonementCrystal other) {
+        return this.getField() == other.getField();
+    }
 }

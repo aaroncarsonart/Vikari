@@ -3,6 +3,7 @@ package com.atonementcrystals.dnr.vikari.core;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
+import com.atonementcrystals.dnr.vikari.core.expression.BooleanLogicExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LeftAssignmentExpression;
@@ -63,6 +64,16 @@ public class AstPrintVisitor implements Statement.Visitor<String>, Expression.Vi
 
     @Override
     public String visit(BinaryExpression expr) {
+        String left = expr.getLeft().accept(this);
+        String operator = expr.getOperator().getIdentifier();
+        String right = expr.getRight().accept(this);
+
+        String descriptor = Utils.getSimpleClassName(expr.getOperator());
+        return group(descriptor, left, operator, right);
+    }
+
+    @Override
+    public String visit(BooleanLogicExpression expr) {
         String left = expr.getLeft().accept(this);
         String operator = expr.getOperator().getIdentifier();
         String right = expr.getRight().accept(this);

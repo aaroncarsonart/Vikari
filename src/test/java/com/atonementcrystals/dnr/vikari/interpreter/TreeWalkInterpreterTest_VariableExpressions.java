@@ -70,10 +70,9 @@ public class TreeWalkInterpreterTest_VariableExpressions {
             assertEquals(expectedLength, actualLength, "Unexpected length for null crystal.");
         }
 
-        else if (variable instanceof NumberCrystal) {
-            NumberCrystal numberCrystal = (NumberCrystal) variable;
-            Object actualvalue = numberCrystal.getValue();
-            assertEquals(expectedValue, actualvalue, "Unexpected value.");
+        else if (variable instanceof NumberCrystal<?> numberCrystal) {
+            Object actualValue = numberCrystal.getValue();
+            assertEquals(expectedValue, actualValue, "Unexpected value.");
         } else {
             TypeCrystal typeCrystal = variable.getInstantiatedType();
             if (typeCrystal == null) {
