@@ -12,10 +12,10 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
  * syntax highlighting and to allow the regular line continuation operator
  * to be put back in place when the code is un-minimized.
  */
-public class LineContinuationMinimizedOperatorCrystal extends AtonementCrystal {
+public class MinimizedLineContinuationCrystal extends AtonementCrystal {
 
-    public LineContinuationMinimizedOperatorCrystal() {
-        super(TokenType.LINE_CONTINUATION_MINIMIZED.getIdentifier());
+    public MinimizedLineContinuationCrystal() {
+        super(TokenType.MINIMIZED_LINE_CONTINUATION.getIdentifier());
     }
 
 }

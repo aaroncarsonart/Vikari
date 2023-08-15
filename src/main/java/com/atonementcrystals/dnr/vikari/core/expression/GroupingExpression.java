@@ -15,5 +15,4 @@ public class GroupingExpression extends Expression {
     public <E> E accept(Visitor<E> visitor) {
         return visitor.visit(this);
     }
-
 }

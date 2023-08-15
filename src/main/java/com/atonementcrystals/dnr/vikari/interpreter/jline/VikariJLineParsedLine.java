@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class VikariJLineParsedLine implements ParsedLine, CompletingParsedLine {
 
-    private String line;
+    private final String line;
 
     public VikariJLineParsedLine(String line) {
         this.line = line;

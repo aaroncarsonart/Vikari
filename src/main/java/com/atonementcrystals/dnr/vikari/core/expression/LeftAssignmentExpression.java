@@ -3,7 +3,7 @@ package com.atonementcrystals.dnr.vikari.core.expression;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 
 /**
- * Left assignment expressions contain an lvalue, which is the value
+ * Left assignment expressions contain an lvalue, which is the target
  * being assigned to, and an rvalue, which is the value being assigned.
  */
 public class LeftAssignmentExpression extends Expression {

@@ -28,7 +28,6 @@ import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
 import static com.atonementcrystals.dnr.vikari.TestUtils.assertSyntaxErrors;
 import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ParserTest_Base {
     protected final AtonementField globalAtonementField = VikariProgram.initGlobalAtonementField();
@@ -160,7 +159,7 @@ public class ParserTest_Base {
     }
 
     /**
-     * Test a declaration where the assignment does not match the type of the declared variable.
+     * Test a declaration where the assignment from a literal value does not match the type of the declared variable.
      */
     public void testDeclaration_TypeError(Statement statement, String identifier, VikariType declaredType,
                                           VikariType instantiatedType, CoordinatePair location, Object value) {
@@ -188,7 +187,7 @@ public class ParserTest_Base {
     }
 
     /**
-     * Test a declaration where the assignment does not match the type of the declared variable.
+     * Test a declaration where the assignment from another variable does not match the type of the declared variable.
      */
     public void testDeclaration_FromVariable_TypeError(Statement statement, String identifier, VikariType declaredType,
                                                        CoordinatePair location, String initializerIdentifier,

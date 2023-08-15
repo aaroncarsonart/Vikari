@@ -2,7 +2,6 @@ package com.atonementcrystals.dnr.vikari.interpreter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class LexerOptions {
     public final boolean printTokens;        // p
@@ -11,15 +10,6 @@ public class LexerOptions {
     public final boolean separateTokens;     // t
     public final boolean verbose;            // v
     public boolean warnings;                 // w
-
-    public LexerOptions() {
-        printTokens = true;
-        printLineNumbers = true;
-        showInvisibles = true;
-        separateTokens = true;
-        verbose = true;
-        warnings = true;
-    }
 
     public LexerOptions(boolean printTokens, boolean printLineNumbers, boolean showInvisibles,
                         boolean separateTokens, boolean verbose, boolean warnings) {
@@ -42,7 +32,7 @@ public class LexerOptions {
         if (separateTokens) enabledFlags.add("separateTokens");
         if (verbose) enabledFlags.add("verbose");
 
-        String csv = enabledFlags.stream().collect(Collectors.joining(","));
+        String csv = String.join(",", enabledFlags);
         sb.append(csv);
         sb.append('}');
 

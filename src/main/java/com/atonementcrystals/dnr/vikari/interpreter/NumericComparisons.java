@@ -12,11 +12,9 @@ import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.util.function.BiFunction;
 
 public class NumericComparisons {
-    private static MathContext mathContext = Arithmetic.getMathContext();
 
     /**
      * Compare the left and right operands. Performs type promotion such that the left or right operand are promoted to
@@ -98,12 +96,12 @@ public class NumericComparisons {
         // -------------------------------
         // Upcast to BigDecimal
         if (left instanceof BigDecimalCrystal) {
-            BigDecimal value = new BigDecimal(right.getValue().toString(), mathContext);
+            BigDecimal value = new BigDecimal(right.getValue().toString(), Arithmetic.getMathContext());
             BigDecimalCrystal right2 = new BigDecimalCrystal(right.getIdentifier(), value);
             return compare(left, right2, compareIntegers, compareLongs, compareBigIntegers, compareFloats,
                     compareDoubles, compareBigDecimals);
         } else if (right instanceof BigDecimalCrystal) {
-            BigDecimal value = new BigDecimal(left.getValue().toString(), mathContext);
+            BigDecimal value = new BigDecimal(left.getValue().toString(), Arithmetic.getMathContext());
             BigDecimalCrystal left2 = new BigDecimalCrystal(left.getIdentifier(), value);
             return compare(left2, right, compareIntegers, compareLongs, compareBigIntegers, compareFloats,
                     compareDoubles, compareBigDecimals);

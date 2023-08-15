@@ -4,7 +4,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 
 /**
- * The dot operator . de-references type members from a crystal's field.
+ * The dot operator . dereferences instance field members from a crystal.
  */
 public class DotOperatorCrystal extends AtonementCrystal {
 

@@ -50,8 +50,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  * number token which immediately follows it. Either this is because it is a part of a valid expression
  * which should be kept as separate tokens (aka: `a - 5`), or it is an invalid expression which will be a
  * syntax error in which it would not be more helpful for the "-" token to be applied to the number for
- * correctly interpreting the error case result.
- * <p>
+ * correctly interpreting the error case result.<br/>
+ * <br/>
  * "Positive cases" means all cases in which "-" is to be applied as a negation operator to a number
  * crystal's literal value and parsed as a singular token, not two. However, some cases are in fact error
  * cases, as mentioned above. For example, the expression `vv -5` is not valid Vikari code, because the

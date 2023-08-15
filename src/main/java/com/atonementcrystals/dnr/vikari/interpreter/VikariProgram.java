@@ -13,7 +13,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,21 +24,18 @@ import java.util.Map;
 public class VikariProgram {
     private static final Logger log = LogManager.getLogger(VikariProgram.class);
 
-    private Lexer lexer;
-    private Parser parser;
-    private TreeWalkInterpreter interpreter;
+    private final Lexer lexer;
+    private final Parser parser;
+    private final TreeWalkInterpreter interpreter;
 
     private LexerOptions lexerOptions;
     private ParserOptions parserOptions;
 
-    private Map<String, List<List<AtonementCrystal>>> lexerResults;
-    private Map<String, List<Statement>> parserResults;
-    private SyntaxErrorReporter syntaxErrorReporter;
+    private final Map<String, List<List<AtonementCrystal>>> lexerResults;
+    private final Map<String, List<Statement>> parserResults;
+    private final SyntaxErrorReporter syntaxErrorReporter;
 
-    private List<List<List<AtonementCrystal>>> replLexerResults;
-    private List<List<Statement>> replParserResults;
-
-    private AtonementField globalAtonementField;
+    private final AtonementField globalAtonementField;
 
     public VikariProgram() {
         log.trace("VikariProgram constructor.");
@@ -55,9 +51,6 @@ public class VikariProgram {
         parser.setSyntaxErrorReporter(syntaxErrorReporter);
         interpreter.setGetLineFunction(syntaxErrorReporter::getLineFromCache);
 
-        replLexerResults = new ArrayList<>();
-        replParserResults = new ArrayList<>();
-
         globalAtonementField = initGlobalAtonementField();
 
         parser.setGlobalAtonementField(globalAtonementField);
@@ -66,7 +59,7 @@ public class VikariProgram {
 
     /**
      * Sets up the global, top-level AtonementField which is shared for all files
-     * in the parser and interpreter.
+     * in the Parser and TreeWalkInterpreter.
      */
     public static AtonementField initGlobalAtonementField() {
         // Initialize with no parent and shadowing enabled.
@@ -135,13 +128,11 @@ public class VikariProgram {
      */
     public List<List<AtonementCrystal>> lex(String sourceCode) {
         log.info("lex()");
-        log.info("Source code:\n{}", sourceCode );
-
+        log.info("Source code:\n{}", sourceCode);
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceCode);
-        replLexerResults.add(lexedStatements);
 
         if (shouldPrintLexerResults()) {
-            printMessageWithLines("Lex code string.");
+            printMessageWithLines("Lex code string:");
             printLexedStatements(lexedStatements,
                     lexerOptions.printLineNumbers,
                     lexerOptions.showInvisibles,
@@ -157,20 +148,12 @@ public class VikariProgram {
      * @param sourceFile The source file to lex and parse.
      */
     public void lexAndParse(File sourceFile) {
-
-        // -----------------------
-        // 1. Lex the source file.
-        // -----------------------
         lex(sourceFile);
-
-        // -------------------------
-        // 2. Parse the source file.
-        // -------------------------
         parse(sourceFile);
     }
 
     /**
-     * Parse the output of the lexer.
+     * Parse the output of the Lexer.
      * @param sourceFile The previously lexed Vikari source file to parse.
      */
     public List<Statement> parse(File sourceFile) {
@@ -193,16 +176,15 @@ public class VikariProgram {
     }
 
     /**
-     * Parse the output of the lexer.
-     * @param lexedStatements The output of the lexer to parse.
+     * Parse the output of the Lexer.
+     * @param lexedStatements The output of the Lexer to parse.
      */
     public List<Statement> parse(List<List<AtonementCrystal>> lexedStatements) {
         log.info("parse()");
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
-        replParserResults.add(parsedStatements);
 
         if (shouldPrintParserResults()) {
-            printMessageWithLines("Parse code string.");
+            printMessageWithLines("Parse code string:");
             printParsedStatements(parsedStatements,
                     parserOptions.printLineNumbers,
                     parserOptions.printAst,
@@ -217,14 +199,7 @@ public class VikariProgram {
      * @param sourceString The Vikari source code string to lex and parse.
      */
     public List<Statement> lexAndParse(String sourceString) {
-        // -----------------------
-        // 1. Lex the source code.
-        // -----------------------
         List<List<AtonementCrystal>> lexedStatements = lex(sourceString);
-
-        // -------------------------
-        // 2. Parse the source code.
-        // -------------------------
         List<Statement> parsedStatements = parse(lexedStatements);
         return parsedStatements;
     }
@@ -237,11 +212,11 @@ public class VikariProgram {
         String filePath = sourceFile.getAbsolutePath();
 
         log.info("execute(\"{}\")", filePath);
-        log.info("Execute phase is not implemented.");
 
-        // -----------------------------
-        // 3. Execute the resulting AST.
-        // -----------------------------
+        if (shouldPrintExecuteBannerMessage()) {
+            printMessageWithLines("Execute file: \"" + filePath + "\"");
+        }
+
         List<Statement> parsedStatements = parserResults.get(filePath);
         interpreter.interpret(sourceFile, parsedStatements);
     }
@@ -252,9 +227,10 @@ public class VikariProgram {
     public void execute(List<Statement> parsedStatements) {
         log.info("execute()");
 
-        // -----------------------------
-        // 3. Execute the resulting AST.
-        // -----------------------------
+        if (shouldPrintExecuteBannerMessage()) {
+            printMessageWithLines("Execute code string:");
+        }
+
         interpreter.interpret(null, parsedStatements);
     }
 
@@ -334,17 +310,14 @@ public class VikariProgram {
             int lineNumber = 0;
             for (Statement statement : parsedStatements) {
                 if (printLineNumbers) {
-
-                    if (printLineNumbers) {
-                        formatter.format(lineNumberFormat, lineNumber++);
-                    }
+                    formatter.format(lineNumberFormat, lineNumber);
                 }
                 String result = statement.accept(astPrintVisitor);
                 sb.append(result);
                 if (lineNumber < parsedStatements.size() - 1) {
                     sb.append('\n');
                 }
-
+                lineNumber++;
             }
 
             String result = sb.toString();
@@ -383,6 +356,10 @@ public class VikariProgram {
         Level logLevel = log.getLevel();
         return parserOptions != null && parserOptions.printAst && (logLevel == Level.TRACE || logLevel == Level.DEBUG ||
                 logLevel == Level.ALL);
+    }
+
+    public boolean shouldPrintExecuteBannerMessage() {
+        return shouldPrintLexerResults() || shouldPrintParserResults();
     }
 
     private void printMessageWithLines(String message) {

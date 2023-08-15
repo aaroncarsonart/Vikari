@@ -14,7 +14,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOpera
 import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
-import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -23,6 +22,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 
+import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
 import static com.atonementcrystals.dnr.vikari.TestUtils.location;
 import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,7 +45,7 @@ public class ParserTest_PrintStatements {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
+        assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -85,7 +85,7 @@ public class ParserTest_PrintStatements {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
+        assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -128,7 +128,7 @@ public class ParserTest_PrintStatements {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
+        assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -176,7 +176,7 @@ public class ParserTest_PrintStatements {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
+        assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -222,7 +222,7 @@ public class ParserTest_PrintStatements {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
+        assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -268,7 +268,7 @@ public class ParserTest_PrintStatements {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
+        assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -316,7 +316,7 @@ public class ParserTest_PrintStatements {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
+        assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 4;
         int actualSize = parsedStatements.size();

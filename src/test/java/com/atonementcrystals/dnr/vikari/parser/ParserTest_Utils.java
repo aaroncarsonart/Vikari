@@ -1,6 +1,5 @@
 package com.atonementcrystals.dnr.vikari.parser;
 
-import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
@@ -152,9 +151,9 @@ public class ParserTest_Utils {
 
     public static void testRvalue(Object value, AtonementCrystal rvalue, VikariType instantiatedType) {
         if (value instanceof Number) {
-            TestUtils.testNumberCrystal(rvalue, value, (Class<? extends NumberCrystal<?>>) instantiatedType.getJavaType());
+            testNumberCrystal(rvalue, value, (Class<? extends NumberCrystal<?>>) instantiatedType.getJavaType());
         } else if (value instanceof Boolean) {
-            TestUtils.testBooleanCrystal(rvalue, value);
+            testBooleanCrystal(rvalue, value);
         } else {
             fail("Malformed test. Unexpected value type for rvalue: " + value.getClass().getSimpleName());
         }

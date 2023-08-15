@@ -1,11 +1,10 @@
 package com.atonementcrystals.dnr.vikari.parser.expression;
 
-import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.logical.LogicalNotOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.NegateCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.NegateOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
@@ -49,7 +48,7 @@ public class ParserTest_Unary {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
+        assertNoSyntaxErrors(syntaxErrorReporter);
 
         int expectedSize = 1;
         int actualSize = parsedStatements.size();
@@ -86,7 +85,7 @@ public class ParserTest_Unary {
 
         ExpressionStatement expressionStatement = assertExpressionStatement(statements.get(0), location(0, 0));
         UnaryExpression unaryExpression = assertUnaryExpression(expressionStatement.getExpression(), location(0, 0));
-        testOperator(unaryExpression.getOperator(), NegateCrystal.class, location(0, 0));
+        testOperator(unaryExpression.getOperator(), NegateOperatorCrystal.class, location(0, 0));
         testLiteralExpression(unaryExpression.getOperand(), BooleanCrystal.class, true, location(0, 1));
 
         List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();

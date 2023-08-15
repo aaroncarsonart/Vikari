@@ -5,7 +5,7 @@ import com.atonementcrystals.dnr.vikari.core.expression.PrintExpression;
 import java.util.List;
 
 public class PrintStatement extends Statement {
-    private List<PrintExpression> printExpressions;
+    private final List<PrintExpression> printExpressions;
 
     public PrintStatement(List<PrintExpression> printExpressions) {
         this.printExpressions = printExpressions;

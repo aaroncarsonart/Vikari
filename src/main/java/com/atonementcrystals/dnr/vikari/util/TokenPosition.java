@@ -1,8 +1,8 @@
 package com.atonementcrystals.dnr.vikari.util;
 
 public class TokenPosition {
-    private int lineNumber;
-    private int tokenNumber;
+    private final int lineNumber;
+    private final int tokenNumber;
 
     public TokenPosition(int lineNumber, int tokenNumber) {
         this.lineNumber = lineNumber;

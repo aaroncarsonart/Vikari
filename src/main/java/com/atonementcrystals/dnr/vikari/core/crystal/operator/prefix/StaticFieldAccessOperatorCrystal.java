@@ -9,7 +9,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
  *     <li>Declare a static type member.</li>
  *     <li>Access a static type member.</li>
  * </ol>
- * # Refers to the DNR type outside of a type declaraton.
+ * # Refers to the DNR type outside a type declaration statement.
  */
 public class StaticFieldAccessOperatorCrystal extends AtonementCrystal {
 

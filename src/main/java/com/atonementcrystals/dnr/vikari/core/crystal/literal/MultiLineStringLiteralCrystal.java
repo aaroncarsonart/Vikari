@@ -3,7 +3,7 @@ package com.atonementcrystals.dnr.vikari.core.crystal.literal;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 
 /**
- * A multi-line string literal is defined across more than one line.
+ * A multi-line string literal is a string defined across more than one line.
  */
 public class MultiLineStringLiteralCrystal extends AtonementCrystal {
 

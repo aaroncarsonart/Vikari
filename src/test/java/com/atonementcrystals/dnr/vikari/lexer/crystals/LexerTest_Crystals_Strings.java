@@ -44,9 +44,9 @@ public class LexerTest_Crystals_Strings {
     @Order(4)
     public void testLexer_Crystals_MultiLineStrings_QuotedBacktick_AtStartOfFirstToken() {
         String sourceString = """
-            ``\\`` This is a multi-line string which
-            contains a quoted capture quotation.``
-            """;
+                ``\\`` This is a multi-line string which
+                contains a quoted capture quotation.``
+                """;
 
         List<List<AtonementCrystal>> statements = lex(sourceString, 2, tokenCounts(1, 1));
 
@@ -60,9 +60,9 @@ public class LexerTest_Crystals_Strings {
     @Order(5)
     public void testLexer_Crystals_MultiLineStrings_QuotedBacktick_InMiddleOfFirstToken() {
         String sourceString = """
-            ``This is a multi-line string \\`` which
-            contains a quoted capture quotation.``
-            """;
+                ``This is a multi-line string \\`` which
+                contains a quoted capture quotation.``
+                """;
 
         List<List<AtonementCrystal>> statements = lex(sourceString, 2, tokenCounts(1, 1));
 
@@ -76,9 +76,9 @@ public class LexerTest_Crystals_Strings {
     @Order(6)
     public void testLexer_Crystals_MultiLineStrings_QuotedBacktick_AtEndOfFirstToken() {
         String sourceString = """
-            ``This is a multi-line string \\``
-            which contains a quoted capture quotation.``
-            """;
+                ``This is a multi-line string \\``
+                which contains a quoted capture quotation.``
+                """;
 
         List<List<AtonementCrystal>> statements = lex(sourceString, 2, tokenCounts(1, 1));
 
@@ -92,10 +92,10 @@ public class LexerTest_Crystals_Strings {
     @Order(7)
     public void testLexer_Crystals_MultiLineStrings_QuotedBacktick_AtStartOfMiddleToken() {
         String sourceString = """
-            ``This is a multi-line string which
-            \\`` contains a quoted capture quotation
-            at the start of the middle token.``
-            """;
+                ``This is a multi-line string which
+                \\`` contains a quoted capture quotation
+                at the start of the middle token.``
+                """;
 
         List<List<AtonementCrystal>> statements = lex(sourceString, 3, tokenCounts(1, 1, 1));
 
@@ -110,10 +110,10 @@ public class LexerTest_Crystals_Strings {
     @Order(8)
     public void testLexer_Crystals_MultiLineStrings_QuotedBacktick_InMiddleOfMiddleToken() {
         String sourceString = """
-            ``This is a multi-line string which
-            contains a quoted \\`` capture quotation
-            in the middle of the middle token.``
-            """;
+                ``This is a multi-line string which
+                contains a quoted \\`` capture quotation
+                in the middle of the middle token.``
+                """;
 
         List<List<AtonementCrystal>> statements = lex(sourceString, 3, tokenCounts(1, 1, 1));
 
@@ -128,10 +128,10 @@ public class LexerTest_Crystals_Strings {
     @Order(9)
     public void testLexer_Crystals_MultiLineStrings_QuotedBacktick_AtEndOfMiddleToken() {
         String sourceString = """
-            ``This is a multi-line string which
-            contains a quoted capture quotation \\``
-            at the end of the middle token.``
-            """;
+                ``This is a multi-line string which
+                contains a quoted capture quotation \\``
+                at the end of the middle token.``
+                """;
 
         List<List<AtonementCrystal>> statements = lex(sourceString, 3, tokenCounts(1, 1, 1));
 
@@ -146,10 +146,10 @@ public class LexerTest_Crystals_Strings {
     @Order(10)
     public void testLexer_Crystals_MultiLineStrings_QuotedBacktick_AtStartOfEndToken() {
         String sourceString = """
-            ``This is a multi-line string which
-            contains a quoted capture quotation
-            \\`` at the start of the end token.``
-            """;
+                ``This is a multi-line string which
+                contains a quoted capture quotation
+                \\`` at the start of the end token.``
+                """;
 
         List<List<AtonementCrystal>> statements = lex(sourceString, 3, tokenCounts(1, 1, 1));
 
@@ -164,10 +164,10 @@ public class LexerTest_Crystals_Strings {
     @Order(11)
     public void testLexer_Crystals_MultiLineStrings_QuotedBacktick_InMiddleOfEndToken() {
         String sourceString = """
-            ``This is a multi-line string which
-            contains a quoted capture quotation
-            in the middle \\`` of the end token.``
-            """;
+                ``This is a multi-line string which
+                contains a quoted capture quotation
+                in the middle \\`` of the end token.``
+                """;
 
         List<List<AtonementCrystal>> statements = lex(sourceString, 3, tokenCounts(1, 1, 1));
 
@@ -182,10 +182,10 @@ public class LexerTest_Crystals_Strings {
     @Order(12)
     public void testLexer_Crystals_MultiLineStrings_QuotedBacktick_AtEndOfEndToken() {
         String sourceString = """
-            ``This is a multi-line string which
-            contains a quoted capture quotation
-            at the end of the end token.\\```
-            """;
+                ``This is a multi-line string which
+                contains a quoted capture quotation
+                at the end of the end token.\\```
+                """;
 
         List<List<AtonementCrystal>> statements = lex(sourceString, 3, tokenCounts(1, 1, 1));
 

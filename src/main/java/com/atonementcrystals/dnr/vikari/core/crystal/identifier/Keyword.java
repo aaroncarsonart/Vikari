@@ -20,7 +20,7 @@ public enum Keyword {
     NULL("null");
 
     /**
-     * Create A new Keyword.
+     * Create a new Keyword.
      * @param identifier The default string identifier.
      */
     Keyword(String identifier) {

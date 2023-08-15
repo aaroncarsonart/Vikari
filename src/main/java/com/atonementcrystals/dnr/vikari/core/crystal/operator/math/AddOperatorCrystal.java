@@ -6,7 +6,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonementcrystals.dnr.vikari.interpreter.Arithmetic;
 
 /**
- * The ADD operator + adds the left and right operands.
+ * The add operator + adds the left and right operands.
  */
 public class AddOperatorCrystal extends BinaryOperatorCrystal {
 

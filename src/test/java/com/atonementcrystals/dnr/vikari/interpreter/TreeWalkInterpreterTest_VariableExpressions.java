@@ -1,13 +1,6 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
-import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
-import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
-import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
-import com.atonementcrystals.dnr.vikari.core.statement.Statement;
-import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -16,71 +9,9 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TreeWalkInterpreterTest_VariableExpressions {
-    private final AtonementField globalAtonementField = VikariProgram.initGlobalAtonementField();
-    private AtonementField currentEnvironment;
-
-    private void lexParseAndInterpret(String sourceString) {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-        TreeWalkInterpreter interpreter = new TreeWalkInterpreter();
-
-        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
-        parser.setSyntaxErrorReporter(syntaxErrorReporter);
-        interpreter.setGetLineFunction(syntaxErrorReporter::getLineFromCache);
-
-        parser.setGlobalAtonementField(globalAtonementField);
-        interpreter.setGlobalAtonementField(globalAtonementField);
-
-        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
-        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
-        interpreter.interpret(null, parsedStatements);
-
-        currentEnvironment = interpreter.getCurrentEnvironment();
-    }
-
-    private void testVariable(String identifier, VikariType declaredType, VikariType instantiatedType,
-                              Object expectedValue) {
-
-        assertTrue(currentEnvironment.isDefined(identifier), "Expected variable to be defined.");
-        AtonementCrystal variable = currentEnvironment.get(identifier);
-
-        // 1: Check types.
-        assertEquals(declaredType.getTypeCrystal(), variable.getDeclaredType(), "Unexpected declared type.");
-
-        if (instantiatedType != null) {
-            assertEquals(instantiatedType.getTypeCrystal(), variable.getInstantiatedType(), "Unexpected instantiated type.");
-        } else {
-            assertNull(variable.getInstantiatedType(), "Unexpected instantiated type.");
-        }
-
-        // 2: Check value.
-        if (expectedValue == null) {
-            assertEquals(NullCrystal.class, variable.getClass(), "Unexpected type for declaration result.");
-            NullCrystal nullCrystal = (NullCrystal) variable;
-
-            int expectedLength = 0;
-            int actualLength = nullCrystal.getLength();
-            assertEquals(expectedLength, actualLength, "Unexpected length for null crystal.");
-        }
-
-        else if (variable instanceof NumberCrystal<?> numberCrystal) {
-            Object actualValue = numberCrystal.getValue();
-            assertEquals(expectedValue, actualValue, "Unexpected value.");
-        } else {
-            TypeCrystal typeCrystal = variable.getInstantiatedType();
-            if (typeCrystal == null) {
-                typeCrystal = variable.getDeclaredType();
-            }
-            fail("Malformed test. Unhandled type in declaration: " + typeCrystal);
-        }
-    }
+public class TreeWalkInterpreterTest_VariableExpressions extends TreeWalkInterpreterTest_Base {
 
     @Test
     @Order(1)
@@ -96,13 +27,13 @@ public class TreeWalkInterpreterTest_VariableExpressions {
     @Order(2)
     public void testTreeWalkInterpreter_VariableExpression_InArithmeticExpression() {
         String sourceString = """
-            foo << 22
-            a << foo + 7
-            b << foo - 7
-            c << foo * 7
-            d << foo / 7
-            e << foo \\ 7
-            """;
+                foo << 22
+                a << foo + 7
+                b << foo - 7
+                c << foo * 7
+                d << foo / 7
+                e << foo \\ 7
+                """;
         lexParseAndInterpret(sourceString);
 
         testVariable("foo", VikariType.ATONEMENT_CRYSTAL, VikariType.INTEGER, 22);
@@ -117,15 +48,15 @@ public class TreeWalkInterpreterTest_VariableExpressions {
     @Order(3)
     public void testTreeWalkInterpreter_VariableExpression_InArithmeticExpression_NumericConversions() {
         String sourceString = """
-            foo << 22L
-            a:Number << foo + 7
-            b:Integer << foo + 7
-            c:Long << foo + 7
-            d:BigInteger << foo + 7
-            e:Float << foo + 7
-            f:Double << foo + 7
-            g:BigDecimal << foo + 7
-            """;
+                foo << 22L
+                a:Number << foo + 7
+                b:Integer << foo + 7
+                c:Long << foo + 7
+                d:BigInteger << foo + 7
+                e:Float << foo + 7
+                f:Double << foo + 7
+                g:BigDecimal << foo + 7
+                """;
         lexParseAndInterpret(sourceString);
 
         MathContext mathContext = Arithmetic.getMathContext();
@@ -144,23 +75,23 @@ public class TreeWalkInterpreterTest_VariableExpressions {
     @Order(4)
     public void testTreeWalkInterpreter_VariableExpression_InArithmeticExpression_NumericConversions_LeftAssignment() {
         String sourceString = """
-            foo << 22L
-            a:Number
-            b:Integer
-            c:Long
-            d:BigInteger
-            e:Float
-            f:Double
-            g:BigDecimal
+                foo << 22L
+                a:Number
+                b:Integer
+                c:Long
+                d:BigInteger
+                e:Float
+                f:Double
+                g:BigDecimal
 
-            a << foo + 7
-            b << foo + 7
-            c << foo + 7
-            d << foo + 7
-            e << foo + 7
-            f << foo + 7
-            g << foo + 7
-            """;
+                a << foo + 7
+                b << foo + 7
+                c << foo + 7
+                d << foo + 7
+                e << foo + 7
+                f << foo + 7
+                g << foo + 7
+                """;
         lexParseAndInterpret(sourceString);
 
         MathContext mathContext = Arithmetic.getMathContext();
@@ -179,23 +110,23 @@ public class TreeWalkInterpreterTest_VariableExpressions {
     @Order(5)
     public void testTreeWalkInterpreter_VariableExpression_InArithmeticExpression_NumericConversions_RightAssignment() {
         String sourceString = """
-            foo << 22L
-            a:Number
-            b:Integer
-            c:Long
-            d:BigInteger
-            e:Float
-            f:Double
-            g:BigDecimal
+                foo << 22L
+                a:Number
+                b:Integer
+                c:Long
+                d:BigInteger
+                e:Float
+                f:Double
+                g:BigDecimal
 
-            foo + 7 >> a
-            foo + 7 >> b
-            foo + 7 >> c
-            foo + 7 >> d
-            foo + 7 >> e
-            foo + 7 >> f
-            foo + 7 >> g
-            """;
+                foo + 7 >> a
+                foo + 7 >> b
+                foo + 7 >> c
+                foo + 7 >> d
+                foo + 7 >> e
+                foo + 7 >> f
+                foo + 7 >> g
+                """;
         lexParseAndInterpret(sourceString);
 
         MathContext mathContext = Arithmetic.getMathContext();
@@ -214,15 +145,15 @@ public class TreeWalkInterpreterTest_VariableExpressions {
     @Order(6)
     public void testTreeWalkInterpreter_VariableExpression_InArithmeticExpression_NumericConversions_ComplexArithmetic() {
         String sourceString = """
-            a:Integer << 1
-            b:Long << 2
-            c:BigInteger << 3
-            d:Float << 4
-            e:Double << 5
-            f:BigDecimal << 6
+                a:Integer << 1
+                b:Long << 2
+                c:BigInteger << 3
+                d:Float << 4
+                e:Double << 5
+                f:BigDecimal << 6
 
-            foo:Number << a + b - c * d / e \\ f;
-            """;
+                foo:Number << a + b - c * d / e \\ f
+                """;
         lexParseAndInterpret(sourceString);
 
         MathContext mathContext = Arithmetic.getMathContext();

@@ -1,6 +1,5 @@
 package com.atonementcrystals.dnr.vikari.error;
 
-import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 
 import java.io.File;

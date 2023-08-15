@@ -55,7 +55,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     private AtonementField globalAtonementField;
 
     /** Root environments are unique per source file. */
-    private Map<String, AtonementField> rootEnvironments;
+    private final Map<String, AtonementField> rootEnvironments;
     private AtonementField rootEnvironment;
     private AtonementField currentEnvironment;
 
@@ -75,7 +75,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
 
     public void interpret(File file, List<Statement> statements) {
         log.trace("interpret({})", file == null ? "null" : "\"" + file + "\"");
-        this.currentFile = file;
+        currentFile = file;
         establishRootEnvironment();
         try {
             for (Statement statement : statements) {
@@ -84,7 +84,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         } catch (Vikari_RuntimeException e) {
             reportError(e);
         }
-        this.currentFile = null;
+        currentFile = null;
     }
 
     public void setGlobalAtonementField(AtonementField globalAtonementField) {
@@ -120,7 +120,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         return currentEnvironment;
     }
 
-    public void reportError(Vikari_RuntimeException e) {
+    private void reportError(Vikari_RuntimeException e) {
         RuntimeError runtimeError = e.getRuntimeError();
         String errorReport = runtimeError.getErrorReport();
         System.out.println(errorReport);
@@ -252,7 +252,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         declaredVariable.setIdentifier(identifier);
         declaredVariable.setDeclaredType(declaredType);
 
-        // NOTE: The initializedType is already set! (Unless it is a NullCrystal.)
+        // NOTE: The instantiatedType is already set! (Unless it is a NullCrystal.)
         if (declaredVariable instanceof NullCrystal) {
             TypeCrystal nullType = TypeHierarchy.getNullTypeFor(declaredType);
             declaredVariable.setInstantiatedType(nullType);
@@ -276,7 +276,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         variable.setIdentifier(identifier);
         variable.setDeclaredType(declaredType);
 
-        // NOTE: The initializedType is already set! (Unless it is a NullCrystal.)
+        // NOTE: The instantiatedType is already set! (Unless it is a NullCrystal.)
         if (variable instanceof NullCrystal) {
             TypeCrystal nullType = TypeHierarchy.getNullTypeFor(declaredType);
             variable.setInstantiatedType(nullType);
@@ -354,7 +354,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         for (PrintExpression printExpression : stmt.getPrintExpressions()) {
             evaluate(printExpression);
         }
-        // TODO: Return a String for what is printed.
+        // TODO: Return a StringCrystal for what is printed.
         return null;
     }
 
@@ -406,11 +406,5 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         CoordinatePair location = operator.getCoordinates();
         String errorMessage = "Undefined variable: ``" + operator.getIdentifier() + "``.";
         return internalRuntimeError(location, errorMessage);
-    }
-
-    public void clear() {
-        currentFile = null;
-        rootEnvironment = null;
-        currentEnvironment = null;
     }
 }

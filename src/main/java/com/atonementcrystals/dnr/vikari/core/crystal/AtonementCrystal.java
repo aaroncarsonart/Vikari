@@ -56,8 +56,7 @@ public class AtonementCrystal {
     }
 
     public void setDeclaredType(VikariType vikariType) {
-        TypeCrystal declaredType = vikariType.getTypeCrystal();
-        this.declaredType = declaredType;
+        this.declaredType = vikariType.getTypeCrystal();
     }
 
     public TypeCrystal getInstantiatedType() {

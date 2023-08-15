@@ -9,9 +9,9 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
  * <br/>
  * Constants cannot be reassigned. Functions overloaded with different
  * type signatures can be defined as constant on an individual
- * basis. Constant functions cannot be overridden in subclasses.
+ * basis. Constant functions cannot be overridden in subclasses.<br/>
  * <br/>
- * Curly brackets are also used in declaring use of an
+ * Curly brackets are also used in declaring use of
  * <code>${Annotations}</code> and flexible expressions.
  */
 public class LeftCurlyBracketCrystal extends AtonementCrystal {

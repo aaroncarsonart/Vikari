@@ -7,10 +7,10 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrys
 import com.atonementcrystals.dnr.vikari.core.expression.Expression;
 
 public class VariableDeclarationStatement extends Statement {
-    private AtonementCrystal declaredVariable;
-    private TypeCrystal declaredType;
-    private BinaryOperatorCrystal assignmentOperator;
-    private Expression initializerExpression;
+    private final AtonementCrystal declaredVariable;
+    private final TypeCrystal declaredType;
+    private final BinaryOperatorCrystal assignmentOperator;
+    private final Expression initializerExpression;
 
     /** For resetting after a syntax error in VikariREPL. */
     private AtonementField environment;

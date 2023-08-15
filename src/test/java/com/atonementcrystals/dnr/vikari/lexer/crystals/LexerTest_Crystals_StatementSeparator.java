@@ -34,9 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_Crystals_StatementSeparator {
 
-    private class TestPair {
-        private String sourceString;
-        private CoordinatePair offset;
+    private static class TestPair {
+        private final String sourceString;
+        private final CoordinatePair offset;
 
         public TestPair(String sourceString, CoordinatePair offset) {
             this.sourceString = sourceString;

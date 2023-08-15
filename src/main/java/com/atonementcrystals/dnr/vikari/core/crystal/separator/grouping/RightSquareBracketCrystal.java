@@ -5,7 +5,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 
 /**
  * The use of pairs of square brackets [ ] denotes grouping.
- * Use grouping on expressions to forces evaluation different
+ * Use grouping on expressions to force evaluation different
  * from the default operator precedence rules.<br/>
  * <br/>
  * And, in some cases, they are used to group together related

@@ -2,18 +2,11 @@ package com.atonementcrystals.dnr.vikari.interpreter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ParserOptions {
     public final boolean printAst;           // p
     public final boolean printLineNumbers;   // l
     public final boolean verbose;            // v
-
-    public ParserOptions() {
-        printAst = true;
-        printLineNumbers = true;
-        verbose = true;
-    }
 
     public ParserOptions(boolean printAst, boolean printLineNumbers, boolean verbose) {
         this.printAst = printAst;
@@ -31,7 +24,7 @@ public class ParserOptions {
         if (printLineNumbers) enabledFlags.add("printLineNumbers");
         if (verbose) enabledFlags.add("verbose");
 
-        String csv = enabledFlags.stream().collect(Collectors.joining(","));
+        String csv = String.join(",", enabledFlags);
         sb.append(csv);
         sb.append('}');
 

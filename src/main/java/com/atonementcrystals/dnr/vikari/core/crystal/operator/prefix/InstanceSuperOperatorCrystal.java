@@ -4,7 +4,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 
 /**
- * The instance super operator @ accepts an integer as its right
+ * The instance super operator @ accepts an integer as its left
  * operand to access instance members of a type's parent that many
  * levels up the inheritance hierarchy.
  */

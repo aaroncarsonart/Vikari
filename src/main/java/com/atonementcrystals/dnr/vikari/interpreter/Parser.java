@@ -29,7 +29,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.PrintStatementOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.NegateCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.NegateOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.UnaryExpression;
@@ -55,13 +55,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
- * Parses the output of the Lexer into an abstract syntax tree consisting of
- * a list of statements.
+ * Parses the output of the Lexer into an abstract syntax tree consisting of a list of statements.
  */
 public class Parser {
     private static final Logger log = LogManager.getLogger(Parser.class);
 
-    private File file;
+    private File currentFile;
     private List<List<AtonementCrystal>> lexedStatements;
     private int lineNumber;
     private int tokenNumber;
@@ -72,13 +71,13 @@ public class Parser {
     private List<AtonementCrystal> currentLine;
 
     private SyntaxErrorReporter syntaxErrorReporter;
-    private TypeResolver typeResolver;
+    private final TypeResolver typeResolver;
 
     /** Parent field of the rootEnvironment. */
     private AtonementField globalAtonementField;
 
     /** Root environments are unique per source file. */
-    private Map<String, AtonementField> rootEnvironments;
+    private final Map<String, AtonementField> rootEnvironments;
     private AtonementField rootEnvironment;
     private AtonementField currentEnvironment;
 
@@ -116,7 +115,7 @@ public class Parser {
 
     public List<Statement> parse(File file, List<List<AtonementCrystal>> lexedStatements) {
         log.trace("parse({})", file == null ? "null" : "\"" + file + "\"");
-        this.file = file;
+        currentFile = file;
 
         // First pass on user input.
         if (lineNumber == 0 && this.lexedStatements == null) {
@@ -152,7 +151,7 @@ public class Parser {
         typeResolver.resolve(statements);
         typeResolver.reportErrors(syntaxErrorReporter, file);
 
-        this.file = null;
+        currentFile = null;
         return statements;
     }
 
@@ -163,8 +162,8 @@ public class Parser {
     private void establishRootEnvironment() {
         // File is for a type or a script.
         // Cache the environment with the file path.
-        if (file != null) {
-            String filePath = file.getAbsolutePath();
+        if (currentFile != null) {
+            String filePath = currentFile.getAbsolutePath();
             if (rootEnvironments.containsKey(filePath)) {
                 rootEnvironment = rootEnvironments.get(filePath);
             } else {
@@ -217,7 +216,7 @@ public class Parser {
             }
 
             // Parse as a variable declaration for the error case.
-            return lookAhead(1) instanceof TypeLabelOperatorCrystal;
+            return lookAhead() instanceof TypeLabelOperatorCrystal;
         }
         return false;
     }
@@ -237,7 +236,6 @@ public class Parser {
             try {
                 declaredType = (TypeCrystal) rootEnvironment.get(typeName);
             } catch (Vikari_UndefinedFieldMemberException e) {
-                // TODO: Will need to move this check to the TypeResolver.
                 error(typeReference, "Unknown Type.");
                 declaredType = VikariType.ATONEMENT_CRYSTAL.getTypeCrystal();
             } catch (ClassCastException e) {
@@ -279,8 +277,7 @@ public class Parser {
             error(peek(), "Unexpected token(s) in variable declaration statement.");
         }
 
-        // Advance past an optional statement separator , crystal.
-        // (And synchronize after an error case.)
+        // Synchronize after an error case.
         advanceToEndOfStatement();
 
         CoordinatePair location = variableToDefine.getCoordinates();
@@ -291,6 +288,7 @@ public class Parser {
     private Statement printStatement() {
         List<PrintExpression> printExpressions = new ArrayList<>();
         int currentLine = lineNumber;
+
         while (match(TokenType.TYPE_LABEL)) {
             AtonementCrystal typeLabel = previous();
             PrintStatementOperatorCrystal printOperator = new PrintStatementOperatorCrystal();
@@ -305,6 +303,7 @@ public class Parser {
             printExpression.setLocation(printOperator.getCoordinates());
             printExpressions.add(printExpression);
         }
+
         PrintStatement printStatement = new PrintStatement(printExpressions);
         CoordinatePair location = printExpressions.get(0).getLocation();
         printStatement.setLocation(location);
@@ -322,8 +321,7 @@ public class Parser {
         ExpressionStatement expressionStatement = new ExpressionStatement(expression);
         expressionStatement.setLocation(expression.getLocation());
 
-        // Advance past an optional statement separator , crystal.
-        // (And synchronize after an error case.)
+        // Synchronize after an error case.
         advanceToEndOfStatement();
 
         return expressionStatement;
@@ -406,22 +404,22 @@ public class Parser {
     private Expression unaryExpression() {
         if (match(TokenType.SUBTRACT)) {
             AtonementCrystal previous = previous();
-            NegateCrystal operator = new NegateCrystal();
-            operator.setCoordinates(previous.getCoordinates());
+            NegateOperatorCrystal negateOperator = new NegateOperatorCrystal();
+            negateOperator.setCoordinates(previous.getCoordinates());
 
             Expression right = unaryExpression();
-            UnaryExpression unaryExpression = new UnaryExpression(operator, right);
-            unaryExpression.setLocation(operator.getCoordinates());
+            UnaryExpression unaryExpression = new UnaryExpression(negateOperator, right);
+            unaryExpression.setLocation(negateOperator.getCoordinates());
 
             return unaryExpression;
         }
 
         if (match(TokenType.LOGICAL_NOT)) {
-            LogicalNotOperatorCrystal operator = (LogicalNotOperatorCrystal) previous();
+            LogicalNotOperatorCrystal notOperator = (LogicalNotOperatorCrystal) previous();
 
             Expression right = unaryExpression();
-            UnaryExpression unaryExpression = new UnaryExpression(operator, right);
-            unaryExpression.setLocation(operator.getCoordinates());
+            UnaryExpression unaryExpression = new UnaryExpression(notOperator, right);
+            unaryExpression.setLocation(notOperator.getCoordinates());
 
             return unaryExpression;
         }
@@ -521,29 +519,29 @@ public class Parser {
         return groupingExpression;
     }
 
-    public boolean isAtEndOfStatement(int tokenNumber) {
+    private boolean isAtEndOfStatement(int tokenNumber) {
         return tokenNumber >= currentLine.size();
     }
 
-    public boolean isAtEndOfStatement() {
+    private boolean isAtEndOfStatement() {
         return tokenNumber >= currentLine.size();
     }
 
-    public boolean isAtEnd(int tokenNumber) {
+    private boolean isAtEnd(int tokenNumber) {
         return isAtEnd(lineNumber, tokenNumber);
     }
 
-    public boolean isAtEnd(int lineNumber, int tokenNumber) {
+    private boolean isAtEnd(int lineNumber, int tokenNumber) {
         return lineNumber >= lineCount || (
                 (lineNumber == lineCount - 1) &&
                         (tokenNumber >= lastLineLength));
     }
 
-    public boolean isAtEnd() {
+    private boolean isAtEnd() {
         return isAtEnd(lineNumber, tokenNumber);
     }
 
-    public boolean match(TokenType... tokenTypes) {
+    private boolean match(TokenType... tokenTypes) {
         for (TokenType tokenType : tokenTypes) {
             if (check(tokenType)) {
                 advance();
@@ -554,7 +552,7 @@ public class Parser {
     }
 
     @SafeVarargs
-    public final boolean match(Class<? extends AtonementCrystal>... crystalTypes) {
+    private boolean match(Class<? extends AtonementCrystal>... crystalTypes) {
         for (Class<? extends AtonementCrystal> crystalType : crystalTypes) {
             if (check(crystalType)) {
                 advance();
@@ -564,20 +562,15 @@ public class Parser {
         return false;
     }
 
-    private AtonementCrystal lookAhead(int distance) {
-        int position = tokenNumber;
-        AtonementCrystal current = currentLine.get(position);
-        for (int i = 0; i < distance; i++) {
-            position++;
-
-            if (!isAtEnd(position) && !isAtEndOfStatement(position)) {
-                current = currentLine.get(position);
-            }
+    private AtonementCrystal lookAhead() {
+        int position = tokenNumber + 1;
+        if (!isAtEnd(position) && !isAtEndOfStatement(position)) {
+            return currentLine.get(position);
         }
-        return current;
+        return currentLine.get(tokenNumber);
     }
 
-    public AtonementCrystal advance() {
+    private AtonementCrystal advance() {
         AtonementCrystal previous = peek();
         if (!isAtEnd()) {
             tokenNumber++;
@@ -585,13 +578,13 @@ public class Parser {
         return previous;
     }
 
-    public void advanceToEndOfStatement() {
+    private void advanceToEndOfStatement() {
         while (tokenNumber < currentLine.size()) {
             advance();
         }
     }
 
-    public void advanceToNextLine() {
+    private void advanceToNextLine() {
         ++lineNumber;
         tokenNumber = 0;
         if (isAtEnd()) {
@@ -601,7 +594,7 @@ public class Parser {
         }
     }
 
-    public boolean check(TokenType tokenType) {
+    private boolean check(TokenType tokenType) {
         if (isAtEnd()) {
             return false;
         }
@@ -609,36 +602,12 @@ public class Parser {
         return tokenType.getJavaType().isInstance(crystal);
     }
 
-    public boolean check(Class<? extends AtonementCrystal> crystalType) {
+    private boolean check(Class<? extends AtonementCrystal> crystalType) {
         if (isAtEnd()) {
             return false;
         }
         AtonementCrystal crystal = peek();
         return crystalType.isInstance(crystal);
-    }
-
-    public boolean check(AtonementCrystal crystal, TokenType... tokenTypes) {
-        if (crystal == null) {
-            return false;
-        }
-        for (TokenType tokenType : tokenTypes) {
-            if (tokenType.getJavaType().isInstance(crystal)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean check(AtonementCrystal crystal, Class<? extends AtonementCrystal>... crystalTypes) {
-        if (crystal == null) {
-            return false;
-        }
-        for (Class<? extends AtonementCrystal> crystalType : crystalTypes) {
-            if (crystalType.isInstance(crystal)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private AtonementCrystal peek() {
@@ -655,17 +624,6 @@ public class Parser {
         int lineNumber = position.getLineNumber();
         int tokenNumber = position.getTokenNumber();
         return lexedStatements.get(lineNumber).get(tokenNumber);
-    }
-
-    private AtonementCrystal get(TokenPosition position) {
-        int lineNumber = position.getLineNumber();
-        int tokenNumber = position.getTokenNumber();
-        if (isAtEnd(lineNumber, tokenNumber)) {
-            return null;
-        }
-        List<AtonementCrystal> lexedStatement = lexedStatements.get(lineNumber);
-        AtonementCrystal crystal = lexedStatement.get(tokenNumber);
-        return crystal;
     }
 
     private TokenPosition backup(TokenPosition position) {
@@ -708,13 +666,12 @@ public class Parser {
     }
 
     private Vikari_ParserException error(CoordinatePair location, String errorMessage) {
-        SyntaxError syntaxError = new SyntaxError(file, location, errorMessage);
+        SyntaxError syntaxError = new SyntaxError(currentFile, location, errorMessage);
         syntaxErrorReporter.add(syntaxError);
         return new Vikari_ParserException(errorMessage);
     }
 
     private void synchronize() {
-        // TODO: Will need special handling for the LINE_CONTINUATION operator ~.
         advanceToEndOfStatement();
     }
 
@@ -724,17 +681,5 @@ public class Parser {
             lastLine = lexedStatements.get(lexedStatements.size() - 1);
         }
         return lastLine;
-    }
-
-    public void clear() {
-        file = null;
-        lexedStatements = null;
-        lineNumber = 0;
-        tokenNumber = 0;
-        lineCount = 0;
-        lastLineLength = 0;
-        currentLine = null;
-        rootEnvironment = null;
-        currentEnvironment = null;
     }
 }

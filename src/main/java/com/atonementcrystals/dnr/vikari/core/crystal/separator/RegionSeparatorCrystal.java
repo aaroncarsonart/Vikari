@@ -4,8 +4,8 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 
 /**
- * A semicolon ; is a region separator. This denotes an explicit termination
- * of the innermost field region or code block.<br/>
+ * A semicolon ; is a region separator. This denotes an explicit termination of
+ * the innermost field region or code block local to the region separator.<br/>
  * <br/>
  * For indented code, these are not necessary to terminate ordinary regions
  * of code. But they can be used optionally to explicitly terminate every

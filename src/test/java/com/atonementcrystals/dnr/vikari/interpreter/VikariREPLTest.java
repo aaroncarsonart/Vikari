@@ -71,9 +71,9 @@ class VikariREPLTest {
         repl.lexParseAndInterpret("bar << foo + 2");
 
         String expectedOutput = """
-            foo:Integer = 2
-            bar:Integer = 4
-            """;
+                foo:Integer = 2
+                bar:Integer = 4
+                """;
 
         testOutput(expectedOutput);
     }
@@ -86,10 +86,10 @@ class VikariREPLTest {
         repl.lexParseAndInterpret("6 >> foo");
 
         String expectedOutput = """
-            foo:Integer = 2
-            foo:Integer = 4
-            foo:Integer = 6
-            """;
+                foo:Integer = 2
+                foo:Integer = 4
+                foo:Integer = 6
+                """;
 
         testOutput(expectedOutput);
     }
@@ -101,11 +101,11 @@ class VikariREPLTest {
         repl.lexParseAndInterpret("a, b, c, d");
 
         String expectedOutput = """
-            a:AtonementCrystal = null
-            b:AtonementCrystal = null
-            c:AtonementCrystal = null
-            d:AtonementCrystal = null
-            """;
+                a:AtonementCrystal = null
+                b:AtonementCrystal = null
+                c:AtonementCrystal = null
+                d:AtonementCrystal = null
+                """;
 
         testOutput(expectedOutput);
 
@@ -113,11 +113,11 @@ class VikariREPLTest {
         repl.lexParseAndInterpret("a << [b << 7] * [c << 6L] / [d << 22F]");
 
         expectedOutput = """
-            a:Float = 1.9090909
-            b:Integer = 7
-            c:Long = 6
-            d:Float = 22.0
-            """;
+                a:Float = 1.9090909
+                b:Integer = 7
+                c:Long = 6
+                d:Float = 22.0
+                """;
 
         testOutput(expectedOutput);
     }
@@ -166,9 +166,9 @@ class VikariREPLTest {
         repl.lexParseAndInterpret("6 + [foo << 2]");
 
         String expectedOutput = """
-            8
-            foo:Integer = 2
-            """;
+                8
+                foo:Integer = 2
+                """;
 
         testOutput(expectedOutput);
     }
@@ -195,9 +195,9 @@ class VikariREPLTest {
         repl.lexParseAndInterpret(":foo << 2:4:6:");
 
         String expectedOutput = """
-            246
-            foo:Integer = 2
-            """;
+                246
+                foo:Integer = 2
+                """;
 
         testOutput(expectedOutput);
     }
@@ -293,8 +293,9 @@ class VikariREPLTest {
     public void testSyntaxError_Basic() {
         repl.lexParseAndInterpret("+5");
         String expectedErrorReport = """
-                    ^
-            Error: Expected expression.\n""";
+                        ^
+                Error: Expected expression.
+                """;
         testOutput(expectedErrorReport);
     }
 
@@ -303,15 +304,17 @@ class VikariREPLTest {
     public void testSyntaxError_MultipleErrorsOnSameLine() {
         repl.lexParseAndInterpret("2 + foo -");
         String expectedErrorReport = """
-            <repl>:1:5:
-                2 + foo -
-                    ^
-                Error: Undefined variable reference.
-
-            <repl>:1:9:
-                2 + foo -
+                <repl>:1:5:
+                    2 + foo -
                         ^
-                Error: Expected expression.\n\n""";
+                    Error: Undefined variable reference.
+
+                <repl>:1:9:
+                    2 + foo -
+                            ^
+                    Error: Expected expression.
+
+                """;
         testOutput(expectedErrorReport);
     }
 
@@ -320,10 +323,12 @@ class VikariREPLTest {
     public void testSyntaxError_MultiLineStatement_ErrorOnFirstLine() {
         repl.lexParseAndInterpret("5 + ~:\n:~");
         String expectedErrorReport = """
-            <repl>:1:3:
-                5 + ~:
-                  ^
-                Error: Expected expression.\n\n""";
+                <repl>:1:3:
+                    5 + ~:
+                      ^
+                    Error: Expected expression.
+
+                """;
         testOutput(expectedErrorReport);
     }
 
@@ -332,10 +337,12 @@ class VikariREPLTest {
     public void testSyntaxError_MultiLineStatement_ErrorOnMiddleLine() {
         repl.lexParseAndInterpret("~:\n:~ 5 + ~:\n:~");
         String expectedErrorReport = """
-            <repl>:2:6:
-                :~ 5 + ~:
-                     ^
-                Error: Expected expression.\n\n""";
+                <repl>:2:6:
+                    :~ 5 + ~:
+                         ^
+                    Error: Expected expression.
+
+                """;
         testOutput(expectedErrorReport);
     }
 
@@ -344,8 +351,9 @@ class VikariREPLTest {
     public void testSyntaxError_MultiLineStatement_ErrorOnLastLine() {
         repl.lexParseAndInterpret("~:\n:~ ~:\n:~ 5 +");
         String expectedErrorReport = """
-                         ^
-            Error: Expected expression.\n""";
+                             ^
+                Error: Expected expression.
+                """;
         testOutput(expectedErrorReport);
     }
 
@@ -357,15 +365,17 @@ class VikariREPLTest {
 
         repl.lexParseAndInterpret("2 + foo ~:\n:~ * 4 -");
         String expectedErrorReport = """
-            <repl>:2:5:
-                2 + foo ~:
-                    ^
-                Error: Undefined variable reference.
+                <repl>:2:5:
+                    2 + foo ~:
+                        ^
+                    Error: Undefined variable reference.
 
-            <repl>:3:8:
-                :~ * 4 -
-                       ^
-                Error: Expected expression.\n\n""";
+                <repl>:3:8:
+                    :~ * 4 -
+                           ^
+                    Error: Expected expression.
+
+                """;
         testOutput(expectedErrorReport);
     }
 
@@ -374,23 +384,27 @@ class VikariREPLTest {
     public void testSyntaxError_MultipleErrors_AfterMultiLineStatementWithErrors() {
         repl.lexParseAndInterpret("+5 ~:\n:~");
         String expectedErrorReport = """
-            <repl>:1:1:
-                +5 ~:
-                ^
-                Error: Expected expression.\n\n""";
+                <repl>:1:1:
+                    +5 ~:
+                    ^
+                    Error: Expected expression.
+
+                """;
         testOutput(expectedErrorReport);
 
         repl.lexParseAndInterpret("2 + foo -");
         expectedErrorReport = """
-            <repl>:1:5:
-                2 + foo -
-                    ^
-                Error: Undefined variable reference.
-
-            <repl>:1:9:
-                2 + foo -
+                <repl>:1:5:
+                    2 + foo -
                         ^
-                Error: Expected expression.\n\n""";
+                    Error: Undefined variable reference.
+
+                <repl>:1:9:
+                    2 + foo -
+                            ^
+                    Error: Expected expression.
+
+                """;
         testOutput(expectedErrorReport);
     }
 
@@ -399,8 +413,9 @@ class VikariREPLTest {
     public void testSyntaxError_VariableDeclarationWithExtraTokens_TestThatVariableCanBeRedefined() {
         repl.lexParseAndInterpret("foo -");
         String expectedErrorReport = """
-                        ^
-            Error: Unexpected token(s) in variable declaration statement.\n""";
+                            ^
+                Error: Unexpected token(s) in variable declaration statement.
+                """;
         testOutput(expectedErrorReport);
 
         repl.lexParseAndInterpret("foo");
@@ -417,8 +432,8 @@ class VikariREPLTest {
         // 2. Attempt to redefine it.
         repl.lexParseAndInterpret("a:Integer");
         String expectedOutput = """
-                    ^
-            Error: Variable is already defined.""";
+                        ^
+                Error: Variable is already defined.""";
         testOutput(expectedOutput);
     }
 
@@ -428,9 +443,9 @@ class VikariREPLTest {
         repl.setWarningsEnabled(true);
         repl.lexParseAndInterpret("~");
         String expectedOutput = """
-                    ^
-            Warning: Statement contains only line continuations.
-            """;
+                        ^
+                Warning: Statement contains only line continuations.
+                """;
         testOutput(expectedOutput);
     }
 
@@ -440,12 +455,12 @@ class VikariREPLTest {
         repl.setWarningsEnabled(true);
         repl.lexParseAndInterpret("~\na");
         String expectedOutput = """
-            <repl>:1:1:
-                ~
-                ^
-                Warning: Unnecessary line continuation at start of statement.
+                <repl>:1:1:
+                    ~
+                    ^
+                    Warning: Unnecessary line continuation at start of statement.
 
-            """;
+                """;
         testOutput(expectedOutput);
     }
 
@@ -455,17 +470,17 @@ class VikariREPLTest {
         repl.setWarningsEnabled(true);
         repl.lexParseAndInterpret("~\na:Integer~\n");
         String expectedOutput = """
-            <repl>:1:1:
-                ~
-                ^
-                Warning: Unnecessary line continuation at start of statement.
+                <repl>:1:1:
+                    ~
+                    ^
+                    Warning: Unnecessary line continuation at start of statement.
 
-            <repl>:2:10:
-                a:Integer~
-                         ^
-                Warning: Unnecessary line continuation at end of statement.
+                <repl>:2:10:
+                    a:Integer~
+                             ^
+                    Warning: Unnecessary line continuation at end of statement.
 
-            """;
+                """;
         testOutput(expectedOutput);
     }
 
@@ -475,17 +490,17 @@ class VikariREPLTest {
         repl.setWarningsEnabled(true);
         repl.lexParseAndInterpret("[a + 5]~");
         String expectedOutput = """
-            <repl>:1:2:
-                [a + 5]~
-                 ^
-                Error: Undefined variable reference.
+                <repl>:1:2:
+                    [a + 5]~
+                     ^
+                    Error: Undefined variable reference.
 
-            <repl>:1:8:
-                [a + 5]~
-                       ^
-                Warning: Unnecessary line continuation at end of statement.
+                <repl>:1:8:
+                    [a + 5]~
+                           ^
+                    Warning: Unnecessary line continuation at end of statement.
 
-            """;
+                """;
         testOutput(expectedOutput);
     }
 
@@ -503,9 +518,9 @@ class VikariREPLTest {
         // 3. Execute the same statement again. Expect a warning report.
         repl.lexParseAndInterpret("[2 + 5]~");
         String expectedOutput = """
-                           ^
-            Warning: Unnecessary line continuation at end of statement.
-            """;
+                               ^
+                Warning: Unnecessary line continuation at end of statement.
+                """;
         testOutput(expectedOutput);
 
         // 4. Disable warnings.
@@ -527,9 +542,9 @@ class VikariREPLTest {
         // 2. Cause a ResolverError in the TypeResolver.
         repl.lexParseAndInterpret("[a + 2]");
         String expectedOutput = """
-                     ^
-            Error: Arithmetic expression expects a Number for operands.
-            """;
+                         ^
+                Error: Arithmetic expression expects a Number for operands.
+                """;
         testOutput(expectedOutput);
 
         // 3. Execute another statement with the variable. Ensure the ResolverError has been cleared.

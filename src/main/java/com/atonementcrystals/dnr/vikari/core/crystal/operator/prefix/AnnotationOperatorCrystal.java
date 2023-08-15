@@ -5,8 +5,8 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 
 /**
  * The annotation operator $ followed by a pair of curly brackets { }
- * accepts a list of operands separated by | to be applied in order
- * to instantiate a new Annotation.
+ * enclosing a list of operands separated by | supplies the operands as
+ * constructor arguments in order to instantiate a new Annotation.
  */
 public class AnnotationOperatorCrystal extends AtonementCrystal {
 

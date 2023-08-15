@@ -142,6 +142,7 @@ public class LexerTestUtils {
                                                    int... statementSizes) {
         return lex(sourceString, expectedStatementCount, new SyntaxErrorReporter(), 0, statementSizes);
     }
+
     public static List<List<AtonementCrystal>> lex(String sourceString, int expectedStatementCount,
                                                    SyntaxErrorReporter syntaxErrorReporter, int expectedErrorCount,
                                                    int... statementSizes) {

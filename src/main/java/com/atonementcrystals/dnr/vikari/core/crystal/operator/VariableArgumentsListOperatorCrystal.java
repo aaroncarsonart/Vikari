@@ -11,7 +11,8 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
  * <br/>
  * Multiple variable argument lists may be provided for the same
  * function signature. Given that each argument has a clearly
- * distinguishable type from all previous variable argument lists.
+ * distinguishable type from an immediately preceding variable
+ * argument list.
  */
 public class VariableArgumentsListOperatorCrystal extends AtonementCrystal {
 

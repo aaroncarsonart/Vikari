@@ -59,7 +59,6 @@ class UtilsTest {
         integer = "4000000000";
         assertTrue(Utils.isLongIntegerNumber(integer), "Expected long literal to return true for Utils::isLongNumber.");
 
-
         // negative tests
         String notInteger = "3.14";
         assertFalse(Utils.isLongIntegerNumber(notInteger), "Expected decimal number to return false for Utils::isLongNumber.");

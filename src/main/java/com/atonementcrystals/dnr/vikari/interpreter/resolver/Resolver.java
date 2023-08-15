@@ -20,16 +20,12 @@ import java.util.List;
  * @param <T> The type of value returned by the Resolver.
  */
 public abstract class Resolver<T> implements Statement.Visitor<T>, Expression.Visitor<T> {
-    protected List<ResolverError> resolutionErrors = new ArrayList<>();
+    private final List<ResolverError> resolutionErrors = new ArrayList<>();
 
     public void resolve(List<Statement> statements) {
         for (Statement statement : statements) {
             statement.accept(this);
         }
-    }
-
-    public final List<ResolverError> getResolutionErrors() {
-        return resolutionErrors;
     }
 
     public final void reportErrors(SyntaxErrorReporter syntaxErrorReporter, File file) {
@@ -41,6 +37,7 @@ public abstract class Resolver<T> implements Statement.Visitor<T>, Expression.Vi
             syntaxErrorReporter.add(syntaxError);
         }
     }
+
     public final void error(AtonementCrystal crystal, String errorMessage) {
         error(crystal.getCoordinates(), errorMessage);
     }

@@ -9,7 +9,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
  *     <li>Declare an instance type member.</li>
  *     <li>Access an instance type member.</li>
  * </ol>
- * @ cannot be used outside of a type's field declaration.
+ * @ cannot be used outside a type's field declaration statement.
  */
 public class InstanceFieldAccessOperatorCrystal extends AtonementCrystal {
 

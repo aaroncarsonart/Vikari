@@ -1,6 +1,5 @@
 package com.atonementcrystals.dnr.vikari.parser.expression;
 
-import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
@@ -24,6 +23,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.List;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.location;
+import static com.atonementcrystals.dnr.vikari.TestUtils.testSyntaxError;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -44,7 +44,7 @@ public class ParserTest_Variables extends ParserTest_Base {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), sourceString, "Unexpected token(s) in " +
+        testSyntaxError(syntaxErrors.get(0), location(0, 4), sourceString, "Unexpected token(s) in " +
                 "variable declaration statement");
 
         int expectedStatementCount = 1;
@@ -65,7 +65,7 @@ public class ParserTest_Variables extends ParserTest_Base {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), sourceString, "Undefined variable reference.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 4), sourceString, "Undefined variable reference.");
 
         int expectedStatementCount = 1;
         int actualStatementCount = statements.size();
@@ -130,10 +130,8 @@ public class ParserTest_Variables extends ParserTest_Base {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), location(1, 0), "foo + 5", "Arithmetic " +
-                "expression expects a Number for operands.");
-        TestUtils.testSyntaxError(syntaxErrors.get(1), location(2, 4), "5 + foo", "Arithmetic " +
-                "expression expects a Number for operands.");
+        testSyntaxError(syntaxErrors.get(0), location(1, 0), "foo + 5", "Arithmetic expression expects a Number for operands.");
+        testSyntaxError(syntaxErrors.get(1), location(2, 4), "5 + foo", "Arithmetic expression expects a Number for operands.");
 
         int expectedStatementCount = 3;
         int actualStatementCount = statements.size();

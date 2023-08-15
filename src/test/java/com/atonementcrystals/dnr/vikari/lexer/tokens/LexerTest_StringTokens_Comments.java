@@ -184,8 +184,8 @@ public class LexerTest_StringTokens_Comments {
     @Order(13)
     public void testLexer_StringTokens_MultLineComment_QuotedPrefixToken_BeforeEndOfLine() {
         String sourceString = """
-            ~:This suffix token is quoted: \\~: and so,
-            the comment can then span across two lines.:~""";
+                ~:This suffix token is quoted: \\~: and so,
+                the comment can then span across two lines.:~""";
 
         List<List<String>> statements = lexAsTokens(sourceString, 2, tokenCounts(1, 1));
 
@@ -197,8 +197,8 @@ public class LexerTest_StringTokens_Comments {
     @Order(14)
     public void testLexer_StringTokens_MultLineComment_QuotedPrefixToken_BeforeEndOfLine_OneCharacterAfter() {
         String sourceString = """
-            ~:This suffix token is quoted \\~:,
-            and so the comment can then span across two lines.:~""";
+                ~:This suffix token is quoted \\~:,
+                and so the comment can then span across two lines.:~""";
 
         List<List<String>> statements = lexAsTokens(sourceString, 2, tokenCounts(1, 1));
 
@@ -211,8 +211,8 @@ public class LexerTest_StringTokens_Comments {
     @Order(15)
     public void testLexer_StringTokens_MultLineComment_QuotedPrefixToken_AtEndOfLine() {
         String sourceString = """
-            ~:This suffix token is quoted: \\~:
-            and so, the comment can then span across two lines.:~""";
+                ~:This suffix token is quoted: \\~:
+                and so, the comment can then span across two lines.:~""";
 
         List<List<String>> statements = lexAsTokens(sourceString, 2, tokenCounts(1, 1));
 
@@ -260,8 +260,8 @@ public class LexerTest_StringTokens_Comments {
     @Order(20)
     public void testLexer_StringTokens_MultLineComment_QuotedSuffixToken_BeforeEndOfLine() {
         String sourceString = """
-            ~:This suffix token is quoted: \\:~ and so,
-            the comment can then span across two lines.:~""";
+                ~:This suffix token is quoted: \\:~ and so,
+                the comment can then span across two lines.:~""";
 
         List<List<String>> statements = lexAsTokens(sourceString, 2, tokenCounts(1, 1));
 
@@ -273,8 +273,8 @@ public class LexerTest_StringTokens_Comments {
     @Order(21)
     public void testLexer_StringTokens_MultLineComment_QuotedSuffixToken_BeforeEndOfLine_OneCharacterAfter() {
         String sourceString = """
-            ~:This suffix token is quoted \\:~,
-            and so the comment can then span across two lines.:~""";
+                ~:This suffix token is quoted \\:~,
+                and so the comment can then span across two lines.:~""";
 
         List<List<String>> statements = lexAsTokens(sourceString, 2, tokenCounts(1, 1));
 

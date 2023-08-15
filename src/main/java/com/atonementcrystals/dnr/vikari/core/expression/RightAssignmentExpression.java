@@ -3,8 +3,12 @@ package com.atonementcrystals.dnr.vikari.core.expression;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.BinaryOperatorCrystal;
 
 /**
- * Right assignment expressions switch the order of operands. But the lvalue is
- * still the value being assigned to, and the rvalue is the value being assigned.
+ * Right assignment expressions contain an lvalue, which is the target
+ * being assigned to, and an rvalue, which is the value being assigned.<br/>
+ * <br/>
+ * Right assignment expressions switch the order of operands in comparison to
+ * left assignment expressions. But the lvalue is still the value being assigned to
+ * (the right operand), and the rvalue is the value being assigned (the left operand).
  */
 public class RightAssignmentExpression extends Expression {
     private Expression rvalue;

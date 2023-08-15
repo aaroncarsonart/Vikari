@@ -26,7 +26,7 @@ import com.atonementcrystals.dnr.vikari.util.Utils;
 public class AstPrintVisitor implements Statement.Visitor<String>, Expression.Visitor<String> {
 
     /**
-     * A simple, shared AstPrintVisitor instance for debugging purposes.
+     * A shared AstPrintVisitor instance for debugging purposes.
      */
     public static final AstPrintVisitor INSTANCE = new AstPrintVisitor();
 

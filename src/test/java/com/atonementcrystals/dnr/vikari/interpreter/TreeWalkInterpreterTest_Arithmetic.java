@@ -1,11 +1,15 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
+import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigDecimalCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.BigIntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.DoubleCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.FloatCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.LongCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
+import com.atonementcrystals.dnr.vikari.core.statement.Statement;
+import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -14,12 +18,43 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.List;
 
-import static com.atonementcrystals.dnr.vikari.interpreter.InterpreterTest_Utils.testVikariExpression;
+import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
+import static com.atonementcrystals.dnr.vikari.TestUtils.testNumberCrystal;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TreeWalkInterpreterTest_Arithmetic {
-    private MathContext mathContext = Arithmetic.getMathContext();
+    private final MathContext mathContext = Arithmetic.getMathContext();
+
+    /**
+     * Helper method to efficiently test a single Vikari expression statement returning a numeric value.
+     * @param sourceString The Vikari source code to execute.
+     * @param expectedValue The expected value for the result.
+     * @param expectedClass The expected type of the result.
+     */
+    private void testVikariExpression(String sourceString, Object expectedValue,
+                                            Class<? extends NumberCrystal<?>> expectedClass) {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        TreeWalkInterpreter interpreter = new TreeWalkInterpreter();
+
+        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
+        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
+        parser.setSyntaxErrorReporter(syntaxErrorReporter);
+
+        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
+        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
+
+        assertNoSyntaxErrors(syntaxErrorReporter);
+        assertEquals(1, parsedStatements.size(), "Unexpected number of statements");
+
+        // statement 1
+        Statement statement = parsedStatements.get(0);
+        AtonementCrystal crystal = interpreter.execute(statement);
+        testNumberCrystal(crystal, expectedValue, expectedClass);
+    }
 
     @Test
     @Order(1)

@@ -32,7 +32,6 @@ import java.util.List;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.*;
 import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.*;
-import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.testOperator;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

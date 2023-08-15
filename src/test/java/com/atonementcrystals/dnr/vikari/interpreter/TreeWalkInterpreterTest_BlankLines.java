@@ -16,7 +16,7 @@ import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
 public class TreeWalkInterpreterTest_BlankLines {
 
     /**
-     * Execute a series of statements, asserting no Exceptions are thrown.
+     * Execute a series of statements, asserting no SyntaxErrors are reported.
      * @param sourceString The source string to execute.
      */
     public void testVikariStatements(String sourceString) {

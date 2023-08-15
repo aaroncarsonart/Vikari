@@ -2,8 +2,8 @@ package com.atonementcrystals.dnr.vikari.error;
 
 public class Vikari_Exception extends RuntimeException {
 
-    private String errorName;
-    private String errorMessage;
+    private final String errorName;
+    private final String errorMessage;
 
     public Vikari_Exception(String name, String message) {
         super(name + ": " + message);

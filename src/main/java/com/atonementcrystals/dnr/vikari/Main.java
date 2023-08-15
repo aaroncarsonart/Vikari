@@ -301,7 +301,6 @@ public class Main {
      * @return The Options object representing these optional argument rules.
      */
     public static Options buildOptions() {
-        // Options are the characters: litv.
         Option lexOption = Option.builder("l").longOpt("lex")
                 .required(false)
                 .desc("Run lexer.")
@@ -474,35 +473,33 @@ public class Main {
      * @param phase The phase of the interpreter to run the source file through.
      * @param lexerOptions An optional set of options for configuring output of the Lexer.
      */
-    public static void runSourceFile(File sourceFile, Phase phase, LexerOptions lexerOptions, ParserOptions parserOptions, boolean warningsEnabled) {
+    public static void runSourceFile(File sourceFile, Phase phase, LexerOptions lexerOptions,
+                                     ParserOptions parserOptions, boolean warningsEnabled) {
         log.debug("Run source file.");
         VikariProgram program = new VikariProgram();
         program.setLexerOptions(lexerOptions);
         program.setParserOptions(parserOptions);
 
         switch (phase) {
-            case LEX:
+            case LEX -> {
                 program.lex(sourceFile);
                 program.reportErrors();
                 program.reportWarnings();
-                break;
-            case PARSE:
+            }
+            case PARSE -> {
                 program.lexAndParse(sourceFile);
                 program.reportErrors();
                 program.reportWarnings();
-                break;
-            case EXECUTE:
-            case DEFAULT:
+            }
+            case EXECUTE, DEFAULT -> {
                 program.lexAndParse(sourceFile);
                 program.reportErrors();
                 program.reportWarnings();
-
                 if (!program.hasErrors() && (!warningsEnabled || !program.hasWarnings())) {
                     program.execute(sourceFile);
                 }
-                break;
-            default:
-                throw new IllegalStateException("Unreachable code.");
+            }
+            default -> throw new IllegalStateException("Unreachable code.");
         }
     }
 
@@ -523,28 +520,25 @@ public class Main {
         program.setParserOptions(parserOptions);
 
         switch (phase) {
-            case LEX:
+            case LEX -> {
                 program.lex(sourceString);
                 program.reportErrors();
                 program.reportWarnings();
-                break;
-            case PARSE:
+            }
+            case PARSE -> {
                 program.lexAndParse(sourceString);
                 program.reportErrors();
                 program.reportWarnings();
-                break;
-            case EXECUTE:
-            case DEFAULT:
+            }
+            case EXECUTE, DEFAULT -> {
                 List<Statement> statements = program.lexAndParse(sourceString);
                 program.reportErrors();
                 program.reportWarnings();
-
                 if (!program.hasErrors() && (!warningsEnabled || !program.hasWarnings())) {
                     program.execute(statements);
                 }
-                break;
-            default:
-                throw new IllegalStateException("Unreachable code.");
+            }
+            default -> throw new IllegalStateException("Unreachable code.");
         }
     }
 
@@ -565,17 +559,20 @@ public class Main {
     public static void printHelp(Options options) {
         log.trace("printHelp()");
         HelpFormatter helpFormatter = new HelpFormatter();
+
         String header = "\nInterpret the Vikari programming language.\n";
-        String footer = "\n<config_options>: [plitvw] for each line of code in output:\n" +
-         " p: [print] Print the lexed tokens or parsed statements.\n" +
-         " l: [lines] Print line numbers before each line.\n" +
-         " i: [invisibles] Show SPACE, TAB, and NEWLINE as `·`, `→`, and `¶`.\n" +
-         " t: [tokens] Show each token as quoted strings separated by commas.\n" +
-         " v: [verbose] Print each token's type name.\n" +
-         " w: [warnings] Show compilation warnings. Won't halt program execution like -w.\n" +
-         "\n" +
-         "<log_level>: one of the following:\n" +
-         " ALL, TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF.";
+        String footer = """
+                \n<config_options>: [plitvw] for each line of code in output:
+                 p: [print] Print the lexed tokens or parsed statements.
+                 l: [lines] Print line numbers before each line.
+                 i: [invisibles] Show SPACE, TAB, and NEWLINE as `·`, `→`, and `¶`.
+                 t: [tokens] Show each token as quoted strings separated by commas.
+                 v: [verbose] Print each token's type name.
+                 w: [warnings] Show compilation warnings. Won't halt program execution like -w.
+
+                <log_level>: one of the following:
+                 ALL, TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF.""";
+
         helpFormatter.printHelp("vikari", header, options, footer, true);
     }
 

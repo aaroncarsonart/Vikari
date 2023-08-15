@@ -4,8 +4,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 
 /**
  * This type should never be instantiated. But a basic implementation
- * is provided for clarity to ensure modeling of the type hierarchy is
- * consistent.
+ * is provided to ensure modeling of the type hierarchy is consistent.
  */
 public abstract class ValueCrystal<V> extends AtonementCrystal {
     private V value;

@@ -1,6 +1,5 @@
 package com.atonementcrystals.dnr.vikari.parser.statement;
 
-import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
@@ -23,26 +22,12 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.List;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.location;
+import static com.atonementcrystals.dnr.vikari.TestUtils.testSyntaxError;
+import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.lexAndParse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ParserTest_StatementSeparator {
-
-    private List<Statement> lexAndParse(String sourceString) {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-
-        SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        lexer.setSyntaxErrorReporter(syntaxErrorReporter);
-        parser.setSyntaxErrorReporter(syntaxErrorReporter);
-
-        List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
-        List<Statement> parsedStatements = parser.parse(null, lexedStatements);
-
-        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
-
-        return parsedStatements;
-    }
 
     private List<VikariError> lexAndParse_ErrorCase(String sourceString) {
         Lexer lexer = new Lexer();
@@ -353,7 +338,7 @@ public class ParserTest_StatementSeparator {
         VikariError error1 = syntaxErrors.get(0);
         CoordinatePair expectedLocation = location(0, 2);
         String expectedLine = sourceString;
-        TestUtils.testSyntaxError(error1, expectedLocation, expectedLine, "Expected expression.");
+        testSyntaxError(error1, expectedLocation, expectedLine, "Expected expression.");
     }
 
     @Test
@@ -369,12 +354,12 @@ public class ParserTest_StatementSeparator {
         VikariError error1 = syntaxErrors.get(0);
         CoordinatePair expectedLocation = location(0, 2);
         String expectedLine = sourceString;
-        TestUtils.testSyntaxError(error1, expectedLocation, expectedLine, "Expected expression.");
+        testSyntaxError(error1, expectedLocation, expectedLine, "Expected expression.");
 
         VikariError error2 = syntaxErrors.get(1);
         expectedLocation = location(0, 4);
         expectedLine = sourceString;
-        TestUtils.testSyntaxError(error2, expectedLocation, expectedLine, "Expected expression.");
+        testSyntaxError(error2, expectedLocation, expectedLine, "Expected expression.");
     }
 
     @Test
@@ -391,22 +376,22 @@ public class ParserTest_StatementSeparator {
         VikariError error1 = syntaxErrors.get(0);
         CoordinatePair expectedLocation = location(0, 2);
         String expectedLine = "5 ++, * 7 *,";
-        TestUtils.testSyntaxError(error1, expectedLocation, expectedLine, "Expected expression.");
+        testSyntaxError(error1, expectedLocation, expectedLine, "Expected expression.");
 
         VikariError error2 = syntaxErrors.get(1);
         expectedLocation = location(0, 6);
         expectedLine = "5 ++, * 7 *,";
-        TestUtils.testSyntaxError(error2, expectedLocation, expectedLine, "Expected expression.");
+        testSyntaxError(error2, expectedLocation, expectedLine, "Expected expression.");
 
         VikariError error3 = syntaxErrors.get(2);
         expectedLocation = location(1, 3);
         expectedLine = "22 -, / 3";
-        TestUtils.testSyntaxError(error3, expectedLocation, expectedLine, "Expected expression.");
+        testSyntaxError(error3, expectedLocation, expectedLine, "Expected expression.");
 
         VikariError error4 = syntaxErrors.get(3);
         expectedLocation = location(1, 6);
         expectedLine = "22 -, / 3";
-        TestUtils.testSyntaxError(error4, expectedLocation, expectedLine, "Expected expression.");
+        testSyntaxError(error4, expectedLocation, expectedLine, "Expected expression.");
     }
 
     @Test

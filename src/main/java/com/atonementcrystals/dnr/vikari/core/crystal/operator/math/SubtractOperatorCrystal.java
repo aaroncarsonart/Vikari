@@ -6,8 +6,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonementcrystals.dnr.vikari.interpreter.Arithmetic;
 
 /**
- * The subtract operator - subtracts the right operand
- * from the left operand.
+ * The subtract operator - subtracts the right operand from the left operand.
  */
 public class SubtractOperatorCrystal extends BinaryOperatorCrystal {
 

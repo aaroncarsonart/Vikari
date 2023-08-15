@@ -11,8 +11,8 @@ import java.util.Map;
  * An AtonementField describes the structure of an AtonementCrystal.
  * All type members are contained within regions of its associated
  * field. Two identifiers which point to the same crystal instance
- * share the same AtonementField.
- * <p>
+ * share the same AtonementField.<br/>
+ * <br/>
  * AtonementFields are also used to model environments in which
  * program variables exist. So the main program has a global field,
  * which encloses each file's root environment. Then each new scope
@@ -20,7 +20,7 @@ import java.util.Map;
  * outer enclosing environment with a parent reference.
  */
 public class AtonementField {
-    private Map<String, AtonementCrystal> fieldMembers;
+    private final Map<String, AtonementCrystal> fieldMembers;
     private AtonementField parentField;
 
     /**
@@ -29,8 +29,8 @@ public class AtonementField {
      * fields for certain code blocks such as loops or conditional
      * statements to not allow shadowing of variable names. But other
      * code blocks such as for function bodies or type definitions
-     * do shadow variable names.
-     * <p>
+     * do shadow variable names.<br/>
+     * <br/>
      * By default, AtonementFields shadow variables.
      */
     private boolean shadowVariables;
@@ -120,7 +120,6 @@ public class AtonementField {
      * has already been defined with the same identifier.
      * @param identifier The identifier to define a new value for.
      * @param crystal The new value to define the identifier with.
-
      */
     public void define(String identifier, AtonementCrystal crystal) {
         if (!isDefined(identifier)) {

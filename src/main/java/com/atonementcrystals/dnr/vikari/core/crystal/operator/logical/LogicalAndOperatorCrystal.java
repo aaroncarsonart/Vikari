@@ -18,7 +18,7 @@ public class LogicalAndOperatorCrystal extends BinaryOperatorCrystal {
 
     @Override
     public AtonementCrystal evaluate(AtonementCrystal left, AtonementCrystal right) {
-        throw new UnsupportedOperationException("Logical operators are not evaluated using the evaluate() method.");
+        throw new UnsupportedOperationException("Binary logical operators are not evaluated using the evaluate() method.");
     }
 
 }

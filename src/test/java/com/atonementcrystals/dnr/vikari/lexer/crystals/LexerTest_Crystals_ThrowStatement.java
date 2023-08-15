@@ -117,7 +117,7 @@ public class LexerTest_Crystals_ThrowStatement {
 
     @Test
     @Order(7)
-    public void testLexer_Crystals_SeqentialNegations_WithinGroupingExpressions() {
+    public void testLexer_Crystals_SequentialNegations_WithinGroupingExpressions() {
         List<AtonementCrystal> statement = lexSingleStatement("[--bar]+[--5]", 10);
 
         testCrystal(statement.get(0), LeftSquareBracketCrystal.class, "[", location(0, 0));
@@ -136,7 +136,7 @@ public class LexerTest_Crystals_ThrowStatement {
 
     @Test
     @Order(8)
-    public void testLexer_Crystals_SeqentialNegations_WithinListLiteral() {
+    public void testLexer_Crystals_SequentialNegations_WithinListLiteral() {
         List<AtonementCrystal> statement = lexSingleStatement("(--bar|--5)", 8);
 
         testCrystal(statement.get(0), LeftParenthesisCrystal.class, "(", location(0, 0));

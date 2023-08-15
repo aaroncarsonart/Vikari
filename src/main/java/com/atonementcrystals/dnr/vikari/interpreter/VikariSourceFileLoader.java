@@ -35,7 +35,7 @@ public class VikariSourceFileLoader {
             // Ensure that all other file extensions are ignored.
             // Files without extensions are already ignored because of how raw type names are evaluated.
             else if (!FilenameUtils.getExtension(sourceFilePathOrTypeName).isEmpty()) {
-                throw new Vikari_IOException("File does not exist (2): ``" + sourceFilePathOrTypeName + "``." +
+                throw new Vikari_IOException("File does not exist: ``" + sourceFilePathOrTypeName + "``." +
                         "\nNote: valid file extensions are: ``.DNR`` and ``.dnr``.");
             }
 
@@ -58,7 +58,7 @@ public class VikariSourceFileLoader {
 
     /**
      * Get the File for the directory containing the input File.
-     * @param file The file to get the directory for.
+     * @param file The File to get the directory for.
      * @return The File for the directory containing the input File.
      */
     public File getFileDirectory(File file) {
@@ -68,7 +68,7 @@ public class VikariSourceFileLoader {
     /**
      * If a type definition or script source file exists in the local directory, load that file.
      * @param typeOrScriptName The type or script name to load.
-     * @return The source file resolved from teh provided type or script name.
+     * @return The source file resolved from the provided type or script name.
      */
     private File resolveFileFromTypeOrScriptName(String typeOrScriptName) {
         if (fileExists(typeOrScriptName + ".DNR")) {
@@ -103,5 +103,4 @@ public class VikariSourceFileLoader {
         }
         return false;
     }
-
 }

@@ -4,7 +4,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 
 /**
- * The conditional branch crystal `??` begins a conditional branching statement.
+ * The conditional branch crystal ?? begins a conditional branching statement.
  * (An if statement.)
  */
 public class ConditionalBranchCrystal extends AtonementCrystal {

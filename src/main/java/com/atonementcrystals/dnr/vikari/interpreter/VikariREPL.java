@@ -44,7 +44,6 @@ public class VikariREPL {
 
     private boolean exit;
     private boolean warningsEnabled;
-    private LineReader userInput;
 
     /**
      * Instantiate a new VikariRepl instance.
@@ -100,7 +99,7 @@ public class VikariREPL {
     public void start() {
         log.trace("start()");
         exit = false;
-        userInput = buildLineReader();
+        LineReader userInput = buildLineReader();
 
         // Begin REPL loop.
         while (!exit) {
@@ -161,7 +160,7 @@ public class VikariREPL {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(nextLineOfUserInput);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
-        // Report syntax errors, if any. And compilation warnings, if they are enabled.
+        // Report syntax errors, if any. (And compilation warnings if they are enabled.)
         if (syntaxErrorReporter.hasErrors() || (warningsEnabled && syntaxErrorReporter.hasWarnings())) {
             reportProblems(nextLineOfUserInput);
 
@@ -301,8 +300,8 @@ public class VikariREPL {
     }
 
     /**
-     * Report syntax errors for the given line of user input.
-     * @param line The line to report the error for.
+     * Report any syntax errors (and compilation warnings, if enabled) for the given line of user input.
+     * @param line The line to report the errors and warnings for.
      */
     private void reportProblems(String line) {
         if (!syntaxErrorReporter.hasErrors() && !syntaxErrorReporter.hasWarnings()) {
@@ -368,8 +367,11 @@ public class VikariREPL {
         String problemMessage = problem.getMessage();
         System.out.println(problemMessage);
 
+        // Trim the final trailing newline, which is not needed for the log entry.
+        problemMessage = problemMessage.substring(0, problemMessage.length() - 1);
+
         // Print equivalent output as REPL in logs.
-        log.debug("\n{}{}\n{}", REPL_PROMPT, line, problemMessage);
+        log.debug("\n{}{}\n{}\n{}", REPL_PROMPT, line, caretStr, problemMessage);
     }
 
     /**
@@ -389,6 +391,9 @@ public class VikariREPL {
 
         String fullErrorReport = sb.toString();
         System.out.print(fullErrorReport);
+
+        // Trim the final trailing newline, which is not needed for the log entry.
+        fullErrorReport = fullErrorReport.substring(0, fullErrorReport.length() - 1);
 
         // Print equivalent output as REPL in logs.
         log.debug("\n{}", fullErrorReport);

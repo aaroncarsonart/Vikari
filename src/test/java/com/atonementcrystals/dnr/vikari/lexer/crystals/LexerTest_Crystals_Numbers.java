@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_Crystals_Numbers {
-    private MathContext mathContext = Arithmetic.getMathContext();
+    private final MathContext mathContext = Arithmetic.getMathContext();
 
     private void lexAndTestNumberCrystal(String sourceString, Class<? extends AtonementCrystal> expectedClass,
                                          Object expectedValue) {

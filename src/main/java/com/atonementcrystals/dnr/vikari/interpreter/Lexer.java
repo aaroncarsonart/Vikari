@@ -23,7 +23,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.number.LongCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.LineContinuationCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.control.flow.ContinueOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.ModulusOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
@@ -59,9 +58,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Performs the lexical analysis step of scanning the contents of a
- * Vikari source file or string and splitting it into string tokens.
- * These tokens are then converted to their associated crystal types
+ * Performs the lexical analysis step of scanning the contents of a Vikari source file or string and
+ * splitting it into string tokens. These tokens are then converted to their associated crystal types
  * as the final output of the Lexer.
  */
 public class Lexer {
@@ -93,21 +91,20 @@ public class Lexer {
      */
     private static final HashSet<Class<? extends AtonementCrystal>> COLLAPSE_NEGATION_OPERATOR_CLASSES = Stream.of(
                     TokenType.RETURN, TokenType.BREAK, TokenType.CONTINUE, TokenType.LEFT_SQUARE_BRACKET,
-                    TokenType.REGION_SEPARATOR, TokenType.LEFT_PARENTHESIS,
-                    TokenType.LIST_ELEMENT_SEPARATOR, TokenType.RANGE, TokenType.TYPE_LABEL,
-                    TokenType.INDEX_OPERATOR, TokenType.COPY_CONSTRUCTOR, TokenType.MODULUS, TokenType.MULTIPLY,
-                    TokenType.SUBTRACT, TokenType.LEFT_ASSIGNMENT, TokenType.LEFT_ADD_ASSIGNMENT,
-                    TokenType.LEFT_SUBTRACT_ASSIGNMENT, TokenType.LEFT_DIVIDE_ASSIGNMENT,
+                    TokenType.REGION_SEPARATOR, TokenType.LEFT_PARENTHESIS, TokenType.LIST_ELEMENT_SEPARATOR,
+                    TokenType.RANGE, TokenType.TYPE_LABEL, TokenType.INDEX_OPERATOR, TokenType.COPY_CONSTRUCTOR,
+                    TokenType.MODULUS, TokenType.MULTIPLY, TokenType.SUBTRACT, TokenType.LEFT_ASSIGNMENT,
+                    TokenType.LEFT_ADD_ASSIGNMENT, TokenType.LEFT_SUBTRACT_ASSIGNMENT, TokenType.LEFT_DIVIDE_ASSIGNMENT,
                     TokenType.LEFT_MULTIPLY_ASSIGNMENT, TokenType.LEFT_LOGICAL_AND_ASSIGNMENT,
                     TokenType.LEFT_LOGICAL_OR_ASSIGNMENT, TokenType.RIGHT_ADD_ASSIGNMENT,
                     TokenType.RIGHT_SUBTRACT_ASSIGNMENT, TokenType.RIGHT_DIVIDE_ASSIGNMENT,
                     TokenType.RIGHT_MULTIPLY_ASSIGNMENT, TokenType.RIGHT_LOGICAL_AND_ASSIGNMENT,
-                    TokenType.RIGHT_LOGICAL_OR_ASSIGNMENT, TokenType.ADD, TokenType.LEFT_DIVIDE,
-                    TokenType.RIGHT_DIVIDE, TokenType.LOGICAL_AND, TokenType.LOGICAL_OR,
-                    TokenType.LOGICAL_NOT, TokenType.EQUALS, TokenType.REFERENCE_EQUALS, TokenType.LESS_THAN,
-                    TokenType.GREATER_THAN, TokenType.GREATER_THAN_OR_EQUALS, TokenType.LESS_THAN_OR_EQUALS,
-                    TokenType.KEY_VALUE_PAIR, TokenType.ITERATION_ELEMENT, TokenType.INSTANCE_OF,
-                    TokenType.CATCH_ALL, TokenType.LEFT_FEATHER_FALL, TokenType.RIGHT_FEATHER_FALL)
+                    TokenType.RIGHT_LOGICAL_OR_ASSIGNMENT, TokenType.ADD, TokenType.LEFT_DIVIDE, TokenType.RIGHT_DIVIDE,
+                    TokenType.LOGICAL_AND, TokenType.LOGICAL_OR, TokenType.LOGICAL_NOT, TokenType.EQUALS,
+                    TokenType.REFERENCE_EQUALS, TokenType.LESS_THAN, TokenType.GREATER_THAN,
+                    TokenType.GREATER_THAN_OR_EQUALS, TokenType.LESS_THAN_OR_EQUALS, TokenType.KEY_VALUE_PAIR,
+                    TokenType.ITERATION_ELEMENT, TokenType.INSTANCE_OF, TokenType.CATCH_ALL,
+                    TokenType.LEFT_FEATHER_FALL, TokenType.RIGHT_FEATHER_FALL)
             .map(TokenType::getJavaType)
             .collect(Collectors.toCollection(HashSet::new));
 
@@ -194,7 +191,6 @@ public class Lexer {
         }
     }
 
-
     /**
      * Lexes a string of Vikari source code into a sequence of string tokens.
      *
@@ -215,7 +211,7 @@ public class Lexer {
      *
      * @param reader The BufferedReader to read input from.
      * @return A sequence of string tokens.
-     * @throws IOException If an IO error occurs.
+     * @throws Vikari_IOException If an IO error occurs.
      */
     private List<List<String>> readFromBufferAsStringTokens(BufferedReader reader) {
         this.reader = reader;
@@ -501,8 +497,7 @@ public class Lexer {
         Stack<CoordinatePair> unclosedOpeningTokens = multilineNestableCommentToken();
 
         // Report if there were any errors.
-        for (int i = 0; i < unclosedOpeningTokens.size(); i++) {
-            CoordinatePair location = unclosedOpeningTokens.get(i);
+        for (CoordinatePair location : unclosedOpeningTokens) {
             reportError("Missing comment suffix token `:~`.", location);
         }
     }
@@ -610,9 +605,8 @@ public class Lexer {
         return Math.min(openingTokenIndex, closingTokenIndex);
     }
 
-
-    // Comments are nestable. All characters between the opening and
-    // closing tokens are lexed as dashes so the nestable comment tokens
+    // NOTE: Comments are nestable. So all characters between the opening
+    // and closing tokens are lexed as dashes so the nestable comment tokens
     // don't interfere with detecting the end of a multi-line comment.
 
     private void singleLineCommentToken() {
@@ -698,8 +692,8 @@ public class Lexer {
     /**
      * Report a SyntaxError.
      * @param message The error message.
-     * @param row The row number location for the error.
-     * @param column The column number location for the error.
+     * @param row The vertical coordinate for the error.
+     * @param column The horizontal coordinate for the error.
      */
     private void reportError(String message, int row, int column) {
         CoordinatePair location = new CoordinatePair(row, column);
@@ -728,7 +722,7 @@ public class Lexer {
 
     /**
      * Converts string tokens into their associated crystal types.
-     * Identifiers which are references will be resolved later by the parser.
+     * Identifiers which are references will be resolved later by the Parser.
      *
      * @param statementsOfStringTokens The string tokens to convert.
      * @return The crystals representing each string token.
@@ -914,7 +908,7 @@ public class Lexer {
                     continue;
                 }
 
-                // Walk multiple lines at once until end of a multi-line string literal is reached.
+                // Walk multiple lines until end of a multi-line string literal is reached.
                 if (Utils.isStartOfStringLiteral(stringToken)) {
                     // TODO: Impose maximum limits on length of Vikari strings.
                     MultiLineStringLiteralCrystal stringCrystal = new MultiLineStringLiteralCrystal(stringToken);
@@ -1014,14 +1008,6 @@ public class Lexer {
                     continue;
                 }
 
-                if (TokenType.MODULUS.getIdentifier().equals(stringToken)) {
-                    // Handle all as MODULUS at first.
-                    ModulusOperatorCrystal modulusCrystal = new ModulusOperatorCrystal();
-                    modulusCrystal.setCoordinates(tokenCoordinates);
-                    statementOfCrystals.add(modulusCrystal);
-                    continue;
-                }
-
                 if (TokenType.DELETE.getIdentifier().equals(stringToken)) {
                     // Handle all as DELETE at first.
                     DeleteOperatorCrystal deleteOperatorCrystal = new DeleteOperatorCrystal();
@@ -1054,11 +1040,6 @@ public class Lexer {
                     continue;
                 }
 
-                // Blank lines are ignored in the output of the Lexer.
-                if (stringToken.equals("")) {
-                    continue;
-                }
-
                 TokenType mapping = defaultIdentifiersMap.get(stringToken);
 
                 // Not a built-in type. Resolve concrete instance of identifier in parsing step.
@@ -1082,9 +1063,9 @@ public class Lexer {
                 // One of the default identifier types of the Vikari language.
                 // Build a new instance of its crystal type using reflection.
                 try {
-                    Class<? extends AtonementCrystal> clazz = mapping.getJavaType();
-                    Constructor<?> constructor = clazz.getConstructor();
-                    AtonementCrystal crystal = (clazz.cast(constructor.newInstance()));
+                    Class<? extends AtonementCrystal> crystalClass = mapping.getJavaType();
+                    Constructor<? extends AtonementCrystal> constructor = crystalClass.getConstructor();
+                    AtonementCrystal crystal = constructor.newInstance();
                     crystal.setCoordinates(tokenCoordinates);
                     statementOfCrystals.add(crystal);
                 } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |

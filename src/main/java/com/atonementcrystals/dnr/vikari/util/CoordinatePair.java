@@ -27,8 +27,7 @@ public class CoordinatePair implements Comparable<CoordinatePair> {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof CoordinatePair) {
-            CoordinatePair that = (CoordinatePair) obj;
+        if (obj instanceof CoordinatePair that) {
             return this.row == that.row &&
                     this.column == that.column;
         }

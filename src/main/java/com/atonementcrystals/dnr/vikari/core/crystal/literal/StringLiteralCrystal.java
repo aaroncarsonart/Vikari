@@ -4,10 +4,10 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 
 /**
  * String literal identifiers are any such sequence of characters
- * immediately inclosed between two capture quotations. Strings
- * can naturally become wrapped across multiple lines without the
- * need to include an escaped newline inside the string definition.
- * Nested backticks can be escaped using an enclosure of square brackets.
+ * enclosed between two capture quotations. Strings can wrap across
+ * multiple lines without the need to include an escaped newline inside
+ * the string definition. Backticks within a string literal can be
+ * escaped using a backslash.
  */
 public class StringLiteralCrystal extends AtonementCrystal {
 

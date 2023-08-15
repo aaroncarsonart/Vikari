@@ -65,7 +65,8 @@ public class ProgramId {
             }
 
             // Lock the file to ensure unique program ids across different executions of Vikari.
-            try (FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
+            try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+                 FileChannel channel = randomAccessFile.getChannel();
                  FileLock lock = channel.lock()) {
 
                 // Fetch current value of number in file.

@@ -13,7 +13,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
  * terminate every code statement.<br/>
  * <br/>
  * However, these are necessary for minimized Vikari code. Wherein
- * they are used in conjuction with the region separator ; to
+ * they are used in conjunction with the region separator ; to
  * explicitly terminate every minimized Vikari code statement.
  */
 public class StatementSeparatorCrystal extends AtonementCrystal {

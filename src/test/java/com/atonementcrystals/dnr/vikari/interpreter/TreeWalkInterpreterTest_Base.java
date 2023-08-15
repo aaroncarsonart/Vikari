@@ -1,6 +1,5 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
-import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
@@ -13,6 +12,7 @@ import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 
 import java.util.List;
 
+import static com.atonementcrystals.dnr.vikari.TestUtils.assertNoSyntaxErrors;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TreeWalkInterpreterTest_Base {
@@ -34,7 +34,7 @@ public class TreeWalkInterpreterTest_Base {
 
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceString);
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
-        TestUtils.assertNoSyntaxErrors(syntaxErrorReporter);
+        assertNoSyntaxErrors(syntaxErrorReporter);
         interpreter.interpret(null, parsedStatements);
 
         currentEnvironment = interpreter.getCurrentEnvironment();

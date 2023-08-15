@@ -60,7 +60,7 @@ public class ParserTest_Literals {
 
         // first expression
         Expression expression = expressionStatement.getExpression();
-        testIntegerLiteralExpression(expression, Integer.valueOf(2));
+        testIntegerLiteralExpression(expression, 2);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class ParserTest_Literals {
 
         // first expression
         Expression expression = expressionStatement.getExpression();
-        testLongLiteralExpression(expression, Long.valueOf(22L));
+        testLongLiteralExpression(expression, 22L);
     }
 
     @Test
@@ -153,7 +153,7 @@ public class ParserTest_Literals {
 
         // first expression
         Expression expression = expressionStatement.getExpression();
-        testFloatLiteralExpression(expression, Float.valueOf(3.14F));
+        testFloatLiteralExpression(expression, 3.14F);
     }
 
     @Test
@@ -184,7 +184,7 @@ public class ParserTest_Literals {
 
         // first expression
         Expression expression = expressionStatement.getExpression();
-        testDoubleLiteralExpression(expression, Double.valueOf(6.28D));
+        testDoubleLiteralExpression(expression, 6.28D);
     }
 
     @Test

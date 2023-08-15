@@ -104,6 +104,7 @@ public class LexerTest_Crystals_Warnings {
             }
         }
     }
+
     @Test
     @Order(3)
     public void testLexer_Crystals_Warnings_LineContinuation_AtEndOfStatement() {

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.FileSystems;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,7 +23,7 @@ import java.util.regex.Pattern;
  * </ul>
  */
 public class Utils {
-    private static String userDir = System.getProperty("user.dir");
+    private static final String userDir = System.getProperty("user.dir");
 
     /**
      * Regular expression pattern for type names.
@@ -46,43 +45,6 @@ public class Utils {
      * Do not instantiate the Utils class.
      */
     private Utils() {
-    }
-
-    /**
-     * Prints a list of strings as ["str1,"str2"...].
-     * Escapes special characters like newlines and tabs.
-     *
-     * @param list The list of strings to print.
-     */
-    public static void printStringList(List<String>list) {
-        if (list == null) {
-            System.out.println("null");
-            return;
-        }
-
-        System.out.print("[");
-            for (int i = 0; i < list.size(); i++) {
-                String token = list.get(i);
-
-                System.out.print("\"");
-
-                if (token.equals("\n")) {
-                    System.out.print("\\n");
-                } else if (token.equals("\t")) {
-                    System.out.print("\\t");
-                } else if (token.equals("\"")){
-                    System.out.print("\\\"");
-                } else {
-                    System.out.print(token);
-                }
-
-                System.out.print("\"");
-
-                if (i < list.size() - 1) {
-                    System.out.print(",");
-                }
-            }
-        System.out.println("]");
     }
 
     /**
@@ -425,7 +387,7 @@ public class Utils {
             return name;
         }
         if (name.endsWith("Crystal")) {
-            int end = name.indexOf("Crystal");
+            int end = name.lastIndexOf("Crystal");
             name = name.substring(0, end);
             return name;
         }
@@ -496,12 +458,12 @@ public class Utils {
         char firstCharacter = fileToken.charAt(0);
         boolean capitalized = Character.isUpperCase(firstCharacter);
 
-        // Is a type file.
+        // It is a type file.
         if (capitalized) {
             sb.append(".DNR");
         }
 
-        // Is a script file.
+        // It is a script file.
         else {
             sb.append(".dnr");
         }

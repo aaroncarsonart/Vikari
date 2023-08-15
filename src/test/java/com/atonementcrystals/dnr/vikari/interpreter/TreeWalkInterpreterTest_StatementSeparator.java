@@ -19,7 +19,7 @@ public class TreeWalkInterpreterTest_StatementSeparator extends TreeWalkInterpre
      }
 
     // The following 12 tests are all identical to TreeWalkInterpreterTest_PrintStatements,
-    // except that the statement separator , has been interpersed between their calls.
+    // except that the statement separator , has been interspersed between their calls.
     // Resulting behavior should be exactly equivalent in both cases.
 
     @Test
@@ -95,7 +95,7 @@ public class TreeWalkInterpreterTest_StatementSeparator extends TreeWalkInterpre
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     public void testTreeWalkInterpreter_StatementSeparator_PrintlnExpression_MultipleStatementSeparators() {
         String expectedOutput = "8\n5\n27\n";
 

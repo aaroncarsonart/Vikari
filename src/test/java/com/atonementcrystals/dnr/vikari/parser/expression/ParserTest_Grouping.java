@@ -54,12 +54,12 @@ public class ParserTest_Grouping {
         assertEquals(ExpressionStatement.class, statement.getClass(), "Unexpected statement type.");
         ExpressionStatement expressionStatement = (ExpressionStatement) statement;
 
-        // 1. first expression (grouping)
+        // 1. first expression (grouping: "[5]")
         Expression expression = expressionStatement.getExpression();
         assertEquals(GroupingExpression.class, expression.getClass(), "Unexpected expression type.");
         GroupingExpression groupingExpression = (GroupingExpression) expression;
 
-        // 2. inner expression (literal)
+        // 2. inner expression (literal: "5")
         Expression innerExpression = groupingExpression.getExpression();
         assertEquals(LiteralExpression.class, innerExpression.getClass(), "Unexpected expression type.");
         LiteralExpression literalExpression = (LiteralExpression) innerExpression;

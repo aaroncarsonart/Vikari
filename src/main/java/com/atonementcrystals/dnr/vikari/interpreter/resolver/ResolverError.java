@@ -3,8 +3,8 @@ package com.atonementcrystals.dnr.vikari.interpreter.resolver;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 
 public class ResolverError {
-    private CoordinatePair location;
-    private String errorMessage;
+    private final CoordinatePair location;
+    private final String errorMessage;
 
     public ResolverError(CoordinatePair location, String errorMessage) {
         this.location = location;

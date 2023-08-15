@@ -17,7 +17,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.ConstructorCrystal
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.DotOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.FunctionCallOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.KeyValuePairOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.LineContinuationMinimizedOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.MinimizedLineContinuationCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.LineContinuationCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.PrintStatementOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorCrystal;
@@ -53,8 +53,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCr
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.ModulusOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.NegateCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.PercentCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.NegateOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.RightDivideOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.AnnotationOperatorCrystal;
@@ -92,11 +91,11 @@ import java.util.stream.Collectors;
  */
 public enum TokenType {
 
-    // comments
+    // Comments
     COMMENT_PREFIX_CRYSTAL("~:", null),
     COMMENT_SUFFIX_CRYSTAL(":~", null),
 
-    // control flow
+    // Control flow
     CONDITIONAL_BRANCH("??", ConditionalBranchCrystal.class),
     LOOP("<>", LoopCrystal.class),
     THROW("--", ThrowCrystal.class),
@@ -106,7 +105,7 @@ public enum TokenType {
     CONTINUE(">>", ContinueOperatorCrystal.class),
     BREAK("vv", BreakOperatorCrystal.class),
 
-    // literals
+    // Literals
     SWORD("_", SwordCrystal.class),
 
     // Separators
@@ -124,7 +123,7 @@ public enum TokenType {
     RIGHT_PARENTHESIS(")", RightParenthesisCrystal.class),
     LIST_ELEMENT_SEPARATOR("|", ListElementSeparatorCrystal.class),
 
-    // Atonement Field projection enclosures
+    // Other enclosures
     LEFT_CURLY_BRACKET("{", LeftCurlyBracketCrystal.class),
     RIGHT_CURLY_BRACKET("}", RightCurlyBracketCrystal.class),
 
@@ -144,14 +143,21 @@ public enum TokenType {
     ANNOTATION("$", AnnotationOperatorCrystal.class),
     COPY_CONSTRUCTOR("&", CopyConstructorCrystal.class),
     MODULUS("%", ModulusOperatorCrystal.class),
-    PERCENT("%", PercentCrystal.class),
     MULTIPLY("*", MultiplyOperatorCrystal.class),
     CONSTRUCTOR("*", ConstructorCrystal.class),
     SUBTRACT("-", SubtractOperatorCrystal.class),
-    NEGATE("-", NegateCrystal.class),
+    NEGATE("-", NegateOperatorCrystal.class),
     EXISTS("?", ExistsOperatorCrystal.class),
 
-    // assignment operators
+    ADD("+", AddOperatorCrystal.class),
+    CONCATENATE("+", ConcatenateOperatorCrystal.class),
+    LEFT_DIVIDE("/", LeftDivideOperatorCrystal.class),
+    RIGHT_DIVIDE("\\", RightDivideOperatorCrystal.class),
+    DELETE("~", DeleteOperatorCrystal.class),
+    LINE_CONTINUATION("~", LineContinuationCrystal.class),
+    MINIMIZED_LINE_CONTINUATION("/~/", MinimizedLineContinuationCrystal.class),
+
+    // Assignment operators
     LEFT_ASSIGNMENT("<<", LeftAssignmentOperatorCrystal.class),
     LEFT_ADD_ASSIGNMENT("+<<", LeftAddAssignmentOperatorCrystal.class),
     LEFT_SUBTRACT_ASSIGNMENT("-<<", LeftSubtractAssignmentOperatorCrystal.class),
@@ -169,15 +175,7 @@ public enum TokenType {
     RIGHT_LOGICAL_AND_ASSIGNMENT("^>>", RightLogicalAndAssignmentOperatorCrystal.class),
     RIGHT_LOGICAL_OR_ASSIGNMENT("\">>", RightLogicalOrAssignmentOperatorCrystal.class),
 
-    ADD("+", AddOperatorCrystal.class),
-    CONCATENATE("+", ConcatenateOperatorCrystal.class),
-    LEFT_DIVIDE("/", LeftDivideOperatorCrystal.class),
-    RIGHT_DIVIDE("\\", RightDivideOperatorCrystal.class),
-    DELETE("~", DeleteOperatorCrystal.class),
-    LINE_CONTINUATION("~", LineContinuationCrystal.class),
-    LINE_CONTINUATION_MINIMIZED("/~/", LineContinuationMinimizedOperatorCrystal.class),
-
-    // logical and comparison operators
+    // Logical and comparison operators
     LOGICAL_AND("^", LogicalAndOperatorCrystal.class),
     LOGICAL_OR("\"", LogicalOrOperatorCrystal.class),
     LOGICAL_NOT("'", LogicalNotOperatorCrystal.class),
@@ -187,13 +185,13 @@ public enum TokenType {
     // TODO: Determine default behavior of reference equality for literal values.
     REFERENCE_EQUALS("<=>", ReferenceEqualsOperatorCrystal.class),
 
-    // numeric comparisons
+    // Numeric comparisons
     GREATER_THAN(">", GreaterThanOperatorCrystal.class),
     LESS_THAN("<", LessThanOperatorCrystal.class),
     GREATER_THAN_OR_EQUALS(">=", GreaterThanOrEqualsOperatorCrystal.class),
     LESS_THAN_OR_EQUALS("<=", LessThanOrEqualsOperatorCrystal.class),
 
-    // miscellaneous
+    // Miscellaneous
     KEY_VALUE_PAIR("=>", KeyValuePairOperatorCrystal.class),
     ITERATION_ELEMENT("<-", IterationElementOperatorCrystal.class),
     INSTANCE_OF("->", InstanceOfOperatorCrystal.class),
@@ -214,7 +212,6 @@ public enum TokenType {
             TokenType.INSTANCE_SUPER,
             TokenType.STATIC_SUPER,
             TokenType.ANNOTATION,
-            TokenType.PERCENT,
             TokenType.CONSTRUCTOR,
             TokenType.NEGATE,
             TokenType.RIGHT_ASSIGNMENT,
@@ -235,11 +232,11 @@ public enum TokenType {
             .collect(Collectors.toCollection(() -> EnumSet.noneOf(TokenType.class)));
 
     /**
-     * Create A new TokenType with a mapping between its string identifier and its
+     * Create a new TokenType with a mapping between its string identifier and its
      * concrete Crystal class type.
      *
      * @param identifier The default string identifier.
-     * @param javaType The concrete Crystal class type.
+     * @param javaType The concrete crystal class type.
      */
     TokenType(String identifier, Class<? extends AtonementCrystal> javaType) {
         this.identifier = identifier;
@@ -257,7 +254,7 @@ public enum TokenType {
     }
 
     /**
-     * @return The concrete Crystal class type for the token.
+     * @return The concrete crystal class type for the token.
      *         If null, this TokenType is not used directly by the parser,
      *         but rather is used to combine into a larger crystal.
      */

@@ -108,7 +108,7 @@ class VikariProgramTest {
         assertOutput("2\n4.0\n");
     }
 
-    // Need to test all combinations of the following conditions for VikariProgram:
+    // The following 8 tests test all combinations of the following conditions for VikariProgram:
     // ```!program.hasErrors() && (!warningsEnabled || !program.hasWarnings())```
 
     @Test

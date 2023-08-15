@@ -17,6 +17,9 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.function.BiFunction;
 
+/**
+ * Performs arithmetic operations for all NumberCrystal types.
+ */
 public class Arithmetic {
     private static final MathContext DEFAULT_MATH_CONTEXT = MathContext.DECIMAL128;
     private static MathContext mathContext = DEFAULT_MATH_CONTEXT;

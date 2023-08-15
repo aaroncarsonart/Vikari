@@ -13,9 +13,9 @@ import java.util.Map;
 public class SyntaxErrorReporter {
     private static final Logger log = LogManager.getLogger(SyntaxErrorReporter.class);
 
-    private List<VikariError> syntaxErrors;
-    private List<VikariError> compilationWarnings;
-    private Map<File, List<String>> fileToLinesMap;
+    private final List<VikariError> syntaxErrors;
+    private final List<VikariError> compilationWarnings;
+    private final Map<File, List<String>> fileToLinesMap;
 
     public SyntaxErrorReporter() {
         this.syntaxErrors = new ArrayList<>();

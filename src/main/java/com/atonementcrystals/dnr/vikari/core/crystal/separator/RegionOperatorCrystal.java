@@ -11,8 +11,8 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
  *     <li>Denoting nested region references.</li>
  *     <li>Beginning a new code block.</li>
  *     <li>
- *         Accessing a type's static members
- *         outside of its field definition.</li>
+ *         Accessing a crystal or type's static field members
+ *         from outside of its field definition statement.</li>
  *     <li>
  * </ol>
  */

@@ -13,7 +13,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.logical.LogicalNot
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.NegateCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.NegateOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.RightDivideOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.expression.BinaryExpression;
@@ -38,8 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Walks the AST and resolves what is the return type for a statement and each
- * sub-expression in the statement.
+ * Walks the AST and resolves what is the return type for a statement and each sub-expression in the statement.
  */
 public class TypeResolver extends Resolver<TypeCrystal> {
     /** Need a concrete, non-null TypeCrystal instance for type resolution errors. */
@@ -158,7 +157,7 @@ public class TypeResolver extends Resolver<TypeCrystal> {
             return INVALID_TYPE;
         }
 
-        if (operator instanceof NegateCrystal) {
+        if (operator instanceof NegateOperatorCrystal) {
             if (!operandType.hasType(VikariType.NUMBER)) {
                 CoordinatePair operandLocation = expr.getOperand().getLocation();
                 error(operandLocation, "Negate expression expects a Number as its operand.");
@@ -277,6 +276,14 @@ public class TypeResolver extends Resolver<TypeCrystal> {
         return rvalueType;
     }
 
+    /**
+     * Handles a NULL rvalue type in assignment expressions and variable declaration statements.
+     * @param lvalue The target being assigned to.
+     * @param lvalueDeclaredType The declared type of the assignment target.
+     * @param rvalueNullType The specific NULL instantiated type of the value being assigned.
+     * @return The proper NULL instantiated type for the assignment target, if the assignment is
+     *         valid. Otherwise, this returns rvalueNullType.
+     */
     private TypeCrystal handleNullType(AtonementCrystal lvalue, TypeCrystal lvalueDeclaredType,
                                 NullTypeCrystal rvalueNullType) {
         TypeCrystal rvalueParentType = rvalueNullType.getParent();
@@ -288,6 +295,16 @@ public class TypeResolver extends Resolver<TypeCrystal> {
             assignmentError(lvalue.getCoordinates(), lvalueDeclaredType, rvalueParentType);
             return rvalueNullType;
         }
+    }
+
+    /**
+     * Checks if both types are Numbers. (Any Number can be assigned to any Number variable.)
+     * @param declaredType The type of the assignment target variable.
+     * @param initializerType The type of the initializer expression.
+     * @return True if both types are Numbers, else false.
+     */
+    public boolean allowNumericAssignment(TypeCrystal declaredType, TypeCrystal initializerType) {
+        return declaredType.hasType(VikariType.NUMBER) && initializerType.hasType(VikariType.NUMBER);
     }
 
     @Override
@@ -321,16 +338,6 @@ public class TypeResolver extends Resolver<TypeCrystal> {
     public TypeCrystal visit(SyntaxErrorStatement stmt) {
         // Ignore as this contains no expressions or crystals to resolve.
         return null;
-    }
-
-    /**
-     * Checks if both types are Numbers. (Any Number can be assigned to any Number variable.)
-     * @param declaredType The type of the assignment target variable.
-     * @param initializerType The type of the initializer expression.
-     * @return True if both types are Numbers, else false.
-     */
-    public boolean allowNumericAssignment(TypeCrystal declaredType, TypeCrystal initializerType) {
-        return declaredType.hasType(VikariType.NUMBER) && initializerType.hasType(VikariType.NUMBER);
     }
 
     public void assignmentError(CoordinatePair location, TypeCrystal declaredType, TypeCrystal instantiatedType) {

@@ -2,7 +2,7 @@ package com.atonementcrystals.dnr.vikari.core.statement;
 
 public class SyntaxErrorStatement extends Statement {
 
-    String statement;
+    private final String statement;
 
     public SyntaxErrorStatement(String statement) {
         this.statement = statement;

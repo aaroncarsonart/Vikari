@@ -802,6 +802,10 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
         testVariable("d", VikariType.NUMBER, VikariType.INTEGER, 4);
     }
 
+    // -------------------------------
+    // Boolean value assignment tests.
+    // -------------------------------
+
     @Test
     @Order(31)
     public void testTreeWalkInterpreter_LeftAssignment_Booleans() {
@@ -824,7 +828,6 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
                 g << true
                 h << false
                 """;
-
         lexParseAndInterpret(sourceString);
 
         testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
@@ -859,7 +862,6 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
                 true >> g
                 false >> h
                 """;
-
         lexParseAndInterpret(sourceString);
 
         testVariable("a", VikariType.ATONEMENT_CRYSTAL, VikariType.BOOLEAN, true);
@@ -874,7 +876,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
 
     @Test
     @Order(33)
-    public void testTreeWalkInterpreter_LeftAssignment_FromVariable() {
+    public void testTreeWalkInterpreter_LeftAssignment_Booleans_FromVariable() {
         String sourceString = """
                 foo:Boolean << true
                 bar:Boolean << false
@@ -897,7 +899,6 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
                 g << foo
                 h << bar
                 """;
-
         lexParseAndInterpret(sourceString);
 
         testVariable("foo", VikariType.BOOLEAN, VikariType.BOOLEAN, true);
@@ -915,7 +916,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
 
     @Test
     @Order(34)
-    public void testTreeWalkInterpreter_RightAssignment_FromVariable() {
+    public void testTreeWalkInterpreter_RightAssignment_Booleans_FromVariable() {
         String sourceString = """
                 foo:Boolean << true
                 bar:Boolean << false
@@ -938,7 +939,6 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
                 foo >> g
                 bar >> h
                 """;
-
         lexParseAndInterpret(sourceString);
 
         testVariable("foo", VikariType.BOOLEAN, VikariType.BOOLEAN, true);
@@ -953,6 +953,10 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
         testVariable("g", VikariType.VALUE, VikariType.BOOLEAN, true);
         testVariable("h", VikariType.VALUE, VikariType.BOOLEAN, false);
     }
+
+    // ----------------------------
+    // Null value assignment tests.
+    // ----------------------------
 
     @Test
     @Order(35)
@@ -1277,6 +1281,10 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
         testVariable("foo", VikariType.INTEGER, VikariType.NULL, 0);
         testVariable("bar", VikariType.INTEGER, VikariType.NULL, 0);
     }
+
+    // ----------------------------------------------------------------
+    // Boolean logic and equality operator expression assignment tests.
+    // ----------------------------------------------------------------
 
     @Test
     @Order(47)

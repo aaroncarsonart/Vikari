@@ -1,6 +1,5 @@
 package com.atonementcrystals.dnr.vikari.parser.expression;
 
-import com.atonementcrystals.dnr.vikari.TestUtils;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
@@ -38,7 +37,6 @@ import java.util.List;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.*;
 import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.*;
-import static com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils.testOperator;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -485,8 +483,8 @@ public class ParserTest_Assignment extends ParserTest_Base {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), "foo:Foo", "Unknown Type.");
-        TestUtils.testSyntaxError(syntaxErrors.get(1), location(1, 4), "bar:Bar", "Unknown Type.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 4), "foo:Foo", "Unknown Type.");
+        testSyntaxError(syntaxErrors.get(1), location(1, 4), "bar:Bar", "Unknown Type.");
 
         int expectedStatementCount = 4;
         int actualStatementCount = statements.size();
@@ -510,8 +508,8 @@ public class ParserTest_Assignment extends ParserTest_Base {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 10), "foo:Type, foo << 2", "Variable " +
-                "with type Type cannot be assigned a value of type Integer.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 10), "foo:Type, foo << 2", "Variable with type Type cannot " +
+                "be assigned a value of type Integer.");
 
         int expectedStatementCount = 2;
         int actualStatementCount = statements.size();
@@ -1058,8 +1056,8 @@ public class ParserTest_Assignment extends ParserTest_Base {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 4), "foo:Foo", "Unknown Type.");
-        TestUtils.testSyntaxError(syntaxErrors.get(1), location(1, 4), "bar:Bar", "Unknown Type.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 4), "foo:Foo", "Unknown Type.");
+        testSyntaxError(syntaxErrors.get(1), location(1, 4), "bar:Bar", "Unknown Type.");
 
         int expectedStatementCount = 4;
         int actualStatementCount = statements.size();
@@ -1086,8 +1084,8 @@ public class ParserTest_Assignment extends ParserTest_Base {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 15), "foo:Type, 2 >> foo", "Variable " +
-                "with type Type cannot be assigned a value of type Integer.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 15), "foo:Type, 2 >> foo", "Variable with type Type cannot " +
+                "be assigned a value of type Integer.");
 
         int expectedStatementCount = 2;
         int actualStatementCount = statements.size();
@@ -1114,10 +1112,8 @@ public class ParserTest_Assignment extends ParserTest_Base {
         List<Statement> statements = lexAndParse_WithErrors(sourceString, expectedErrorCount);
 
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
-        TestUtils.testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Invalid target for " +
-                "assignment expression.");
-        TestUtils.testSyntaxError(syntaxErrors.get(1), location(0, 19), sourceString, "Invalid target for " +
-                "assignment expression.");
+        testSyntaxError(syntaxErrors.get(0), location(0, 0), sourceString, "Invalid target for assignment expression.");
+        testSyntaxError(syntaxErrors.get(1), location(0, 19), sourceString, "Invalid target for assignment expression.");
 
         int expectedStatementCount = 2;
         int actualStatementCount = statements.size();
@@ -1142,7 +1138,7 @@ public class ParserTest_Assignment extends ParserTest_Base {
         assertEquals(LiteralExpression.class, rvalueExpression.getClass(), "Unexpected rvalue expression type.");
 
         AtonementCrystal rvalue = ((LiteralExpression) rvalueExpression).getValue();
-        TestUtils.testNumberCrystal(rvalue, 7, IntegerCrystal.class);
+        testNumberCrystal(rvalue, 7, IntegerCrystal.class);
 
         // right assignment statement: "7 >> [5 + 2]"
         statement = statements.get(1);
@@ -1163,7 +1159,7 @@ public class ParserTest_Assignment extends ParserTest_Base {
         assertEquals(LiteralExpression.class, rvalueExpression.getClass(), "Unexpected rvalue expression type.");
 
         rvalue = ((LiteralExpression) rvalueExpression).getValue();
-        TestUtils.testNumberCrystal(rvalue, 7, IntegerCrystal.class);
+        testNumberCrystal(rvalue, 7, IntegerCrystal.class);
     }
 
     // ---------------
@@ -1269,10 +1265,14 @@ public class ParserTest_Assignment extends ParserTest_Base {
         assertSyntaxErrors(syntaxErrorReporter, 4);
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
 
-        testSyntaxError(syntaxErrors.get(0), location(1, 0), "foo << false", "Variable with type Integer cannot be assigned a value of type Boolean.");
-        testSyntaxError(syntaxErrors.get(1), location(2, 8), "true >> foo", "Variable with type Integer cannot be assigned a value of type Boolean.");
-        testSyntaxError(syntaxErrors.get(2), location(5, 0), "bar << 2", "Variable with type Boolean cannot be assigned a value of type Integer.");
-        testSyntaxError(syntaxErrors.get(3), location(6, 8), "3.14 >> bar", "Variable with type Boolean cannot be assigned a value of type Double.");
+        testSyntaxError(syntaxErrors.get(0), location(1, 0), "foo << false", "Variable with type Integer cannot be " +
+                "assigned a value of type Boolean.");
+        testSyntaxError(syntaxErrors.get(1), location(2, 8), "true >> foo", "Variable with type Integer cannot be " +
+                "assigned a value of type Boolean.");
+        testSyntaxError(syntaxErrors.get(2), location(5, 0), "bar << 2", "Variable with type Boolean cannot be " +
+                "assigned a value of type Integer.");
+        testSyntaxError(syntaxErrors.get(3), location(6, 8), "3.14 >> bar", "Variable with type Boolean cannot be " +
+                "assigned a value of type Double.");
     }
 
     @Test
@@ -1306,8 +1306,10 @@ public class ParserTest_Assignment extends ParserTest_Base {
         // syntax errors
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
 
-        testSyntaxError(syntaxErrors.get(0), location(3, 0), "bool << int", "Variable with type Boolean cannot be assigned a value of type Integer.");
-        testSyntaxError(syntaxErrors.get(1), location(4, 9), "float >> bool", "Variable with type Boolean cannot be assigned a value of type Float.");
+        testSyntaxError(syntaxErrors.get(0), location(3, 0), "bool << int", "Variable with type Boolean cannot be " +
+                "assigned a value of type Integer.");
+        testSyntaxError(syntaxErrors.get(1), location(4, 9), "float >> bool", "Variable with type Boolean cannot be " +
+                "assigned a value of type Float.");
     }
 
     @Test
@@ -1341,10 +1343,11 @@ public class ParserTest_Assignment extends ParserTest_Base {
         // syntax errors
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
 
-        testSyntaxError(syntaxErrors.get(0), location(3, 0), "int << bool", "Variable with type Integer cannot be assigned a value of type Boolean.");
-        testSyntaxError(syntaxErrors.get(1), location(4, 8), "bool >> float", "Variable with type Float cannot be assigned a value of type Boolean.");
+        testSyntaxError(syntaxErrors.get(0), location(3, 0), "int << bool", "Variable with type Integer cannot be " +
+                "assigned a value of type Boolean.");
+        testSyntaxError(syntaxErrors.get(1), location(4, 8), "bool >> float", "Variable with type Float cannot be " +
+                "assigned a value of type Boolean.");
     }
-
 
     @Test
     @Order(37)
@@ -1374,6 +1377,10 @@ public class ParserTest_Assignment extends ParserTest_Base {
         testLeftAssignment_NullLiteralExpression(statements.get(7), "d", VikariType.INTEGER, location(4, 11),
                 location(4, 16), location(4, 19), 0);
     }
+
+    // ------------
+    // Null values.
+    // ------------
 
     @Test
     @Order(38)
@@ -2075,6 +2082,10 @@ public class ParserTest_Assignment extends ParserTest_Base {
         AtonementCrystal rvalueVariable = ((VariableExpression) rvalue).getReference();
         testVariableCrystal(rvalueVariable, "foo", VikariType.INTEGER, VikariType.NULL, location(2, 0));
     }
+
+    // ------------
+    // Error cases.
+    // ------------
 
     @Test
     @Order(49)

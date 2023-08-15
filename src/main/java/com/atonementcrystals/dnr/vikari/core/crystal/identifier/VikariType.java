@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  * handled separately from this class.
  */
 public enum VikariType {
-    ATONEMENT_CRYSTAL(AtonementCrystal.class, "AtonementCrystal"),
+    ATONEMENT_CRYSTAL(AtonementCrystal.class),
     NULL(NullCrystal.class),
     INVALID(null, "InvalidType"),
 

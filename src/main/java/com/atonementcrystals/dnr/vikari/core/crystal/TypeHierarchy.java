@@ -6,14 +6,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Encapsulates logic for initializing the Type hierarchy for built-in types.
+ * Encapsulates logic for initializing the Type hierarchy for all built-in types.
  */
 public class TypeHierarchy {
 
     /** Ensure init method is not executed multiple times for test cases. */
     private static boolean initialized = false;
 
-    /** Map of Null types. Only instantiated on an as-needed basis. */
+    /** Map of Null types. NullTypeCrystals are only instantiated on an as-needed basis. */
     private static final Map<TypeCrystal, NullTypeCrystal> nullTypes = new HashMap<>();
 
     /**
