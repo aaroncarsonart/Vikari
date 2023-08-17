@@ -32,6 +32,7 @@ import com.atonementcrystals.dnr.vikari.core.expression.GroupingExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.LiteralExpression;
 import com.atonementcrystals.dnr.vikari.core.expression.UnaryExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
+import com.atonementcrystals.dnr.vikari.error.Vikari_TypeException;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -147,6 +148,8 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
             result = operator.evaluate(left, right);
         } catch (UnsupportedOperationException e) {
             throw internalRuntimeErrorForUnexpectedOperator(operator);
+        } catch (Vikari_TypeException e) {
+            throw internalRuntimeErrorForNullTypeError(left, operator, right, e);
         }
 
         if (result == null) {
@@ -206,6 +209,9 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
 
         if (currentEnvironment.isDefined(identifier)) {
             AtonementCrystal value = currentEnvironment.get(identifier);
+            value = value.copy();
+            value.setDeclaredType(reference.getDeclaredType());
+            value.setCoordinates(expr.getLocation());
             return value;
         }
 
@@ -329,7 +335,15 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
             TypeCrystal integerType = VikariType.INTEGER.getTypeCrystal();
             IntegerCrystal integerCrystal = (IntegerCrystal) Arithmetic.maybeUpcastOrDowncast(numberCrystal, integerType);
             int length = integerCrystal.getValue();
-            return new NullCrystal(length);
+
+            NullCrystal nullCrystal = new NullCrystal(length);
+            nullCrystal.setCoordinates(expr.getLocation());
+
+            TypeCrystal nullType = TypeHierarchy.getNullTypeFor(VikariType.NULL);
+            nullCrystal.setDeclaredType(nullType);
+            nullCrystal.setInstantiatedType(nullType);
+
+            return nullCrystal;
         } else {
             CoordinatePair errorLocation = expr.getExpression().getLocation();
             throw internalRuntimeError(errorLocation, "Null literal expression expects a Number as its operand.");
@@ -406,5 +420,23 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
         CoordinatePair location = operator.getCoordinates();
         String errorMessage = "Undefined variable: ``" + operator.getIdentifier() + "``.";
         return internalRuntimeError(location, errorMessage);
+    }
+
+    private Vikari_RuntimeException internalRuntimeErrorForNullTypeError(AtonementCrystal left,
+                                                                         BinaryOperatorCrystal operator,
+                                                                         AtonementCrystal right,
+                                                                         Vikari_TypeException e) {
+        String errorMessage = e.getErrorMessage();
+        CoordinatePair errorLocation;
+
+        if (errorMessage.startsWith("Left and right")) {
+            errorLocation = operator.getCoordinates();
+        } else if (errorMessage.startsWith("Left")) {
+            errorLocation = left.getCoordinates();
+        } else {
+            errorLocation = right.getCoordinates();
+        }
+
+        return internalRuntimeError(errorLocation, errorMessage);
     }
 }
