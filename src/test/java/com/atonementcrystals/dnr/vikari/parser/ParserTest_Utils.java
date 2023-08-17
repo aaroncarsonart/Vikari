@@ -243,6 +243,11 @@ public class ParserTest_Utils {
         return assertType(expression, UnaryExpression.class);
     }
 
+    public static UnaryExpression assertUnaryExpression(Statement statement, CoordinatePair expectedLocation) {
+        ExpressionStatement expressionStatement = assertExpressionStatement(statement, expectedLocation);
+        return assertUnaryExpression(expressionStatement.getExpression(), expectedLocation);
+    }
+
     public static GroupingExpression assertGroupingExpression(Statement statement, CoordinatePair expectedLocation) {
         ExpressionStatement expressionStatement = assertExpressionStatement(statement, expectedLocation);
         return assertType(expressionStatement.getExpression(), GroupingExpression.class);
