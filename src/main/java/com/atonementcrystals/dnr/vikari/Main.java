@@ -27,8 +27,10 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * Lex, parse, and interpret Vikari programs based on input of command-line arguments.
@@ -122,7 +124,6 @@ public class Main {
                 else if (argsList.size() == 0) {
                     log.debug("Zero arguments. Default behavior.");
                     runReplMode(warningsEnabled);
-                    return;
                 }
             }
 
@@ -162,6 +163,8 @@ public class Main {
 
                 String configArgument = cmd.getOptionValue("Lex");
                 configArgument = setWarningConfigOption(configArgument, warningsEnabled);
+                validateConfigOptionsArgument(configArgument, phase);
+
                 lexerOptions = parseLexerOptions(configArgument, true);
                 log.debug("Use config:\n    {}", lexerOptions);
             }
@@ -177,6 +180,8 @@ public class Main {
 
                 String configArgument = cmd.getOptionValue("Parse");
                 configArgument = setWarningConfigOption(configArgument, warningsEnabled);
+                validateConfigOptionsArgument(configArgument, phase);
+
                 lexerOptions = parseLexerOptions(configArgument, true);
                 parserOptions = parseParserOptions(configArgument, true);
                 log.debug("Use config:\n    {}\n    {}", lexerOptions, parserOptions);
@@ -194,6 +199,8 @@ public class Main {
 
                 String configArgument = cmd.getOptionValue("Execute");
                 configArgument = setWarningConfigOption(configArgument, warningsEnabled);
+                validateConfigOptionsArgument(configArgument, phase);
+
                 lexerOptions = parseLexerOptions(configArgument, true);
                 parserOptions = parseParserOptions(configArgument, true);
                 log.debug("Use config:\n    {}\n    {}", lexerOptions, parserOptions);
@@ -407,6 +414,71 @@ public class Main {
     }
 
     /**
+     * Ensure no duplicate or invalid characters exist in the configOptions argument.
+     * @param configOptions The configOptions argument to validate.
+     * @return True if the configOptions string is valid, else false.
+     */
+    private static void validateConfigOptionsArgument(String configOptions, Phase phase) {
+        List<Character> configOptionCharsList = configOptions.chars()
+                .sorted()
+                .mapToObj(i -> (char) i)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        String validChars = "inptvw";
+        for (int i = 0; i < validChars.length(); i++) {
+            Character validChar = validChars.charAt(i);
+            configOptionCharsList.remove(validChar);
+        }
+
+        // Report duplicate and/or invalid characters.
+        if (!configOptionCharsList.isEmpty()) {
+            String phaseArgumentStr = phase.getFullOptionArgumentString();
+
+            // Find and report any duplicate characters.
+            List<Character> duplicateCharsList = new ArrayList<>();
+            for (int i = 0; i < validChars.length(); i++) {
+                Character potentialDuplicateChar = validChars.charAt(i);
+                if (configOptionCharsList.remove(potentialDuplicateChar)) {
+                    duplicateCharsList.add(potentialDuplicateChar);
+                }
+            }
+
+            if (!duplicateCharsList.isEmpty()) {
+                String duplicateChars = duplicateCharsList.stream()
+                        .distinct()
+                        .map(Object::toString)
+                        .collect(Collectors.joining());
+
+                String pluralSuffix = (duplicateCharsList.size() > 1) ? "s" : "";
+                String errorMessage = phaseArgumentStr + " argument <config_options> contains duplicate character" +
+                        pluralSuffix + ": \"" + duplicateChars + "\"";
+
+                log.debug(errorMessage);
+                System.err.println(errorMessage);
+            }
+
+            // Find and report any invalid characters.
+            String invalidChars = configOptionCharsList.stream()
+                    .distinct()
+                    .map(Object::toString)
+                    .filter(s -> !validChars.contains(s))
+                    .collect(Collectors.joining());
+
+            if (!invalidChars.isEmpty()) {
+                String pluralSuffix = (invalidChars.length() > 1) ? "s" : "";
+                String errorMessage = phaseArgumentStr + " argument <config_options> contains invalid character" +
+                        pluralSuffix + ": \"" + invalidChars + "\"";
+
+                log.debug(errorMessage);
+                System.err.println(errorMessage);
+                System.err.println("Allowed characters: " + validChars);
+            }
+
+            System.exit(-1);
+        }
+    }
+
+    /**
      * Parse the LexerOptions from the {@literal <config_options>} argument.
      * @param optionsArgument The optional argument to parse.
      * @param doLog Enable logging of this method call.
@@ -422,7 +494,7 @@ public class Main {
         }
 
         boolean printTokens = optionsArgument.contains("p");
-        boolean printLineNumbers = optionsArgument.contains("l");
+        boolean statementNumbers = optionsArgument.contains("n");
         boolean showInvisibles = optionsArgument.contains("i");
         boolean separateTokens = optionsArgument.contains("t");
         boolean verbose = optionsArgument.contains("v");
@@ -430,7 +502,7 @@ public class Main {
 
         LexerOptions lexerOptions = new LexerOptions(
                 printTokens,
-                printLineNumbers,
+                statementNumbers,
                 showInvisibles,
                 separateTokens,
                 verbose,
@@ -455,12 +527,12 @@ public class Main {
         }
 
         boolean printAst = optionsArgument.contains("p");
-        boolean printLineNumbers = optionsArgument.contains("l");
+        boolean statementNumbers = optionsArgument.contains("n");
         boolean verbose = optionsArgument.contains("v");
 
         ParserOptions parserOptions = new ParserOptions(
                 printAst,
-                printLineNumbers,
+                statementNumbers,
                 verbose);
 
         return parserOptions;
@@ -562,9 +634,9 @@ public class Main {
 
         String header = "\nInterpret the Vikari programming language.\n";
         String footer = """
-                \n<config_options>: [plitvw] for each line of code in output:
+                \n<config_options>: [pnitvw] for each line of code in output:
                  p: [print] Print the lexed tokens or parsed statements.
-                 l: [lines] Print line numbers before each line.
+                 n: [statement-numbers] Print the number of each statement.
                  i: [invisibles] Show SPACE, TAB, and NEWLINE as `·`, `→`, and `¶`.
                  t: [tokens] Show each token as quoted strings separated by commas.
                  v: [verbose] Print each token's type name.

@@ -58,8 +58,7 @@ public class VikariProgram {
     }
 
     /**
-     * Sets up the global, top-level AtonementField which is shared for all files
-     * in the Parser and TreeWalkInterpreter.
+     * Sets up the global, top-level AtonementField which is shared for all files in the Parser and TreeWalkInterpreter.
      */
     public static AtonementField initGlobalAtonementField() {
         // Initialize with no parent and shadowing enabled.
@@ -108,12 +107,9 @@ public class VikariProgram {
         lexerResults.put(filePath, lexedStatements);
 
         if (shouldPrintLexerResults()) {
-            printMessageWithLines("Lex file: \"" + filePath + "\"");
-            printLexedStatements(lexedStatements,
-                    lexerOptions.printLineNumbers,
-                    lexerOptions.showInvisibles,
-                    lexerOptions.separateTokens,
-                    lexerOptions.verbose);
+            printMessageWithLines("Lex: \"" + filePath + "\"");
+            printLexedStatements(lexedStatements, lexerOptions.statementNumbers, lexerOptions.showInvisibles,
+                    lexerOptions.separateTokens, lexerOptions.verbose);
         }
 
         return lexedStatements;
@@ -132,12 +128,9 @@ public class VikariProgram {
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceCode);
 
         if (shouldPrintLexerResults()) {
-            printMessageWithLines("Lex code string:");
-            printLexedStatements(lexedStatements,
-                    lexerOptions.printLineNumbers,
-                    lexerOptions.showInvisibles,
-                    lexerOptions.separateTokens,
-                    lexerOptions.verbose);
+            printMessageWithLines("Lex:");
+            printLexedStatements(lexedStatements, lexerOptions.statementNumbers, lexerOptions.showInvisibles,
+                    lexerOptions.separateTokens, lexerOptions.verbose);
         }
 
         return lexedStatements;
@@ -165,11 +158,8 @@ public class VikariProgram {
         parserResults.put(filePath, parsedStatements);
 
         if (shouldPrintParserResults()) {
-            printMessageWithLines("Parse file: \"" + filePath + "\"");
-            printParsedStatements(parsedStatements,
-                    parserOptions.printLineNumbers,
-                    parserOptions.printAst,
-                    parserOptions.verbose);
+            printMessageWithLines("Parse: \"" + filePath + "\"");
+            printParsedStatements(parsedStatements, parserOptions.statementNumbers, parserOptions.verbose);
         }
 
         return parsedStatements;
@@ -184,11 +174,8 @@ public class VikariProgram {
         List<Statement> parsedStatements = parser.parse(null, lexedStatements);
 
         if (shouldPrintParserResults()) {
-            printMessageWithLines("Parse code string:");
-            printParsedStatements(parsedStatements,
-                    parserOptions.printLineNumbers,
-                    parserOptions.printAst,
-                    parserOptions.verbose);
+            printMessageWithLines("Parse:");
+            printParsedStatements(parsedStatements, parserOptions.statementNumbers, parserOptions.verbose);
         }
 
         return parsedStatements;
@@ -214,7 +201,9 @@ public class VikariProgram {
         log.info("execute(\"{}\")", filePath);
 
         if (shouldPrintExecuteBannerMessage()) {
-            printMessageWithLines("Execute file: \"" + filePath + "\"");
+            printMessageWithLines("Execute: \"" + filePath + "\"");
+        } else if (shouldPrintProgramOutputBannerMessage()) {
+            printMessageWithLines("Program Output:");
         }
 
         List<Statement> parsedStatements = parserResults.get(filePath);
@@ -222,45 +211,48 @@ public class VikariProgram {
     }
 
     /**
-     * Execute the previously parsed Vikari source code string.
+     * Execute the output of the Parser.
+     * @param parsedStatements The output of the Parser to execute.
      */
     public void execute(List<Statement> parsedStatements) {
         log.info("execute()");
 
         if (shouldPrintExecuteBannerMessage()) {
-            printMessageWithLines("Execute code string:");
+            printMessageWithLines("Execute:");
+        } else if (shouldPrintProgramOutputBannerMessage()) {
+            printMessageWithLines("Program Output:");
         }
 
         interpreter.interpret(null, parsedStatements);
     }
 
     /**
-     * Prints the output of the Lexer based on the input formatting flags.
-     * By default, this method just prints out each token's identifier
-     * without any additional formatting applied.<br/>
+     * Prints the output of the Lexer based on the input formatting flags. By default, this method just prints
+     * out each token's identifier, separated by spaces, without any additional formatting applied.<br/>
      * <br/>
-     * <i>(The default output should exactly match the original input source file.)</i>
+     * Tokens that are elided by the Lexer, including statement separators, line continuations, and comments,
+     * are not printed by this method.
      *
      * @param lexedStatements The list of lexed statements to print.
-     * @param printLineNumbers Prints the current line number before each lexed statment.
-     * @param showInvisibles Replaces spaces, tabs, and newlines with "·", "→", and "¶".
+     * @param statementNumbers Prints the current statement number before each lexed statement.
+     * @param showInvisibles Replaces spaces, tabs, and newlines in identifiers with "·", "→", and "¶".
      * @param separateTokens Prints each token in quotes, separated by commas.
-     * @param verbose Prints each token with quotes enclosed by its type name.
+     * @param verbose Same as separateTokens, but also encloses each token with a label of its type name.
      */
-    public static void printLexedStatements(List<List<AtonementCrystal>> lexedStatements, boolean printLineNumbers,
+    private void printLexedStatements(List<List<AtonementCrystal>> lexedStatements, boolean statementNumbers,
                                      boolean showInvisibles, boolean separateTokens, boolean verbose) {
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb);
 
-        int maxLineNumberCharWidth = String.valueOf(lexedStatements.size()).length();
-        String lineNumberFormat = "[line:%0"+ maxLineNumberCharWidth + "d] ";
+        int maxStatementNumberCharWidth = String.valueOf(lexedStatements.size()).length();
+        String statementNumberFormat = "[%0"+ maxStatementNumberCharWidth + "d]: ";
 
-        for (int lineNumber = 0; lineNumber < lexedStatements.size(); lineNumber++) {
-            if (printLineNumbers) {
-                formatter.format(lineNumberFormat, lineNumber);
+        for (int statementNumber = 0; statementNumber < lexedStatements.size(); statementNumber++) {
+            if (statementNumbers) {
+                formatter.format(statementNumberFormat, statementNumber + 1);
             }
 
-            List<AtonementCrystal> statement = lexedStatements.get(lineNumber);
+            List<AtonementCrystal> statement = lexedStatements.get(statementNumber);
             for (int i = 0; i < statement.size(); i++) {
                 AtonementCrystal crystal = statement.get(i);
 
@@ -277,14 +269,15 @@ public class VikariProgram {
                         formatter.format("\"%s\"", identifier);
                     }
                     if ( i < statement.size() - 1) {
-                        sb.append(",");
+                        sb.append(", ");
                     }
                 } else {
                     sb.append(identifier);
+                    sb.append(' ');
                 }
 
             }
-            if (lineNumber < lexedStatements.size() - 1) {
+            if (statementNumber < lexedStatements.size() - 1) {
                 sb.append('\n');
             }
         }
@@ -294,36 +287,42 @@ public class VikariProgram {
         System.out.println(result);
     }
 
-    public static void printParsedStatements(List<Statement> parsedStatements, boolean printAst,
-                                             boolean printLineNumbers, boolean verbose) {
-        if (printAst) {
-            AstPrintVisitor astPrintVisitor = new AstPrintVisitor();
-            astPrintVisitor.setVerbose(verbose);
+    /**
+     * Prints the output of the Parser based in the input formatting flags. By default, this method wraps the
+     * contents of each statement, and each expression containing more than one element, in square brackets
+     * delimited by commas.
+     *
+     * @param parsedStatements The list of parsed statements to print.
+     * @param statementNumbers Prints the current statement number before each parsed statement.
+     * @param verbose Prepends a shorthand label describing the type of each statement, expression, or crystal.
+     */
+    private void printParsedStatements(List<Statement> parsedStatements, boolean statementNumbers, boolean verbose) {
+        AstPrintVisitor astPrintVisitor = new AstPrintVisitor();
+        astPrintVisitor.setVerbose(verbose);
 
-            StringBuilder sb = new StringBuilder();
-            Formatter formatter = new Formatter(sb);
+        StringBuilder sb = new StringBuilder();
+        Formatter formatter = new Formatter(sb);
 
-            int maxLineNumber = parsedStatements.size() - 1;
-            int maxLineNumberCharWidth = String.valueOf(maxLineNumber).length();
-            String lineNumberFormat = "[line:%0"+ maxLineNumberCharWidth + "d] ";
+        int maxStatementNumber = parsedStatements.size();
+        int maxStatementNumberCharWidth = String.valueOf(maxStatementNumber).length();
+        String statementNumberFormat = "[%0"+ maxStatementNumberCharWidth + "d]: ";
 
-            int lineNumber = 0;
-            for (Statement statement : parsedStatements) {
-                if (printLineNumbers) {
-                    formatter.format(lineNumberFormat, lineNumber);
-                }
-                String result = statement.accept(astPrintVisitor);
-                sb.append(result);
-                if (lineNumber < parsedStatements.size() - 1) {
-                    sb.append('\n');
-                }
-                lineNumber++;
+        int statementNumber = 0;
+        for (Statement statement : parsedStatements) {
+            if (statementNumbers) {
+                formatter.format(statementNumberFormat, statementNumber + 1);
             }
-
-            String result = sb.toString();
-            log.trace("Parsed statements:\n{}", result);
-            System.out.println(result);
+            String result = statement.accept(astPrintVisitor);
+            sb.append(result);
+            if (statementNumber < parsedStatements.size() - 1) {
+                sb.append('\n');
+            }
+            statementNumber++;
         }
+
+        String result = sb.toString();
+        log.trace("Parsed statements:\n{}", result);
+        System.out.println(result);
     }
 
     public boolean hasErrors() {
@@ -346,20 +345,24 @@ public class VikariProgram {
         }
     }
 
-    public boolean shouldPrintLexerResults() {
+    private boolean shouldPrintLexerResults() {
         Level logLevel = log.getLevel();
         return lexerOptions != null && lexerOptions.printTokens && (logLevel == Level.TRACE || logLevel == Level.DEBUG ||
                 logLevel == Level.ALL);
     }
 
-    public boolean shouldPrintParserResults() {
+    private boolean shouldPrintParserResults() {
         Level logLevel = log.getLevel();
         return parserOptions != null && parserOptions.printAst && (logLevel == Level.TRACE || logLevel == Level.DEBUG ||
                 logLevel == Level.ALL);
     }
 
-    public boolean shouldPrintExecuteBannerMessage() {
+    private boolean shouldPrintExecuteBannerMessage() {
         return shouldPrintLexerResults() || shouldPrintParserResults();
+    }
+
+    private boolean shouldPrintProgramOutputBannerMessage() {
+        return hasWarnings();
     }
 
     private void printMessageWithLines(String message) {

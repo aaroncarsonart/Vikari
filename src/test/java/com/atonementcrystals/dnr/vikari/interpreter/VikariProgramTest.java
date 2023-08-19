@@ -298,6 +298,9 @@ class VikariProgramTest {
                     ^
                     Unnecessary line continuation at start of statement.
 
+                ---------------
+                Program Output:
+                ---------------
                 2
                 """;
         assertOutput(expectedOutput);

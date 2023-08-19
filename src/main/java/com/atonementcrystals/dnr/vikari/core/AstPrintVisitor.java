@@ -20,6 +20,9 @@ import com.atonementcrystals.dnr.vikari.core.statement.SyntaxErrorStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.VariableDeclarationStatement;
 import com.atonementcrystals.dnr.vikari.util.Utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Walk the AST and print a string representation of each statement and expression.
  */
@@ -41,72 +44,86 @@ public class AstPrintVisitor implements Statement.Visitor<String>, Expression.Vi
         this.verbose = verbose;
     }
 
-    private String group(String... args) {
+    private String group(String descriptor, String... args) {
         StringBuilder sb = new StringBuilder();
 
         if (verbose) {
-            String label = args[0];
-            sb.append(label);
+            sb.append(descriptor);
             sb.append(":");
         }
-        sb.append('[');
 
-        for (int i = 1; i < args.length; i++) {
+        if (verbose || args.length > 1) {
+            sb.append('[');
+        }
+
+        for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             sb.append(arg);
             if (i < args.length - 1) {
-                sb.append(" ");
+                sb.append(", ");
             }
         }
-        sb.append(']');
+
+        if (verbose || args.length > 1) {
+            sb.append(']');
+        }
+
         return sb.toString();
+    }
+
+    private String visit(AtonementCrystal operator) {
+        String descriptor = Utils.getSimpleClassName(operator);
+        return group(descriptor, operator.getIdentifier());
     }
 
     @Override
     public String visit(BinaryExpression expr) {
         String left = expr.getLeft().accept(this);
-        String operator = expr.getOperator().getIdentifier();
+        String operator = visit(expr.getOperator());
         String right = expr.getRight().accept(this);
 
-        String descriptor = Utils.getSimpleClassName(expr.getOperator());
+        String descriptor = "BinaryExpr";
         return group(descriptor, left, operator, right);
     }
 
     @Override
     public String visit(BooleanLogicExpression expr) {
         String left = expr.getLeft().accept(this);
-        String operator = expr.getOperator().getIdentifier();
+        String operator = visit(expr.getOperator());
         String right = expr.getRight().accept(this);
 
-        String descriptor = Utils.getSimpleClassName(expr.getOperator());
+        String descriptor = "LogicalExpr";
         return group(descriptor, left, operator, right);
     }
 
     @Override
     public String visit(GroupingExpression expr) {
-        return group("Grouping", expr.getExpression().accept(this));
+        return group("GroupingExpr", expr.getExpression().accept(this));
     }
 
     @Override
     public String visit(LiteralExpression expr) {
-        return expr.getValue().getIdentifier();
+        String descriptor = "LiteralExpr";
+        return group(descriptor, expr.getValue().getIdentifier());
     }
 
     @Override
     public String visit(PrintExpression expr) {
-        String operator = expr.getPrintOperatorCrystal().getIdentifier();
+        String operator = visit(expr.getPrintOperatorCrystal());
         Expression operand = expr.getExpression();
+
+        String descriptor = "PrintExpr";
         if (operand != null) {
-            return operator + operand.accept(this);
+            return group(descriptor, operator, operand.accept(this));
         }
-        return operator;
+        return group(descriptor, operator);
     }
 
     @Override
     public String visit(UnaryExpression expr) {
-        String operator = expr.getOperator().getIdentifier();
+        String operator = visit(expr.getOperator());
         String operand = expr.getOperand().accept(this);
-        String descriptor = Utils.getSimpleClassName(expr.getOperator());
+        String descriptor = "UnaryExpr";
         return group(descriptor, operator, operand);
     }
 
@@ -114,13 +131,13 @@ public class AstPrintVisitor implements Statement.Visitor<String>, Expression.Vi
     public String visit(VariableExpression expr) {
         AtonementCrystal reference = expr.getReference();
         String identifier = reference.getIdentifier();
-        String descriptor = Utils.getSimpleClassName(reference);
+        String descriptor = "VariableExpr";
         return group(descriptor, identifier);
     }
 
     @Override
     public String visit(VariableDeclarationStatement stmt) {
-        String descriptor = "Variable Declaration";
+        String descriptor = "VariableDeclarationStmt";
 
         AtonementCrystal declaredVariable = stmt.getDeclaredVariable();
         String declaredVariableString = declaredVariable.getIdentifier();
@@ -131,7 +148,7 @@ public class AstPrintVisitor implements Statement.Visitor<String>, Expression.Vi
         }
 
         if (stmt.getInitializerExpression() != null) {
-            String operator = stmt.getAssignmentOperator().getIdentifier();
+            String operator = visit(stmt.getAssignmentOperator());
             String initializerExpression = stmt.getInitializerExpression().accept(this);
             return group(descriptor, declaredVariableString, operator, initializerExpression);
         }
@@ -142,50 +159,48 @@ public class AstPrintVisitor implements Statement.Visitor<String>, Expression.Vi
     @Override
     public String visit(LeftAssignmentExpression expr) {
         String lvalue = expr.getLvalue().accept(this);
-        String operator = expr.getOperator().getIdentifier();
+        String operator = visit(expr.getOperator());
         String rvalue = expr.getRvalue().accept(this);
-        String descriptor = Utils.getSimpleClassName(expr.getOperator());
+        String descriptor = "LeftAssignmentExpr";
         return group(descriptor, lvalue, operator, rvalue);
     }
 
     @Override
     public String visit(RightAssignmentExpression expr) {
         String rvalue = expr.getRvalue().accept(this);
-        String operator = expr.getOperator().getIdentifier();
+        String operator = visit(expr.getOperator());
         String lvalue = expr.getLvalue().accept(this);
-        String descriptor = Utils.getSimpleClassName(expr.getOperator());
+        String descriptor = "RightAssignmentExpr";
         return group(descriptor, rvalue, operator, lvalue);
     }
 
     @Override
     public String visit(NullLiteralExpression expr) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("_[");
-
         String expressionResult = expr.getExpression().accept(this);
-        sb.append(expressionResult);
-
-        sb.append("]_");
-        return sb.toString();
+        String descriptor = "NullLiteralExpr";
+        return group(descriptor, expressionResult);
     }
 
     @Override
     public String visit(PrintStatement stmt) {
-        StringBuilder sb = new StringBuilder();
+        List<String> groupArgs = new ArrayList<>();
         for (PrintExpression printExpression : stmt.getPrintExpressions()) {
-            sb.append(printExpression.accept(this));
+            groupArgs.add(printExpression.accept(this));
         }
-        return sb.toString();
+        String descriptor = "PrintStmt";
+        return group(descriptor, groupArgs.toArray(new String[0]));
     }
 
     @Override
     public String visit(ExpressionStatement stmt) {
-        return stmt.getExpression().accept(this);
+        String descriptor = "ExpressionStmt";
+        return group(descriptor, stmt.getExpression().accept(this));
     }
 
     @Override
     public String visit(SyntaxErrorStatement stmt) {
         String statement = stmt.getStatement();
-        return "Syntax Error: [" + statement + "]";
+        String descriptor = "SyntaxErrorStmt";
+        return group(descriptor, statement);
     }
 }

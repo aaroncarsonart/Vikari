@@ -5,12 +5,12 @@ import java.util.List;
 
 public class ParserOptions {
     public final boolean printAst;           // p
-    public final boolean printLineNumbers;   // l
+    public final boolean statementNumbers;   // n
     public final boolean verbose;            // v
 
-    public ParserOptions(boolean printAst, boolean printLineNumbers, boolean verbose) {
+    public ParserOptions(boolean printAst, boolean statementNumbers, boolean verbose) {
         this.printAst = printAst;
-        this.printLineNumbers = printLineNumbers;
+        this.statementNumbers = statementNumbers;
         this.verbose = verbose;
     }
 
@@ -21,7 +21,7 @@ public class ParserOptions {
 
         List<String> enabledFlags = new ArrayList<>();
         if (printAst) enabledFlags.add("printAst");
-        if (printLineNumbers) enabledFlags.add("printLineNumbers");
+        if (statementNumbers) enabledFlags.add("statementNumbers");
         if (verbose) enabledFlags.add("verbose");
 
         String csv = String.join(",", enabledFlags);
