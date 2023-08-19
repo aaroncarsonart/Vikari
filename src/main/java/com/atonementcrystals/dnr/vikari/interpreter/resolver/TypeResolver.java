@@ -233,7 +233,9 @@ public class TypeResolver extends Resolver<TypeCrystal> {
             return expr.getLvalue().accept(this);
         }
 
-        if (rvalueType instanceof NullTypeCrystal rvalueNullType) {
+        if (lvalue.getDeclaredType() == INVALID_TYPE) {
+            return INVALID_TYPE;
+        } else if (rvalueType instanceof NullTypeCrystal rvalueNullType) {
             return handleNullType(lvalue, lvalueDeclaredType, rvalueNullType);
         } else if (rvalueType.hasType(lvalueDeclaredType) || allowNumericAssignment(lvalueDeclaredType, rvalueType)) {
             lvalue.setInstantiatedType(rvalueType);
@@ -262,7 +264,9 @@ public class TypeResolver extends Resolver<TypeCrystal> {
             return expr.getLvalue().accept(this);
         }
 
-        if (rvalueType instanceof NullTypeCrystal rvalueNullType) {
+        if (lvalue.getDeclaredType() == INVALID_TYPE) {
+            return INVALID_TYPE;
+        } else if (rvalueType instanceof NullTypeCrystal rvalueNullType) {
             return handleNullType(lvalue, lvalueDeclaredType, rvalueNullType);
         } else if (rvalueType.hasType(lvalueDeclaredType) || allowNumericAssignment(lvalueDeclaredType, rvalueType)) {
             lvalue.setInstantiatedType(rvalueType);

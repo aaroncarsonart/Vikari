@@ -660,7 +660,7 @@ public class ParserTest_Assignment extends ParserTest_Base {
 
         // assignment statements
         testSimpleRightAssignment(statements.get(3), location(0, 39), "foo", VikariType.INTEGER, VikariType.INTEGER, location(0, 44), 1);
-        testSimpleRightAssignment(statements.get(4), location(0, 49) ,"bar", VikariType.INTEGER, VikariType.INTEGER, location(0, 54), 2);
+        testSimpleRightAssignment(statements.get(4), location(0, 49), "bar", VikariType.INTEGER, VikariType.INTEGER, location(0, 54), 2);
         testSimpleRightAssignment(statements.get(5), location(0, 59), "baz", VikariType.INTEGER, VikariType.INTEGER, location(0, 64), 3);
     }
 
@@ -2217,5 +2217,51 @@ public class ParserTest_Assignment extends ParserTest_Base {
         // errors
         List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 13), sourceString, "Undefined variable reference.");
+    }
+
+    @Test
+    @Order(54)
+    public void testParser_Expression_LeftAssignment_UndefinedVariableReferenceForLValue() {
+        String sourceString = "[foo << 2]";
+
+        List<Statement> statements = lexAndParse(sourceString, 1);
+        assertStatementCount(statements, 1);
+
+        // statements
+        GroupingExpression groupingExpression = assertGroupingExpression(statements.get(0), location(0, 0));
+        LeftAssignmentExpression assignmentExpression = assertLeftAssignment(groupingExpression.getExpression(),
+                location(0, 1));
+
+        testVariableExpression(assignmentExpression.getLvalue(), "foo", VikariType.INVALID, VikariType.INVALID,
+                location(0, 1));
+        testOperator(assignmentExpression.getOperator(), LeftAssignmentOperatorCrystal.class, location(0, 5));
+        testLiteralExpression(assignmentExpression.getRvalue(), IntegerCrystal.class, 2, location(0, 8));
+
+        /// errors
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Undefined variable reference");
+    }
+
+    @Test
+    @Order(55)
+    public void testParser_Expression_RightAssignment_UndefinedVariableReferenceForLValue() {
+        String sourceString = "[2 >> foo]";
+
+        List<Statement> statements = lexAndParse(sourceString, 1);
+        assertStatementCount(statements, 1);
+
+        // statements
+        GroupingExpression groupingExpression = assertGroupingExpression(statements.get(0), location(0, 0));
+        RightAssignmentExpression assignmentExpression = assertRightAssignment(groupingExpression.getExpression(),
+                location(0, 1));
+
+        testLiteralExpression(assignmentExpression.getRvalue(), IntegerCrystal.class, 2, location(0, 1));
+        testOperator(assignmentExpression.getOperator(), RightAssignmentOperatorCrystal.class, location(0, 3));
+        testVariableExpression(assignmentExpression.getLvalue(), "foo", VikariType.INVALID, VikariType.INVALID,
+                location(0, 6));
+
+        /// errors
+        List<VikariError> syntaxErrors = syntaxErrorReporter.getSyntaxErrors();
+        testSyntaxError(syntaxErrors.get(0), location(0, 6), sourceString, "Undefined variable reference");
     }
 }
