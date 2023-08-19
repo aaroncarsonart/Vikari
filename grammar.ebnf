@@ -1,0 +1,89 @@
+(* The following is an ebnf-like grammar. *)
+(* It is used to model parser behavior only. *)
+(* Only presently implemented features are modeled. *)
+(* So this is currently but a subset of the entire Vikari language. *)
+
+(* A = denotes the definition of a rule. *)
+(* A ; denotes the end of a rule. *)
+(* A ( and ) denotes grouping. *)
+(* A ? denotes an optional element. *)
+(* A + denotes one or more elements. *)
+(* A * denotes an zero or more elements. *)
+(* A , denotes concatenation of successive elements. *)
+(* A | denotes an OR operation between successive elements. *)
+(* A sequence enclosed in ? denotes a special sequence. (Used for regular expressions.) *)
+
+REFERENCE = ? [a-z_][A-Za-z0-9_]* ? ;
+TYPE = ? [A-Z][A-Za-z0-9_]* ? ;
+SWORD = "_" + ;
+
+NUMBER = INTEGER
+       | LONG
+       | BIG_INTEGER
+       | FLOAT
+       | DOUBLE
+       | BIG_DECIMAL ;
+
+DIGIT_SEQUENCE = ? [0-9]+ ? ;
+
+INTEGER     = DIGIT_SEQUENCE ;
+LONG        = DIGIT_SEQUENCE, "L" ;
+BIG_INTEGER = DIGIT_SEQUENCE, "B" ;
+FLOAT       = ( DIGIT_SEQUENCE, "F" | DIGIT_SEQUENCE, ".", DIGIT_SEQUENCE, "F" ;
+DOUBLE      = ( DIGIT_SEQUENCE, "D" | DIGIT_SEQUENCE, ".", DIGIT_SEQUENCE, "D" ? ;
+BIG_DECIMAL = DIGIT_SEQUENCE, ".", DIGIT_SEQUENCE, "B" ;
+
+BOOLEAN = "true" | "false" ;
+NULL = "null" | SWORD + | SWORD, grouping, SWORD ;
+
+NEWLINE = "\n" ;
+
+(* Whitespace is allowed between any two tokens. *)
+(* It is ignored by the Parser. *)
+
+WHITESPACE = ( " " | "\t" )+ ;
+
+(* Line continuations is allowed between any two tokens to cause the statement parsing *)
+(* to flow over to the following line. end of any line to continue *)
+
+LINE_CONTINUATION = "~", NEWLINE ;
+
+(* Comments are allowed between any two tokens. Comments begin with "~:" and end with :~". *)
+(* Comments can flow across multiple lines. Comments can be nested. *)
+(* Comments cause line continuations, unless the final closing ":~" token is at the end of a line. *)
+
+program = statement *
+statement = ( variableDeclarationStatement
+          | expressionStatement
+          | printStatement
+          | ""
+          ), ( ",", statement ? ) *, NEWLINE ;
+
+variableDeclarationStatement = REFERENCE, ( ":", TYPE )*, ("<<", expression )? ;
+expressionStatement = expression ;
+printStatement = printExpression+ ;
+
+expression = assignment ;
+printExpression = ":", expression ? ;
+
+assignment = leftAssignment
+           | rightAssignment
+           | logicalOrExpression ;
+
+leftAssignment = REFERENCE, "<<", assignment ;
+rightAssignment = assignment, ">>", REFERENCE ;
+
+logicalOr = logicalAnd, "\"", logicalOr ;
+logicalAnd = equality, "^", logicalAnd ;
+equality = term, ( "=" | "'=", ), equality ;
+term = factor, ( "+" | "'-" ), term ;
+factor = unary, ( "*" | "/" | "\\" ), term ;
+unary = ( ( "-" | "'" ), unary ) | primary ;
+
+primary = grouping
+        | NULL
+        | NUMBER
+        | BOOLEAN
+        | REFERENCE ;
+
+grouping = "[", expression, "]" ;
