@@ -101,13 +101,13 @@ public class VikariProgram {
      */
     public List<List<AtonementCrystal>> lex(File sourceFile) {
         String filePath = sourceFile.getAbsolutePath();
-        log.info("lex(\"{}\")", filePath);
+        log.info("lex(``{}``)", filePath);
 
         List<List<AtonementCrystal>> lexedStatements = lexer.lex(sourceFile);
         lexerResults.put(filePath, lexedStatements);
 
         if (shouldPrintLexerResults()) {
-            printMessageWithLines("Lex: \"" + filePath + "\"");
+            printMessageWithLines("Lex: ``" + filePath + "``");
             printLexedStatements(lexedStatements, lexerOptions.statementNumbers, lexerOptions.showInvisibles,
                     lexerOptions.separateTokens, lexerOptions.verbose);
         }
@@ -151,14 +151,14 @@ public class VikariProgram {
      */
     public List<Statement> parse(File sourceFile) {
         String filePath = sourceFile.getAbsolutePath();
-        log.info("parse(\"{}\")", filePath);
+        log.info("parse(``{}``)", filePath);
 
         List<List<AtonementCrystal>> lexedStatements = lexerResults.get(filePath);
         List<Statement> parsedStatements = parser.parse(sourceFile, lexedStatements);
         parserResults.put(filePath, parsedStatements);
 
         if (shouldPrintParserResults()) {
-            printMessageWithLines("Parse: \"" + filePath + "\"");
+            printMessageWithLines("Parse: ``" + filePath + "``");
             printParsedStatements(parsedStatements, parserOptions.statementNumbers, parserOptions.verbose);
         }
 
@@ -198,10 +198,10 @@ public class VikariProgram {
     public void execute(File sourceFile) {
         String filePath = sourceFile.getAbsolutePath();
 
-        log.info("execute(\"{}\")", filePath);
+        log.info("execute(``{}``)", filePath);
 
         if (shouldPrintExecuteBannerMessage()) {
-            printMessageWithLines("Execute: \"" + filePath + "\"");
+            printMessageWithLines("Execute: ``" + filePath + "``");
         } else if (shouldPrintProgramOutputBannerMessage()) {
             printMessageWithLines("Program Output:");
         }

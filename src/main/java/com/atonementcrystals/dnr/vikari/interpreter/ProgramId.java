@@ -80,7 +80,7 @@ public class ProgramId {
                         sb.append(line);
                     }
                 } catch (IOException e) {
-                    log.error("Error reading from \"{}\".", programIdFilePath);
+                    log.error("Error reading from ``{}``.", programIdFilePath);
                     log.error(e);
 
                     return ERROR_READING_FROM_FILE;
@@ -107,7 +107,7 @@ public class ProgramId {
                     String output = String.valueOf(programId);
                     bufferedWriter.write(output);
                 } catch (IOException e) {
-                    log.error("Error writing to \"{}\".", programIdFilePath);
+                    log.error("Error writing to ``{}``.", programIdFilePath);
                     log.error(e);
 
                     return ERROR_WRITING_TO_FILE;
@@ -117,13 +117,13 @@ public class ProgramId {
                 return programId;
 
             } catch (IOException e) {
-                log.error("Error acquiring file lock for \"{}\".", programIdFilePath);
+                log.error("Error acquiring file lock for ``{}``.", programIdFilePath);
                 log.error(e);
 
                 return ERROR_ACQUIRING_LOCK;
             }
         } catch (IOException e) {
-            log.error("Error opening file \"{}\".", programIdFilePath);
+            log.error("Error opening file ``{}``.", programIdFilePath);
             log.error(e);
 
             return ERROR_OPENING_FILE;

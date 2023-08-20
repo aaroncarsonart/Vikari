@@ -152,7 +152,7 @@ public class Lexer {
      * @return The sequence of AtonementCrystals defined by the Vikari source file.
      */
     public List<List<AtonementCrystal>> lex(File sourceFile) {
-        log.trace("lex({})", sourceFile == null ? "null" : "\"" + sourceFile + "\"");
+        log.trace("lex({})", sourceFile == null ? "null" : "``" + sourceFile + "``");
         currentFile = sourceFile;
 
         List<List<String>> statementsOfStringTokens = lexToStringTokens(sourceFile);
@@ -1070,7 +1070,7 @@ public class Lexer {
                     statementOfCrystals.add(crystal);
                 } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
                          IllegalAccessException e) {
-                    throw new Vikari_LexerException("Internal error. Description: \"" + e.getMessage() + "\"");
+                    throw new Vikari_LexerException("Internal error. Description: ``" + e.getMessage() + "``");
                 }
             }
 

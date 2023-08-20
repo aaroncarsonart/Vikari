@@ -114,7 +114,7 @@ public class Parser {
     }
 
     public List<Statement> parse(File file, List<List<AtonementCrystal>> lexedStatements) {
-        log.trace("parse({})", file == null ? "null" : "\"" + file + "\"");
+        log.trace("parse({})", file == null ? "null" : "``" + file + "``");
         currentFile = file;
 
         // First pass on user input.

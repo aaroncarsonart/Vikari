@@ -111,6 +111,6 @@ public class SyntaxErrorReporter {
             return lines.get(lineNumber);
         }
         throw new SyntaxErrorReportingException("Internal Error: No line data mapped to file: " +
-                "\"" + file.getAbsolutePath() + "\"");
+                "``" + file.getAbsolutePath() + "``");
     }
 }

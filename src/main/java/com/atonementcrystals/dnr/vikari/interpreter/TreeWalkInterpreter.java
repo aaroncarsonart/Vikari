@@ -75,7 +75,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
     }
 
     public void interpret(File file, List<Statement> statements) {
-        log.trace("interpret({})", file == null ? "null" : "\"" + file + "\"");
+        log.trace("interpret({})", file == null ? "null" : "``" + file + "``");
         currentFile = file;
         establishRootEnvironment();
         try {

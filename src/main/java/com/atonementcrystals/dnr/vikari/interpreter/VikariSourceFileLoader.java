@@ -28,15 +28,15 @@ public class VikariSourceFileLoader {
                     sourceFile = new File(sourceFilePathOrTypeName);
                 } else {
                     throw new Vikari_IOException("File does not exist: ``" + sourceFilePathOrTypeName + "``." +
-                            "\nNote: valid file extensions are: ``.DNR`` and ``.dnr``.");
+                            "\nValid file extensions are: ``.DNR`` and ``.dnr``.");
                 }
             }
 
             // Ensure that all other file extensions are ignored.
             // Files without extensions are already ignored because of how raw type names are evaluated.
             else if (!FilenameUtils.getExtension(sourceFilePathOrTypeName).isEmpty()) {
-                throw new Vikari_IOException("File does not exist: ``" + sourceFilePathOrTypeName + "``." +
-                        "\nNote: valid file extensions are: ``.DNR`` and ``.dnr``.");
+                throw new Vikari_IOException("File has invalid extension: ``" + sourceFilePathOrTypeName + "``." +
+                        "\nValid file extensions are: ``.DNR`` and ``.dnr``.");
             }
 
             // Otherwise, it must be a type name.
@@ -81,7 +81,7 @@ public class VikariSourceFileLoader {
         }
 
         throw new Vikari_IOException("Type ``" + typeOrScriptName + "`` not resolvable to a Vikari source file." +
-                "\nNote: valid file extensions are: ``.DNR`` and ``.dnr``.");
+                "\nValid file extensions are: ``.DNR`` and ``.dnr``.");
     }
 
     /**

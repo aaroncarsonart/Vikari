@@ -451,7 +451,7 @@ public class Main {
 
                 String pluralSuffix = (duplicateCharsList.size() > 1) ? "s" : "";
                 String errorMessage = phaseArgumentStr + " argument <config_options> contains duplicate character" +
-                        pluralSuffix + ": \"" + duplicateChars + "\"";
+                        pluralSuffix + ": ``" + duplicateChars + "``";
 
                 log.debug(errorMessage);
                 System.err.println(errorMessage);
@@ -467,7 +467,7 @@ public class Main {
             if (!invalidChars.isEmpty()) {
                 String pluralSuffix = (invalidChars.length() > 1) ? "s" : "";
                 String errorMessage = phaseArgumentStr + " argument <config_options> contains invalid character" +
-                        pluralSuffix + ": \"" + invalidChars + "\"";
+                        pluralSuffix + ": ``" + invalidChars + "``";
 
                 log.debug(errorMessage);
                 System.err.println(errorMessage);
@@ -486,7 +486,7 @@ public class Main {
      */
     public static LexerOptions parseLexerOptions(String optionsArgument, boolean doLog) {
         if (doLog) {
-            log.trace("parseLexerOptions(\"{}\")", optionsArgument);
+            log.trace("parseLexerOptions(``{}``)", optionsArgument);
         }
 
         if (optionsArgument == null || optionsArgument.isBlank()) {
@@ -519,7 +519,7 @@ public class Main {
      */
     public static ParserOptions parseParserOptions(String optionsArgument, boolean doLog) {
         if (doLog) {
-            log.trace("parseParserOptions(\"{}\")", optionsArgument);
+            log.trace("parseParserOptions(``{}``)", optionsArgument);
         }
 
         if (optionsArgument == null || optionsArgument.isBlank()) {
