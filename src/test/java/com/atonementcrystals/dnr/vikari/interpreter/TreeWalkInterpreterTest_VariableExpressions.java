@@ -59,8 +59,6 @@ public class TreeWalkInterpreterTest_VariableExpressions extends TreeWalkInterpr
                 """;
         lexParseAndInterpret(sourceString);
 
-        MathContext mathContext = Arithmetic.getMathContext();
-
         testVariable("foo", VikariType.ATONEMENT_CRYSTAL, VikariType.LONG, 22L);
         testVariable("a", VikariType.NUMBER, VikariType.LONG, 29L);
         testVariable("b", VikariType.INTEGER, VikariType.INTEGER, 29);
@@ -68,7 +66,7 @@ public class TreeWalkInterpreterTest_VariableExpressions extends TreeWalkInterpr
         testVariable("d", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, new BigInteger("29"));
         testVariable("e", VikariType.FLOAT, VikariType.FLOAT, 29.0F);
         testVariable("f", VikariType.DOUBLE, VikariType.DOUBLE, 29.0D);
-        testVariable("g", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("29", mathContext));
+        testVariable("g", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("29"));
     }
 
     @Test
@@ -94,8 +92,6 @@ public class TreeWalkInterpreterTest_VariableExpressions extends TreeWalkInterpr
                 """;
         lexParseAndInterpret(sourceString);
 
-        MathContext mathContext = Arithmetic.getMathContext();
-
         testVariable("foo", VikariType.ATONEMENT_CRYSTAL, VikariType.LONG, 22L);
         testVariable("a", VikariType.NUMBER, VikariType.LONG, 29L);
         testVariable("b", VikariType.INTEGER, VikariType.INTEGER, 29);
@@ -103,7 +99,7 @@ public class TreeWalkInterpreterTest_VariableExpressions extends TreeWalkInterpr
         testVariable("d", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, new BigInteger("29"));
         testVariable("e", VikariType.FLOAT, VikariType.FLOAT, 29.0F);
         testVariable("f", VikariType.DOUBLE, VikariType.DOUBLE, 29.0D);
-        testVariable("g", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("29", mathContext));
+        testVariable("g", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("29"));
     }
 
     @Test
@@ -129,8 +125,6 @@ public class TreeWalkInterpreterTest_VariableExpressions extends TreeWalkInterpr
                 """;
         lexParseAndInterpret(sourceString);
 
-        MathContext mathContext = Arithmetic.getMathContext();
-
         testVariable("foo", VikariType.ATONEMENT_CRYSTAL, VikariType.LONG, 22L);
         testVariable("a", VikariType.NUMBER, VikariType.LONG, 29L);
         testVariable("b", VikariType.INTEGER, VikariType.INTEGER, 29);
@@ -138,7 +132,7 @@ public class TreeWalkInterpreterTest_VariableExpressions extends TreeWalkInterpr
         testVariable("d", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, new BigInteger("29"));
         testVariable("e", VikariType.FLOAT, VikariType.FLOAT, 29.0F);
         testVariable("f", VikariType.DOUBLE, VikariType.DOUBLE, 29.0D);
-        testVariable("g", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("29", mathContext));
+        testVariable("g", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("29"));
     }
 
     @Test
@@ -156,14 +150,12 @@ public class TreeWalkInterpreterTest_VariableExpressions extends TreeWalkInterpr
                 """;
         lexParseAndInterpret(sourceString);
 
-        MathContext mathContext = Arithmetic.getMathContext();
-
         testVariable("a", VikariType.INTEGER, VikariType.INTEGER, 1);
         testVariable("b", VikariType.LONG, VikariType.LONG, 2L);
         testVariable("c", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, new BigInteger("3"));
         testVariable("d", VikariType.FLOAT, VikariType.FLOAT, 4.0F);
         testVariable("e", VikariType.DOUBLE, VikariType.DOUBLE, 5.0D);
-        testVariable("f", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("6", mathContext));
-        testVariable("foo", VikariType.NUMBER, VikariType.BIG_DECIMAL, new BigDecimal("0.5", mathContext));
+        testVariable("f", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("6"));
+        testVariable("foo", VikariType.NUMBER, VikariType.BIG_DECIMAL, new BigDecimal("0.5"));
     }
 }

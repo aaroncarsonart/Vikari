@@ -12,7 +12,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.number.DoubleCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.FloatCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.LongCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.DotOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.FunctionCallOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.angelguard.LeftFeatherFallCrystal;
@@ -30,7 +29,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.RightSqu
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.ListElementSeparatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.RightParenthesisCrystal;
-import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -38,11 +36,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 
-import static com.atonementcrystals.dnr.vikari.TestUtils.location;
-import static com.atonementcrystals.dnr.vikari.TestUtils.testCrystal;
+import static com.atonementcrystals.dnr.vikari.TestUtils.*;
 import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * These test cases only test the positive cases. So for all other cases not explicitly tested for here,
@@ -116,15 +111,6 @@ public class LexerTest_Crystals_NegationOperator {
         testCrystal(statement.get(4), ReferenceCrystal.class, "bar", location(0, 4 + operatorLength + 6));
 
         testNegationOperatorLocation(statement.get(2), location(0, 4 + operatorLength + 1));
-    }
-
-    private void testNegationOperatorLocation(AtonementCrystal crystal, CoordinatePair expectedLocation) {
-        if (crystal instanceof NumberCrystal<?> numberCrystal) {
-            CoordinatePair actualLocation = numberCrystal.getNegationOperatorLocation();
-            assertEquals(expectedLocation, actualLocation, "Unexpected location for negation operator.");
-        } else {
-            fail("Expected a NumberCrystal, but instead crystal has type: " + crystal.getClass());
-        }
     }
 
     @Test

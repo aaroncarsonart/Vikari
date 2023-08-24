@@ -215,7 +215,7 @@ public class ParserTest_Literals {
 
         // first expression
         Expression expression = expressionStatement.getExpression();
-        testBigDecimalLiteralExpression(expression, new BigDecimal("9.42", Arithmetic.getMathContext()));
+        testBigDecimalLiteralExpression(expression, new BigDecimal("9.42"));
     }
 
     @Test
@@ -292,6 +292,6 @@ public class ParserTest_Literals {
         testNullLiteralExpression("__[5B]__", BigIntegerCrystal.class, new BigInteger("5"));
         testNullLiteralExpression("__[5.0F]__", FloatCrystal.class, 5F);
         testNullLiteralExpression("__[5.0D]__", DoubleCrystal.class, 5D);
-        testNullLiteralExpression("__[5.0B]__", BigDecimalCrystal.class, new BigDecimal("5.0", Arithmetic.getMathContext()));
+        testNullLiteralExpression("__[5.0B]__", BigDecimalCrystal.class, new BigDecimal("5.0"));
     }
 }

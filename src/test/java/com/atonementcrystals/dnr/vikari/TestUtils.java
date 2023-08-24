@@ -11,7 +11,9 @@ import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
 
 import java.io.File;
+import java.math.BigDecimal;
 
+import static com.atonementcrystals.dnr.vikari.util.Utils.getBigDecimalStringRepresentation;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -66,7 +68,13 @@ public class TestUtils {
 
     public static void assertSyntaxErrors(SyntaxErrorReporter syntaxErrorReporter, int expectedErrorCount) {
         int actualErrorCount = syntaxErrorReporter.getSyntaxErrors().size();
-        assertEquals(expectedErrorCount, actualErrorCount, "Unexpected number of syntax errors.");
+        if (expectedErrorCount != actualErrorCount) {
+            if (actualErrorCount > 0) {
+                syntaxErrorReporter.reportSyntaxErrors();
+            }
+            fail("Expected syntax error count to be " + expectedErrorCount + ", but instead it was " +
+                    actualErrorCount + ".");
+        }
     }
 
     public static void assertWarnings(SyntaxErrorReporter syntaxErrorReporter, int expectedWarningCount) {
@@ -74,13 +82,25 @@ public class TestUtils {
         assertEquals(expectedWarningCount, actualWarningCountCount, "Unexpected number of compilation warnings.");
     }
 
-    public static void testNumberCrystal(AtonementCrystal crystal, Object expectedValue, Class<? extends NumberCrystal<?>> expectedClass) {
+    public static void testNumberCrystal(AtonementCrystal crystal, Object expectedValue,
+                                         Class<? extends NumberCrystal<?>> expectedClass) {
         Class<? extends AtonementCrystal> actualClass = crystal.getClass();
         assertEquals(expectedClass, actualClass, "Unexpected type.");
 
         NumberCrystal<?> numberCrystal = expectedClass.cast(crystal);
         Object actualValue = numberCrystal.getValue();
-        assertEquals(expectedValue, actualValue, "Unexpected value for NumberCrystal.");
+
+        // Compare BigDecimals with compareTo to discard trailing zeroes for values with different scales.
+        if (expectedValue instanceof BigDecimal expectedBigDecimal &&
+            actualValue instanceof BigDecimal actualBigDecimal) {
+            if(expectedBigDecimal.compareTo(actualBigDecimal) != 0) {
+                fail("Unexpected value for BigDecimal.\n" +
+                        "Expected: " + getBigDecimalStringRepresentation(expectedBigDecimal) + "\n" +
+                        "Actual:   " + getBigDecimalStringRepresentation(actualBigDecimal));
+            }
+        } else {
+            assertEquals(expectedValue, actualValue, "Unexpected value for NumberCrystal.");
+        }
     }
 
     public static void testBooleanCrystal(AtonementCrystal crystal, Object expectedValue) {
@@ -128,5 +148,14 @@ public class TestUtils {
 
     public static CoordinatePair location(int row, int column) {
         return new CoordinatePair(row, column);
+    }
+
+    public static void testNegationOperatorLocation(AtonementCrystal crystal, CoordinatePair expectedLocation) {
+        if (crystal instanceof NumberCrystal<?> numberCrystal) {
+            CoordinatePair actualLocation = numberCrystal.getNegationOperatorLocation();
+            assertEquals(expectedLocation, actualLocation, "Unexpected location for negation operator.");
+        } else {
+            fail("Expected a NumberCrystal, but instead crystal has type: " + crystal.getClass());
+        }
     }
 }

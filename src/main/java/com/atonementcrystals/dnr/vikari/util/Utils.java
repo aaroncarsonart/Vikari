@@ -4,7 +4,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.Keyword;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TokenType;
 import com.atonementcrystals.dnr.vikari.error.Vikari_LexerException;
-import com.atonementcrystals.dnr.vikari.interpreter.Arithmetic;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,14 +82,18 @@ public class Utils {
 
     public static boolean isIntegerNumber(String string) {
         try {
-            Integer.valueOf(string);
+            String value = string;
+            if (Utils.hasIntegerSuffix(value)) {
+                value = Utils.trimLastCharacter(value);
+            }
+            Integer.valueOf(value);
         } catch (NumberFormatException e) {
             return false;
         }
         return true;
     }
 
-    public static boolean isLongIntegerNumber(String string) {
+    public static boolean isLongNumber(String string) {
         try {
             String value = string;
             if (Utils.hasLongSuffix(value)) {
@@ -103,28 +106,25 @@ public class Utils {
         return true;
     }
 
-    /**
-     * Test if an identifier ends with "l" or "L".
-     * @param string The identifier to test.
-     * @return True if the identifier has a Long suffix.
-     */
-    public static boolean hasLongSuffix(String string) {
-        if (string.endsWith("l") || string.endsWith("L")) {
-            return true;
-        }
-        return false;
+    public static boolean hasIntegerSuffix(String string) {
+        return string.endsWith("i") || string.endsWith("I");
     }
 
-    /**
-     * Test if an identifier ends with "b" or "B".
-     * @param string The identifier to test.
-     * @return True if the identifier has a Big suffix.
-     */
+
+    public static boolean hasLongSuffix(String string) {
+        return string.endsWith("l") || string.endsWith("L");
+    }
+
+    public static boolean hasFloatSuffix(String string) {
+        return string.endsWith("f") || string.endsWith("F");
+    }
+
+    public static boolean hasDoubleSuffix(String string) {
+        return string.endsWith("d") || string.endsWith("D");
+    }
+
     public static boolean hasBigSuffix(String string) {
-        if (string.endsWith("b") || string.endsWith("B")) {
-            return true;
-        }
-        return false;
+        return string.endsWith("b") || string.endsWith("B");
     }
 
     /**
@@ -153,7 +153,7 @@ public class Utils {
     public static boolean isFloatNumber(String string) {
         try {
             // Don't allow explicit Double literals.
-            if (string.endsWith("d") || string.endsWith("D")) {
+            if (hasDoubleSuffix(string)) {
                 return false;
             }
             Float.valueOf(string);
@@ -166,7 +166,7 @@ public class Utils {
     public static boolean isDoubleNumber(String string) {
         try {
             // Don't allow explicit Float literals.
-            if (string.endsWith("f") || string.endsWith("F")) {
+            if (hasFloatSuffix(string)) {
                 return false;
             }
             Double.valueOf(string);
@@ -182,39 +182,19 @@ public class Utils {
             if (Utils.hasBigSuffix(value)) {
                 value = Utils.trimLastCharacter(value);
             }
-            new BigDecimal(value, Arithmetic.getMathContext());
+            new BigDecimal(value);
             return true;
         } catch (NumberFormatException e) {
             return false;
         }
     }
 
-    /**
-     * Checks if the string is an integer number followed by f, F, d, D, b, or B.
-     * @param string The identifier to check.
-     * @return True if the string is a valid fractional part of a decimal number; else false.
-     */
-    public static boolean isValidDecimalFractionalPart(String string) {
-        // 1. Check suffix.
-        String suffix = string.substring(string.length() - 1);
-        String allowedSuffixes = "fFdDbB";
-        boolean hasSuffix = allowedSuffixes.contains(suffix);
-
-        // 2. Get number part.
-        String number;
-        if (hasSuffix) {
-            number = string.substring(0, string.length() - 1);
-        } else {
-            number = string;
+    public static String getBigDecimalStringRepresentation(BigDecimal bigDecimal) {
+        String stringRepresentation = bigDecimal.stripTrailingZeros().toPlainString();
+        if (!stringRepresentation.contains(".")) {
+            stringRepresentation += ".0";
         }
-
-        // 3. Check number.
-        try {
-            new BigInteger(number);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+        return stringRepresentation;
     }
 
     public static boolean isEnclosedString(String string, String leftEnclosure, String rightEnclosure) {

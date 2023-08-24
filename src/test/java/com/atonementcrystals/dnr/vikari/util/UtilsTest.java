@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -17,119 +19,534 @@ class UtilsTest {
 
     @Test
     @Order(1)
-    public void testUtils_isIntegerNumber() {
-        // positive tests
-        String integer = "2";
-        assertTrue(Utils.isIntegerNumber(integer), "Expected integer number to return true for Utils::isIntegerNumber.");
-        integer = "-32";
-        assertTrue(Utils.isIntegerNumber(integer), "Expected integer number to return true for Utils::isIntegerNumber.");
-        integer = "98209380";
-        assertTrue(Utils.isIntegerNumber(integer), "Expected integer number to return true for Utils::isIntegerNumber.");
+    public void testUtils_isIntegerNumber_PositiveCases() {
+        String testFailureMessage = "Expected Utils::isIntegerNumber to return true.";
 
-        // negative tests
-        String longInteger = "22L";
-        assertTrue(Utils.isLongIntegerNumber(longInteger), "Expected long literal to return false for Utils::isIntegerNumber.");
-        longInteger = "913l";
-        assertTrue(Utils.isLongIntegerNumber(longInteger), "Expected long literal to return false for Utils::isIntegerNumber.");
-        longInteger = "4000000000";
-        assertTrue(Utils.isLongIntegerNumber(longInteger), "Expected long literal to return false for Utils::isIntegerNumber.");
+        // positive values
+        assertTrue(Utils.isIntegerNumber("2"), testFailureMessage);
+        assertTrue(Utils.isIntegerNumber("7i"), testFailureMessage);
+        assertTrue(Utils.isIntegerNumber("22I"), testFailureMessage);
+        assertTrue(Utils.isIntegerNumber("2147483647"), testFailureMessage); // Integer.MAX_VALUE
 
-        String notInteger = "3.14";
-        assertFalse(Utils.isLongIntegerNumber(notInteger), "Expected decimal number to return false for Utils::isIntegerNumber.");
-        notInteger = "-6.28";
-        assertFalse(Utils.isLongIntegerNumber(notInteger), "Expected decimal number to return false for Utils::isIntegerNumber.");
-        notInteger = "foo";
-        assertFalse(Utils.isLongIntegerNumber(notInteger), "Expected non-number to return false for Utils::isIntegerNumber.");
+        // negative values
+        assertTrue(Utils.isIntegerNumber("-2"), testFailureMessage);
+        assertTrue(Utils.isIntegerNumber("-7i"), testFailureMessage);
+        assertTrue(Utils.isIntegerNumber("-22I"), testFailureMessage);
+        assertTrue(Utils.isIntegerNumber("-2147483648"), testFailureMessage); // Integer.MIN_VALUE
     }
 
     @Test
     @Order(2)
-    public void testUtils_isLongNumber() {
-        // positive tests
-        String integer = "2";
-        assertTrue(Utils.isLongIntegerNumber(integer), "Expected integer number to return true for Utils::isLongNumber.");
-        integer = "-32";
-        assertTrue(Utils.isLongIntegerNumber(integer), "Expected integer number to return true for Utils::isLongNumber.");
-        integer = "98209380";
-        assertTrue(Utils.isLongIntegerNumber(integer), "Expected integer number to return true for Utils::isLongNumber.");
-        integer = "22L";
-        assertTrue(Utils.isLongIntegerNumber(integer), "Expected long literal to return true for Utils::isLongNumber.");
-        integer = "913l";
-        assertTrue(Utils.isLongIntegerNumber(integer), "Expected long literal to return true for Utils::isLongNumber.");
-        integer = "4000000000";
-        assertTrue(Utils.isLongIntegerNumber(integer), "Expected long literal to return true for Utils::isLongNumber.");
+    public void testUtils_isIntegerNumber_NegativeCases() {
+        String testFailureMessage = "Expected Utils::isIntegerNumber to return false.";
 
-        // negative tests
-        String notInteger = "3.14";
-        assertFalse(Utils.isLongIntegerNumber(notInteger), "Expected decimal number to return false for Utils::isLongNumber.");
-        notInteger = "-6.28";
-        assertFalse(Utils.isLongIntegerNumber(notInteger), "Expected decimal number to return false for Utils::isLongNumber.");
-        notInteger = "foo";
-        assertFalse(Utils.isLongIntegerNumber(notInteger), "Expected non-number to return false for Utils::isLongNumber.");
+        // positive values
+        assertFalse(Utils.isIntegerNumber("2.0"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("2147483648"), testFailureMessage); // Integer.MAX_VALUE + 1
+        assertFalse(Utils.isIntegerNumber("9223372036854775807"), testFailureMessage); // Long.MAX_VALUE
+        assertFalse(Utils.isIntegerNumber("9223372036854775808"), testFailureMessage); // Long.MAX_VALUE + 1
+
+        assertFalse(Utils.isIntegerNumber("7.0i"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("22.0I"), testFailureMessage);
+
+        assertFalse(Utils.isIntegerNumber("7L"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("22L"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("7.0l"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("22.0L"), testFailureMessage);
+
+        assertFalse(Utils.isIntegerNumber("7f"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("22F"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("7.0f"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("22.0F"), testFailureMessage);
+
+        assertFalse(Utils.isIntegerNumber("7d"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("22D"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("7.0d"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("22.0D"), testFailureMessage);
+
+        assertFalse(Utils.isIntegerNumber("7b"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("22B"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("7.0b"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("22.0B"), testFailureMessage);
+
+        // negative values
+        assertFalse(Utils.isIntegerNumber("-2.0"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-2147483649"), testFailureMessage); // Integer.MIN_VALUE - 1
+        assertFalse(Utils.isIntegerNumber("-9223372036854775808"), testFailureMessage); // Long.MIN_VALUE
+        assertFalse(Utils.isIntegerNumber("-9223372036854775809"), testFailureMessage); // Long.MIN_VALUE - 1
+
+        assertFalse(Utils.isIntegerNumber("-7.0i"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-22.0I"), testFailureMessage);
+
+        assertFalse(Utils.isIntegerNumber("-7L"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-22L"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-7.0l"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-22.0L"), testFailureMessage);
+
+        assertFalse(Utils.isIntegerNumber("-7f"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-22F"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-7.0f"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-22.0F"), testFailureMessage);
+
+        assertFalse(Utils.isIntegerNumber("-7d"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-22D"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-7.0d"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-22.0D"), testFailureMessage);
+
+        assertFalse(Utils.isIntegerNumber("-7b"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-22B"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-7.0b"), testFailureMessage);
+        assertFalse(Utils.isIntegerNumber("-22.0B"), testFailureMessage);
     }
 
     @Test
     @Order(3)
-    public void testUtils_isFloatNumber() {
-        // positive tests
-        String notDecimal = "2";
-        assertTrue(Utils.isFloatNumber(notDecimal), "Expected integer number to return true for Utils::isFloatNumber.");
-        notDecimal = "-32";
-        assertTrue(Utils.isFloatNumber(notDecimal), "Expected integer number to return true for Utils::isFloatNumber.");
-        notDecimal = "98209380";
-        assertTrue(Utils.isFloatNumber(notDecimal), "Expected integer number to return true for Utils::isFloatNumber.");
+    public void testUtils_isLongNumber_PositiveCases() {
+        String testFailureMessage = "Expected Utils::isLongNumber to return true.";
 
-        String decimal = "3.14";
-        assertTrue(Utils.isFloatNumber(decimal), "Expected decimal number to return true for Utils::isFloatNumber.");
-        decimal = "-6.28";
-        assertTrue(Utils.isFloatNumber(decimal), "Expected decimal number to return true for Utils::isFloatNumber.");
+        // positive values
+        assertTrue(Utils.isLongNumber("2"), testFailureMessage);
+        assertTrue(Utils.isLongNumber("7l"), testFailureMessage);
+        assertTrue(Utils.isLongNumber("22L"), testFailureMessage);
+        assertTrue(Utils.isLongNumber("2147483647"), testFailureMessage); // Integer.MAX_VALUE
+        assertTrue(Utils.isLongNumber("2147483648"), testFailureMessage); // Integer.MAX_VALUE + 1
+        assertTrue(Utils.isLongNumber("9223372036854775807"), testFailureMessage); // Long.MAX_VALUE
 
-        String floatLiteral = "2.0F";
-        assertTrue(Utils.isFloatNumber(floatLiteral), "Expected float literal to return true for Utils::isFloatNumber.");
-        floatLiteral = "22.7f";
-        assertTrue(Utils.isFloatNumber(floatLiteral), "Expected float literal to return true for Utils::isFloatNumber.");
-
-        // negative tests
-        String doubleLiteral = "2.0D";
-        assertFalse(Utils.isFloatNumber(doubleLiteral), "Expected double literal to return false for Utils::isFloatNumber.");
-        doubleLiteral = "22.7d";
-        assertFalse(Utils.isFloatNumber(doubleLiteral), "Expected double literal to return false for Utils::isFloatNumber.");
-        String nonNumber = "foo";
-        assertFalse(Utils.isFloatNumber(nonNumber), "Expected non-number to return false for Utils::isFloatNumber.");
+        // negative values
+        assertTrue(Utils.isLongNumber("-2"), testFailureMessage);
+        assertTrue(Utils.isLongNumber("-7l"), testFailureMessage);
+        assertTrue(Utils.isLongNumber("-22L"), testFailureMessage);
+        assertTrue(Utils.isLongNumber("-2147483648"), testFailureMessage); // Integer.MIN_VALUE
+        assertTrue(Utils.isLongNumber("-2147483649"), testFailureMessage); // Integer.MIN_VALUE - 1
+        assertTrue(Utils.isLongNumber("-9223372036854775808"), testFailureMessage); // Long.MIN_VALUE
     }
 
     @Test
     @Order(4)
-    public void testUtils_isDoubleNumber() {
-        // positive tests
-        String notDecimal = "2";
-        assertTrue(Utils.isDoubleNumber(notDecimal), "Expected integer number to return true for Utils::isDoubleNumber.");
-        notDecimal = "-32";
-        assertTrue(Utils.isDoubleNumber(notDecimal), "Expected integer number to return true for Utils::isDoubleNumber.");
-        notDecimal = "98209380";
-        assertTrue(Utils.isDoubleNumber(notDecimal), "Expected integer number to return true for Utils::isDoubleNumber.");
+    public void testUtils_isLongNumber_NegativeCases() {
+        String testFailureMessage = "Expected Utils::isLongNumber to return false.";
 
-        String decimal = "3.14";
-        assertTrue(Utils.isDoubleNumber(decimal), "Expected decimal number to return true for Utils::isDoubleNumber.");
-        decimal = "-6.28";
-        assertTrue(Utils.isDoubleNumber(decimal), "Expected decimal number to return true for Utils::isDoubleNumber.");
+        // positive values
+        assertFalse(Utils.isLongNumber("2.0"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("9223372036854775808"), testFailureMessage); // Long.MAX_VALUE + 1
 
-        String doubleLiteral = "2.0D";
-        assertTrue(Utils.isDoubleNumber(doubleLiteral), "Expected double literal to return true for Utils::isDoubleNumber.");
-        doubleLiteral = "22.7d";
-        assertTrue(Utils.isDoubleNumber(doubleLiteral), "Expected double literal to return true for Utils::isDoubleNumber.");
+        assertFalse(Utils.isLongNumber("7i"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("22I"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("7.0i"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("22.0I"), testFailureMessage);
 
-        // negative tests
-        String floatLiteral = "2.0F";
-        assertFalse(Utils.isDoubleNumber(floatLiteral), "Expected float literal to return false for Utils::isDoubleNumber.");
-        floatLiteral = "22.7f";
-        assertFalse(Utils.isDoubleNumber(floatLiteral), "Expected float literal to return false for Utils::isDoubleNumber.");
-        decimal = "foo";
-        assertFalse(Utils.isDoubleNumber(decimal), "Expected non-number to return false for Utils::isDoubleNumber.");
+        assertFalse(Utils.isLongNumber("7.0l"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("22.0L"), testFailureMessage);
+
+        assertFalse(Utils.isLongNumber("7f"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("22F"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("7.0f"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("22.0F"), testFailureMessage);
+
+        assertFalse(Utils.isLongNumber("7d"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("22D"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("7.0d"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("22.0D"), testFailureMessage);
+
+        assertFalse(Utils.isLongNumber("7b"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("22B"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("7.0b"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("22.0B"), testFailureMessage);
+
+        // negative values
+        assertFalse(Utils.isLongNumber("-2.0"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-9223372036854775809"), testFailureMessage); // Long.MIN_VALUE - 1
+
+        assertFalse(Utils.isLongNumber("-7i"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-22I"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-7.0i"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-22.0I"), testFailureMessage);
+
+        assertFalse(Utils.isLongNumber("-7.0l"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-22.0L"), testFailureMessage);
+
+        assertFalse(Utils.isLongNumber("-7f"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-22F"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-7.0f"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-22.0F"), testFailureMessage);
+
+        assertFalse(Utils.isLongNumber("-7d"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-22D"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-7.0d"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-22.0D"), testFailureMessage);
+
+        assertFalse(Utils.isLongNumber("-7b"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-22B"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-7.0b"), testFailureMessage);
+        assertFalse(Utils.isLongNumber("-22.0B"), testFailureMessage);
     }
 
     @Test
     @Order(5)
+    public void testUtils_isBigIntegerNumber_PositiveCases() {
+        String testFailureMessage = "Expected Utils::isBigIntegerNumber to return true.";
+
+        // positive values
+        assertTrue(Utils.isBigIntegerNumber("2"), testFailureMessage);
+        assertTrue(Utils.isBigIntegerNumber("7b"), testFailureMessage);
+        assertTrue(Utils.isBigIntegerNumber("22B"), testFailureMessage);
+        assertTrue(Utils.isBigIntegerNumber("2147483647"), testFailureMessage); // Integer.MAX_VALUE
+        assertTrue(Utils.isBigIntegerNumber("2147483648"), testFailureMessage); // Integer.MAX_VALUE + 1
+        assertTrue(Utils.isBigIntegerNumber("9223372036854775807"), testFailureMessage); // Long.MAX_VALUE
+        assertTrue(Utils.isBigIntegerNumber("9223372036854775808"), testFailureMessage); // Long.MAX_VALUE + 1
+
+        // negative values
+        assertTrue(Utils.isBigIntegerNumber("-2"), testFailureMessage);
+        assertTrue(Utils.isBigIntegerNumber("-7b"), testFailureMessage);
+        assertTrue(Utils.isBigIntegerNumber("-22B"), testFailureMessage);
+        assertTrue(Utils.isBigIntegerNumber("-2147483648"), testFailureMessage); // Integer.MIN_VALUE
+        assertTrue(Utils.isBigIntegerNumber("-2147483649"), testFailureMessage); // Integer.MIN_VALUE - 1
+        assertTrue(Utils.isBigIntegerNumber("-9223372036854775808"), testFailureMessage); // Long.MIN_VALUE
+        assertTrue(Utils.isBigIntegerNumber("-9223372036854775809"), testFailureMessage); // Long.MIN_VALUE - 1
+    }
+
+    @Test
+    @Order(6)
+    public void testUtils_isBigIntegerNumber_NegativeCases() {
+        String testFailureMessage = "Expected Utils::isBigIntegerNumber to return false.";
+
+        // positive values
+        assertFalse(Utils.isBigIntegerNumber("2.0"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("7.0i"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("22.0I"), testFailureMessage);
+
+        assertFalse(Utils.isBigIntegerNumber("7L"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("22L"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("7.0l"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("22.0L"), testFailureMessage);
+
+        assertFalse(Utils.isBigIntegerNumber("7f"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("22F"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("7.0f"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("22.0F"), testFailureMessage);
+
+        assertFalse(Utils.isBigIntegerNumber("7d"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("22D"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("7.0d"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("22.0D"), testFailureMessage);
+
+        assertFalse(Utils.isBigIntegerNumber("7.0b"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("22.0B"), testFailureMessage);
+
+        // negative values
+        assertFalse(Utils.isBigIntegerNumber("-2.0"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("-7.0i"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("-22.0I"), testFailureMessage);
+
+        assertFalse(Utils.isBigIntegerNumber("-7L"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("-22L"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("-7.0l"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("-22.0L"), testFailureMessage);
+
+        assertFalse(Utils.isBigIntegerNumber("-7f"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("-22F"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("-7.0f"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("-22.0F"), testFailureMessage);
+
+        assertFalse(Utils.isBigIntegerNumber("-7d"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("-22D"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("-7.0d"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("-22.0D"), testFailureMessage);
+
+        assertFalse(Utils.isBigIntegerNumber("-7.0b"), testFailureMessage);
+        assertFalse(Utils.isBigIntegerNumber("-22.0B"), testFailureMessage);
+    }
+
+    @Test
+    @Order(7)
+    public void testUtils_isFloatNumber_PositiveCases() {
+        String testFailureMessage = "Expected Utils::isFloatNumber to return true.";
+
+        // positive values
+        assertTrue(Utils.isFloatNumber("2"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("7f"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("22F"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("2147483647"), testFailureMessage); // Integer.MAX_VALUE
+        assertTrue(Utils.isFloatNumber("2147483648"), testFailureMessage); // Integer.MAX_VALUE + 1
+        assertTrue(Utils.isFloatNumber("9223372036854775807"), testFailureMessage); // Long.MAX_VALUE
+        assertTrue(Utils.isFloatNumber("9223372036854775808"), testFailureMessage); // Long.MAX_VALUE + 1
+
+        assertTrue(Utils.isFloatNumber("2.0"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("7.0f"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("22.0F"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("2147483647.0"), testFailureMessage); // Integer.MAX_VALUE
+        assertTrue(Utils.isFloatNumber("2147483648.0"), testFailureMessage); // Integer.MAX_VALUE + 1
+        assertTrue(Utils.isFloatNumber("9223372036854775807.0"), testFailureMessage); // Long.MAX_VALUE
+        assertTrue(Utils.isFloatNumber("9223372036854775808.0"), testFailureMessage); // Long.MAX_VALUE + 1
+
+        assertTrue(Utils.isFloatNumber("3.1415926"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("3.1415926f"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("3.1415926F"), testFailureMessage);
+
+        // negative values
+        assertTrue(Utils.isFloatNumber("-2"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("-7f"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("-22F"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("-2147483648"), testFailureMessage); // Integer.MIN_VALUE
+        assertTrue(Utils.isFloatNumber("-2147483649"), testFailureMessage); // Integer.MIN_VALUE - 1
+        assertTrue(Utils.isFloatNumber("-9223372036854775808"), testFailureMessage); // Long.MIN_VALUE
+        assertTrue(Utils.isFloatNumber("-9223372036854775809"), testFailureMessage); // Long.MIN_VALUE - 1
+
+        assertTrue(Utils.isFloatNumber("-2.0"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("-7.0f"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("-22.0F"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("-2147483648.0"), testFailureMessage); // Integer.MIN_VALUE
+        assertTrue(Utils.isFloatNumber("-2147483649.0"), testFailureMessage); // Integer.MIN_VALUE - 1
+        assertTrue(Utils.isFloatNumber("-9223372036854775808.0"), testFailureMessage); // Long.MIN_VALUE
+        assertTrue(Utils.isFloatNumber("-9223372036854775809.0"), testFailureMessage); // Long.MIN_VALUE - 1
+
+        assertTrue(Utils.isFloatNumber("-3.1415926"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("-3.1415926f"), testFailureMessage);
+        assertTrue(Utils.isFloatNumber("-3.1415926F"), testFailureMessage);
+    }
+
+    @Test
+    @Order(8)
+    public void testUtils_isFloatNumber_NegativeCases() {
+        String testFailureMessage = "Expected Utils::isFloatNumber to return false.";
+
+        // positive values
+        assertFalse(Utils.isFloatNumber("7i"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("22I"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("7.0i"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("22.0I"), testFailureMessage);
+
+        assertFalse(Utils.isFloatNumber("7L"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("22L"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("7.0l"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("22.0L"), testFailureMessage);
+
+        assertFalse(Utils.isFloatNumber("7d"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("22D"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("7.0d"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("22.0D"), testFailureMessage);
+
+        assertFalse(Utils.isFloatNumber("7b"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("22B"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("7.0b"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("22.0B"), testFailureMessage);
+
+        // negative values
+        assertFalse(Utils.isFloatNumber("-7i"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("-22I"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("-7.0i"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("-22.0I"), testFailureMessage);
+
+        assertFalse(Utils.isFloatNumber("-7L"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("-22L"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("-7.0l"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("-22.0L"), testFailureMessage);
+
+        assertFalse(Utils.isFloatNumber("-7d"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("-22D"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("-7.0d"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("-22.0D"), testFailureMessage);
+
+        assertFalse(Utils.isFloatNumber("-7b"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("-22B"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("-7.0b"), testFailureMessage);
+        assertFalse(Utils.isFloatNumber("-22.0B"), testFailureMessage);
+    }
+
+    @Test
+    @Order(9)
+    public void testUtils_isDoubleNumber_PositiveCases() {
+        String testFailureMessage = "Expected Utils::isDoubleNumber to return true.";
+
+        // positive values
+        assertTrue(Utils.isDoubleNumber("2"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("7d"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("22D"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("2147483647"), testFailureMessage); // Integer.MAX_VALUE
+        assertTrue(Utils.isDoubleNumber("2147483648"), testFailureMessage); // Integer.MAX_VALUE + 1
+        assertTrue(Utils.isDoubleNumber("9223372036854775807"), testFailureMessage); // Long.MAX_VALUE
+        assertTrue(Utils.isDoubleNumber("9223372036854775808"), testFailureMessage); // Long.MAX_VALUE + 1
+
+        assertTrue(Utils.isDoubleNumber("2.0"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("7.0d"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("22.0D"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("2147483647.0"), testFailureMessage); // Integer.MAX_VALUE
+        assertTrue(Utils.isDoubleNumber("2147483648.0"), testFailureMessage); // Integer.MAX_VALUE + 1
+        assertTrue(Utils.isDoubleNumber("9223372036854775807.0"), testFailureMessage); // Long.MAX_VALUE
+        assertTrue(Utils.isDoubleNumber("9223372036854775808.0"), testFailureMessage); // Long.MAX_VALUE + 1
+
+        assertTrue(Utils.isDoubleNumber("3.1415926"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("3.1415926d"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("3.1415926D"), testFailureMessage);
+
+        // negative values
+        assertTrue(Utils.isDoubleNumber("-2"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("-7d"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("-22D"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("-2147483648"), testFailureMessage); // Integer.MIN_VALUE
+        assertTrue(Utils.isDoubleNumber("-2147483649"), testFailureMessage); // Integer.MIN_VALUE - 1
+        assertTrue(Utils.isDoubleNumber("-9223372036854775808"), testFailureMessage); // Long.MIN_VALUE
+        assertTrue(Utils.isDoubleNumber("-9223372036854775809"), testFailureMessage); // Long.MIN_VALUE - 1
+
+        assertTrue(Utils.isDoubleNumber("-2.0"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("-7.0d"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("-22.0D"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("-2147483648.0"), testFailureMessage); // Integer.MIN_VALUE
+        assertTrue(Utils.isDoubleNumber("-2147483649.0"), testFailureMessage); // Integer.MIN_VALUE - 1
+        assertTrue(Utils.isDoubleNumber("-9223372036854775808.0"), testFailureMessage); // Long.MIN_VALUE
+        assertTrue(Utils.isDoubleNumber("-9223372036854775809.0"), testFailureMessage); // Long.MIN_VALUE - 1
+
+        assertTrue(Utils.isDoubleNumber("-3.1415926"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("-3.1415926d"), testFailureMessage);
+        assertTrue(Utils.isDoubleNumber("-3.1415926D"), testFailureMessage);
+    }
+
+    @Test
+    @Order(10)
+    public void testUtils_isDoubleNumber_NegativeCases() {
+        String testFailureMessage = "Expected Utils::isDoubleNumber to return false.";
+
+        // positive values
+        assertFalse(Utils.isDoubleNumber("7i"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("22I"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("7.0i"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("22.0I"), testFailureMessage);
+
+        assertFalse(Utils.isDoubleNumber("7L"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("22L"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("7.0l"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("22.0L"), testFailureMessage);
+
+        assertFalse(Utils.isDoubleNumber("7f"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("22F"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("7.0f"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("22.0F"), testFailureMessage);
+
+        assertFalse(Utils.isDoubleNumber("7b"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("22B"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("7.0b"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("22.0B"), testFailureMessage);
+
+        // negative values
+        assertFalse(Utils.isDoubleNumber("-7i"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("-22I"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("-7.0i"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("-22.0I"), testFailureMessage);
+
+        assertFalse(Utils.isDoubleNumber("-7L"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("-22L"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("-7.0l"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("-22.0L"), testFailureMessage);
+
+        assertFalse(Utils.isDoubleNumber("-7f"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("-22F"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("-7.0f"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("-22.0F"), testFailureMessage);
+
+        assertFalse(Utils.isDoubleNumber("-7b"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("-22B"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("-7.0b"), testFailureMessage);
+        assertFalse(Utils.isDoubleNumber("-22.0B"), testFailureMessage);
+    }
+
+    @Test
+    @Order(11)
+    public void testUtils_isBigDecimalNumber_PositiveCases() {
+        String testFailureMessage = "Expected Utils::isBigDecimalNumber to return true.";
+
+        // positive values
+        assertTrue(Utils.isBigDecimalNumber("2"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("7b"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("22B"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("2147483647"), testFailureMessage); // Integer.MAX_VALUE
+        assertTrue(Utils.isBigDecimalNumber("2147483648"), testFailureMessage); // Integer.MAX_VALUE + 1
+        assertTrue(Utils.isBigDecimalNumber("9223372036854775807"), testFailureMessage); // Long.MAX_VALUE
+        assertTrue(Utils.isBigDecimalNumber("9223372036854775808"), testFailureMessage); // Long.MAX_VALUE + 1
+
+        assertTrue(Utils.isBigDecimalNumber("2.0"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("7.0b"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("22.0B"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("2147483647.0"), testFailureMessage); // Integer.MAX_VALUE
+        assertTrue(Utils.isBigDecimalNumber("2147483648.0"), testFailureMessage); // Integer.MAX_VALUE + 1
+        assertTrue(Utils.isBigDecimalNumber("9223372036854775807.0"), testFailureMessage); // Long.MAX_VALUE
+        assertTrue(Utils.isBigDecimalNumber("9223372036854775808.0"), testFailureMessage); // Long.MAX_VALUE + 1
+
+        assertTrue(Utils.isBigDecimalNumber("3.1415926"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("3.1415926b"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("3.1415926B"), testFailureMessage);
+
+        // negative values
+        assertTrue(Utils.isBigDecimalNumber("-2"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("-7b"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("-22B"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("-2147483648"), testFailureMessage); // Integer.MIN_VALUE
+        assertTrue(Utils.isBigDecimalNumber("-2147483649"), testFailureMessage); // Integer.MIN_VALUE - 1
+        assertTrue(Utils.isBigDecimalNumber("-9223372036854775808"), testFailureMessage); // Long.MIN_VALUE
+        assertTrue(Utils.isBigDecimalNumber("-9223372036854775809"), testFailureMessage); // Long.MIN_VALUE - 1
+
+        assertTrue(Utils.isBigDecimalNumber("-2.0"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("-7.0b"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("-22.0B"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("-2147483648.0"), testFailureMessage); // Integer.MIN_VALUE
+        assertTrue(Utils.isBigDecimalNumber("-2147483649.0"), testFailureMessage); // Integer.MIN_VALUE - 1
+        assertTrue(Utils.isBigDecimalNumber("-9223372036854775808.0"), testFailureMessage); // Long.MIN_VALUE
+        assertTrue(Utils.isBigDecimalNumber("-9223372036854775809.0"), testFailureMessage); // Long.MIN_VALUE - 1
+
+        assertTrue(Utils.isBigDecimalNumber("-3.1415926"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("-3.1415926b"), testFailureMessage);
+        assertTrue(Utils.isBigDecimalNumber("-3.1415926B"), testFailureMessage);
+    }
+
+    @Test
+    @Order(12)
+    public void testUtils_isBigDecimalNumber_NegativeCases() {
+        String testFailureMessage = "Expected Utils::isBigDecimalNumber to return false.";
+
+        // positive values
+        assertFalse(Utils.isBigDecimalNumber("7i"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("22I"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("7.0i"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("22.0I"), testFailureMessage);
+
+        assertFalse(Utils.isBigDecimalNumber("7L"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("22L"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("7.0l"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("22.0L"), testFailureMessage);
+
+        assertFalse(Utils.isBigDecimalNumber("7f"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("22F"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("7.0f"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("22.0F"), testFailureMessage);
+
+        assertFalse(Utils.isBigDecimalNumber("7d"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("22D"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("7.0d"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("22.0D"), testFailureMessage);
+
+        // negative values
+        assertFalse(Utils.isBigDecimalNumber("-7i"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("-22I"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("-7.0i"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("-22.0I"), testFailureMessage);
+
+        assertFalse(Utils.isBigDecimalNumber("-7L"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("-22L"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("-7.0l"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("-22.0L"), testFailureMessage);
+
+        assertFalse(Utils.isBigDecimalNumber("-7f"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("-22F"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("-7.0f"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("-22.0F"), testFailureMessage);
+
+        assertFalse(Utils.isBigDecimalNumber("-7d"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("-22D"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("-7.0d"), testFailureMessage);
+        assertFalse(Utils.isBigDecimalNumber("-22.0D"), testFailureMessage);
+    }
+
+    @Test
+    @Order(13)
     public void testUtils_stripEnclosure() {
         String enclosure = "`foo`";
         String inner = Utils.stripEnclosure(enclosure, "`", "`");
@@ -163,7 +580,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(6)
+    @Order(14)
     public void testUtils_isWhitespace() {
         // positive tests
         assertTrue(Utils.isWhitespace(" "), "Single-space string should return true for" +
@@ -185,7 +602,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(7)
+    @Order(15)
     public void testUtils_isBacktickQuotedIdentifier() {
         // positive tests
         assertTrue(Utils.isBacktickQuotedIdentifier("`:`"), "A character literal is a quoted identifier.");
@@ -201,7 +618,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(8)
+    @Order(16)
     public void testUtils_isSword() {
         // positive tests
         String sword = "_";
@@ -241,7 +658,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(9)
+    @Order(17)
     public void testUtils_isBooleanLiteral() {
         // positive tests
         String booleanLiteral = Keyword.TRUE.getIdentifier();
@@ -273,7 +690,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(10)
+    @Order(18)
     public void testUtils_isEnclosedString() {
         // positive tests
         String enclosedString = "``foo``";
@@ -327,7 +744,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(11)
+    @Order(19)
     public void testUtils_isStringLiteral() {
         // positive tests
         String stringLiteral = "``foo``";
@@ -368,7 +785,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(12)
+    @Order(20)
     public void testUtils_isStartOfStringLiteral() {
         // positive tests
         String stringLiteral = "``foo``";
@@ -397,7 +814,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(13)
+    @Order(21)
     public void testUtils_isEndOfStringLiteral() {
         // positive tests
         String stringLiteral = "``foo``";
@@ -444,7 +861,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(14)
+    @Order(22)
     public void testUtils_isSingleLineComment() {
         // positive tests
         String comment = "~:This is a comment.:~";
@@ -470,7 +887,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(15)
+    @Order(23)
     public void testUtils_isStartOfComment() {
         // positive tests
         String comment = "~:This is a comment.:~";
@@ -496,7 +913,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(16)
+    @Order(24)
     public void testUtils_isEndOfComment() {
         // positive tests
         String comment = "~:This is a comment.:~";
@@ -540,7 +957,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(17)
+    @Order(25)
     public void testUtils_showInvisibles() {
         // positive tests
         String containingInvisibles = "\t";
@@ -588,7 +1005,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(18)
+    @Order(26)
     public void testUtils_getSimpleClassName() {
         // positive tests
         AtonementCrystal className = new ReferenceCrystal("referenceIdentifier");
@@ -609,7 +1026,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(19)
+    @Order(27)
     public void testUtils_countOccurrences() {
         // Expect no matches.
         String sourceString = "foo";
@@ -652,77 +1069,209 @@ class UtilsTest {
     }
 
     @Test
-    @Order(20)
+    @Order(28)
+    public void testHasIntegerSuffix() {
+        // positive tests
+        String testFailureMessage = "Expected Utils::hasIntegerSuffix to return true.";
+
+        assertTrue(Utils.hasIntegerSuffix("7i"), testFailureMessage);
+        assertTrue(Utils.hasIntegerSuffix("22I"), testFailureMessage);
+
+        // negative tests
+        testFailureMessage = "Expected Utils::hasIntegerSuffix to return false.";
+
+        assertFalse(Utils.hasIntegerSuffix("2"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("7l"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("22L"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("7b"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("22B"), testFailureMessage);
+
+        assertFalse(Utils.hasIntegerSuffix("7f"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("22F"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("7d"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("22D"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("7b"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("22B"), testFailureMessage);
+
+        assertFalse(Utils.hasIntegerSuffix("2.0"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("7.0f"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("22.0F"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("7.0d"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("22.0D"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("7.0b"), testFailureMessage);
+        assertFalse(Utils.hasIntegerSuffix("22.0B"), testFailureMessage);
+
+        assertFalse(Utils.hasIntegerSuffix("3.1415926"), testFailureMessage);
+    }
+
+    @Test
+    @Order(29)
     public void testHasLongSuffix() {
-        assertTrue(Utils.hasLongSuffix("22L"), "Expected literal to have a long suffix.");
-        assertTrue(Utils.hasLongSuffix("7l"), "Expected literal to have a long suffix.");
-        assertFalse(Utils.hasLongSuffix("512B"), "Expected big integer literal to have a long suffix.");
-        assertFalse(Utils.hasLongSuffix("3.14b"), "Expected big decimal literal to have a long suffix.");
-        assertFalse(Utils.hasLongSuffix("5"), "Expected an integer literal to not have a big suffix.");
-        assertFalse(Utils.hasLongSuffix("5f"), "Expected a float literal to not have a big suffix.");
-        assertFalse(Utils.hasLongSuffix("5d"), "Expected a double literal to not have a big suffix.");
-        assertFalse(Utils.hasLongSuffix("3.14"), "Expected an double literal to not have a big suffix.");
+        // positive tests
+        String testFailureMessage = "Expected Utils::hasLongSuffix to return true.";
+
+        assertTrue(Utils.hasLongSuffix("7l"), testFailureMessage);
+        assertTrue(Utils.hasLongSuffix("22L"), testFailureMessage);
+
+        // negative tests
+        testFailureMessage = "Expected Utils::hasLongSuffix to return false.";
+
+        assertFalse(Utils.hasLongSuffix("2"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("7i"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("22I"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("7b"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("22B"), testFailureMessage);
+
+        assertFalse(Utils.hasLongSuffix("7f"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("22F"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("7d"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("22D"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("7b"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("22B"), testFailureMessage);
+
+        assertFalse(Utils.hasLongSuffix("2.0"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("7.0f"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("22.0F"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("7.0d"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("22.0D"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("7.0b"), testFailureMessage);
+        assertFalse(Utils.hasLongSuffix("22.0B"), testFailureMessage);
+
+        assertFalse(Utils.hasLongSuffix("3.1415926"), testFailureMessage);
     }
 
     @Test
-    @Order(21)
+    @Order(30)
+    public void testHasFloatSuffix() {
+        // positive tests
+        String testFailureMessage = "Expected Utils::hasFloatSuffix to return true.";
+
+        assertTrue(Utils.hasFloatSuffix("7f"), testFailureMessage);
+        assertTrue(Utils.hasFloatSuffix("22F"), testFailureMessage);
+        assertTrue(Utils.hasFloatSuffix("7.0f"), testFailureMessage);
+        assertTrue(Utils.hasFloatSuffix("22.0F"), testFailureMessage);
+        assertTrue(Utils.hasFloatSuffix("3.1415926f"), testFailureMessage);
+        assertTrue(Utils.hasFloatSuffix("3.1415926F"), testFailureMessage);
+
+        // negative tests
+        testFailureMessage = "Expected Utils::hasFloatSuffix to return false.";
+
+        assertFalse(Utils.hasFloatSuffix("2"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("7i"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("22I"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("7l"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("22L"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("7b"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("22B"), testFailureMessage);
+
+        assertFalse(Utils.hasFloatSuffix("7d"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("22D"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("7B"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("22B"), testFailureMessage);
+
+        assertFalse(Utils.hasFloatSuffix("2.0"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("7.0d"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("22.0D"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("7.0b"), testFailureMessage);
+        assertFalse(Utils.hasFloatSuffix("22.0B"), testFailureMessage);
+
+        assertFalse(Utils.hasFloatSuffix("3.1415926"), testFailureMessage);
+    }
+
+    @Test
+    @Order(31)
+    public void testHasDoubleSuffix() {
+        // positive tests
+        String testFailureMessage = "Expected Utils::hasDoubleSuffix to return true.";
+
+        assertTrue(Utils.hasDoubleSuffix("7d"), testFailureMessage);
+        assertTrue(Utils.hasDoubleSuffix("22D"), testFailureMessage);
+        assertTrue(Utils.hasDoubleSuffix("7.0d"), testFailureMessage);
+        assertTrue(Utils.hasDoubleSuffix("22.0D"), testFailureMessage);
+        assertTrue(Utils.hasDoubleSuffix("3.1415926d"), testFailureMessage);
+        assertTrue(Utils.hasDoubleSuffix("3.1415926D"), testFailureMessage);
+
+        // negative tests
+        testFailureMessage = "Expected Utils::hasDoubleSuffix to return false.";
+
+        assertFalse(Utils.hasDoubleSuffix("2"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("7i"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("22I"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("7l"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("22L"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("7b"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("22B"), testFailureMessage);
+
+        assertFalse(Utils.hasDoubleSuffix("7f"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("22F"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("7B"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("22B"), testFailureMessage);
+
+        assertFalse(Utils.hasDoubleSuffix("2.0"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("7.0f"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("22.0F"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("7.0b"), testFailureMessage);
+        assertFalse(Utils.hasDoubleSuffix("22.0B"), testFailureMessage);
+
+        assertFalse(Utils.hasDoubleSuffix("3.1415926"), testFailureMessage);
+    }
+
+    @Test
+    @Order(32)
     public void testHasBigSuffix() {
-        assertTrue(Utils.hasBigSuffix("5B"), "Expected literal to have a big suffix.");
-        assertTrue(Utils.hasBigSuffix("5b"), "Expected literal to have a big suffix.");
-        assertTrue(Utils.hasBigSuffix("3.14B"), "Expected literal to have a big suffix.");
-        assertTrue(Utils.hasBigSuffix("3.14b"), "Expected literal to have a big suffix.");
-        assertFalse(Utils.hasBigSuffix("5"), "Expected an integer literal to not have a big suffix.");
-        assertFalse(Utils.hasBigSuffix("5f"), "Expected a float literal to not have a big suffix.");
-        assertFalse(Utils.hasBigSuffix("5d"), "Expected a double literal to not have a big suffix.");
-        assertFalse(Utils.hasBigSuffix("3.14"), "Expected an double literal to not have a big suffix.");
+        // positive tests
+        String testFailureMessage = "Expected Utils::hasBigSuffix to return true.";
+
+        assertTrue(Utils.hasBigSuffix("7b"), testFailureMessage);
+        assertTrue(Utils.hasBigSuffix("22B"), testFailureMessage);
+        assertTrue(Utils.hasBigSuffix("7.0b"), testFailureMessage);
+        assertTrue(Utils.hasBigSuffix("22.0B"), testFailureMessage);
+        assertTrue(Utils.hasBigSuffix("3.1415926b"), testFailureMessage);
+        assertTrue(Utils.hasBigSuffix("3.1415926B"), testFailureMessage);
+
+        // negative tests
+        testFailureMessage = "Expected Utils::hasBigSuffix to return false.";
+
+        assertFalse(Utils.hasBigSuffix("2"), testFailureMessage);
+        assertFalse(Utils.hasBigSuffix("7i"), testFailureMessage);
+        assertFalse(Utils.hasBigSuffix("22I"), testFailureMessage);
+        assertFalse(Utils.hasBigSuffix("7l"), testFailureMessage);
+        assertFalse(Utils.hasBigSuffix("22L"), testFailureMessage);
+
+        assertFalse(Utils.hasBigSuffix("7f"), testFailureMessage);
+        assertFalse(Utils.hasBigSuffix("22F"), testFailureMessage);
+        assertFalse(Utils.hasBigSuffix("7d"), testFailureMessage);
+        assertFalse(Utils.hasBigSuffix("2DF"), testFailureMessage);
+
+        assertFalse(Utils.hasBigSuffix("2.0"), testFailureMessage);
+        assertFalse(Utils.hasBigSuffix("7.0f"), testFailureMessage);
+        assertFalse(Utils.hasBigSuffix("22.0F"), testFailureMessage);
+        assertFalse(Utils.hasBigSuffix("7.0d"), testFailureMessage);
+        assertFalse(Utils.hasBigSuffix("22.0D"), testFailureMessage);
+
+        assertFalse(Utils.hasBigSuffix("3.1415926"), testFailureMessage);
     }
 
     @Test
-    @Order(22)
+    @Order(33)
     public void testTrimLastCharacter() {
-        assertEquals("5", Utils.trimLastCharacter("5B"), "Unexpected trim result.");
-        assertEquals("5", Utils.trimLastCharacter("5b"), "Unexpected trim result.");
-        assertEquals("3.14", Utils.trimLastCharacter("3.14B"), "Unexpected trim result.");
-        assertEquals("3.14", Utils.trimLastCharacter("3.14b"), "Unexpected trim result.");
-        assertEquals("22", Utils.trimLastCharacter("22L"), "Unexpected trim result.");
-        assertEquals("7", Utils.trimLastCharacter("7l"), "Unexpected trim result.");
+        String testFailureMessage = "Unexpected result from Utils::trimLastCharacter.";
+        assertEquals("1", Utils.trimLastCharacter("1i"), testFailureMessage);
+        assertEquals("2", Utils.trimLastCharacter("2I"), testFailureMessage);
+        assertEquals("3", Utils.trimLastCharacter("3l"), testFailureMessage);
+        assertEquals("4", Utils.trimLastCharacter("4L"), testFailureMessage);
+        assertEquals("5", Utils.trimLastCharacter("5b"), testFailureMessage);
+        assertEquals("6", Utils.trimLastCharacter("6B"), testFailureMessage);
+        assertEquals("7.0", Utils.trimLastCharacter("7.0f"), testFailureMessage);
+        assertEquals("8.0", Utils.trimLastCharacter("8.0F"), testFailureMessage);
+        assertEquals("9.0", Utils.trimLastCharacter("9.0d"), testFailureMessage);
+        assertEquals("10.0", Utils.trimLastCharacter("10.0D"), testFailureMessage);
+        assertEquals("11.0", Utils.trimLastCharacter("11.0b"), testFailureMessage);
+        assertEquals("12.0", Utils.trimLastCharacter("12.0B"), testFailureMessage);
     }
 
     @Test
-    @Order(23)
-    public void testIsBigInteger() {
-        assertTrue(Utils.isBigIntegerNumber("5"), "Expected literal to be a big decimal number.");
-        assertTrue(Utils.isBigIntegerNumber("7B"), "Expected literal to be a big decimal number.");
-        assertTrue(Utils.isBigIntegerNumber("22b"), "Expected literal to be a big decimal number.");
-    }
-
-    @Test
-    @Order(24)
-    public void testIsBigDecimal() {
-        assertTrue(Utils.isBigDecimalNumber("5"), "Expected literal to be a big decimal number.");
-        assertTrue(Utils.isBigDecimalNumber("3.14"), "Expected literal to be a big decimal number.");
-        assertTrue(Utils.isBigDecimalNumber("7B"), "Expected literal to be a big decimal number.");
-        assertTrue(Utils.isBigDecimalNumber("7.0b"), "Expected literal to be a big decimal number.");
-    }
-
-    @Test
-    @Order(25)
-    public void testIsValidDecimalFractionalPart() {
-        assertTrue(Utils.isValidDecimalFractionalPart("5"), "Expected to be a valid decimal fractional part.");
-        assertTrue(Utils.isValidDecimalFractionalPart("5f"), "Expected to be a valid decimal fractional part.");
-        assertTrue(Utils.isValidDecimalFractionalPart("5F"), "Expected to be a valid decimal fractional part.");
-        assertTrue(Utils.isValidDecimalFractionalPart("5d"), "Expected to be a valid decimal fractional part.");
-        assertTrue(Utils.isValidDecimalFractionalPart("5D"), "Expected to be a valid decimal fractional part.");
-        assertTrue(Utils.isValidDecimalFractionalPart("5b"), "Expected to be a valid decimal fractional part.");
-        assertTrue(Utils.isValidDecimalFractionalPart("5B"), "Expected to be a valid decimal fractional part.");
-        assertFalse(Utils.isValidDecimalFractionalPart("5.0"), "Expected to not be a valid decimal fractional part.");
-        assertFalse(Utils.isValidDecimalFractionalPart("5.0B"), "Expected to not be a valid decimal fractional part.");
-        assertFalse(Utils.isValidDecimalFractionalPart("7Y"), "Expected to not be a valid decimal fractional part.");
-        assertFalse(Utils.isValidDecimalFractionalPart("22BB"), "Expected to not be a valid decimal fractional part.");
-    }
-
-    @Test
-    @Order(26)
+    @Order(34)
     public void testIsCrystalIdentifier() {
         assertTrue(Utils.isCrystalIdentifier("a"), "Expected to be a valid crystal identifier.");
         assertTrue(Utils.isCrystalIdentifier("foo"), "Expected to be a valid crystal identifier.");
@@ -743,7 +1292,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(27)
+    @Order(35)
     public void testIsFieldRegionIdentifier() {
         assertTrue(Utils.isFieldRegionIdentifier("a"), "Expected to be a valid field region identifier.");
         assertTrue(Utils.isFieldRegionIdentifier("foo"), "Expected to be a valid field region identifier.");
@@ -766,7 +1315,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(28)
+    @Order(36)
     public void testIsTypeIdentifier() {
         assertTrue(Utils.isTypeIdentifier("Foo"), "Expected to  be a valid type identifier.");
         assertTrue(Utils.isTypeIdentifier("BarBaz"), "Expected to  be a valid type identifier.");
@@ -793,7 +1342,7 @@ class UtilsTest {
     }
 
     @Test
-    @Order(29)
+    @Order(37)
     public void testUtils_isEscapedByBackslash() {
         // negative tests
         assertFalse(Utils.isEscapedByBackslash("", 0), "Expected to return false for Utils::isEscapedByBackSlash");
@@ -814,5 +1363,21 @@ class UtilsTest {
         assertTrue(Utils.isEscapedByBackslash("a\\a", 2), "Expected to return true for Utils::isEscapedByBackSlash");
         assertTrue(Utils.isEscapedByBackslash("aa\\a", 3), "Expected to return true for Utils::isEscapedByBackSlash");
         assertTrue(Utils.isEscapedByBackslash("aa\\aa", 3), "Expected to return true for Utils::isEscapedByBackSlash");
+    }
+
+    @Test
+    @Order(38)
+    public void testUtils_getBigDecimalStringRepresentation() {
+        String testFailureMessage = "Unexpected result from Utils::getBigDecimalStringRepresentation";
+
+        assertEquals("10.0", Utils.getBigDecimalStringRepresentation(new BigDecimal("10")), testFailureMessage);
+        assertEquals("10.0", Utils.getBigDecimalStringRepresentation(new BigDecimal("10.0")), testFailureMessage);
+        assertEquals("10.0", Utils.getBigDecimalStringRepresentation(new BigDecimal("10.000")), testFailureMessage);
+        assertEquals("10.1", Utils.getBigDecimalStringRepresentation(new BigDecimal("10.1")), testFailureMessage);
+        assertEquals("10.1", Utils.getBigDecimalStringRepresentation(new BigDecimal("10.10")), testFailureMessage);
+        assertEquals("10.001", Utils.getBigDecimalStringRepresentation(new BigDecimal("10.001")), testFailureMessage);
+        assertEquals("10.001", Utils.getBigDecimalStringRepresentation(new BigDecimal("10.00100")), testFailureMessage);
+        assertEquals("10.111", Utils.getBigDecimalStringRepresentation(new BigDecimal("10.111")), testFailureMessage);
+        assertEquals("10.111", Utils.getBigDecimalStringRepresentation(new BigDecimal("10.111000")), testFailureMessage);
     }
 }

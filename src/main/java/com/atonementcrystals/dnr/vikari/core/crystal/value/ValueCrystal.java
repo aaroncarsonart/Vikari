@@ -37,7 +37,6 @@ public abstract class ValueCrystal<V> extends AtonementCrystal {
         if (value != null) {
             return value.toString();
         }
-
         throw new IllegalStateException("A ValueCrystal's value cannot be null.");
     }
 

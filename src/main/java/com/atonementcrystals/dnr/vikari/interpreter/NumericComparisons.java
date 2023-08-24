@@ -96,12 +96,12 @@ public class NumericComparisons {
         // -------------------------------
         // Upcast to BigDecimal
         if (left instanceof BigDecimalCrystal) {
-            BigDecimal value = new BigDecimal(right.getValue().toString(), Arithmetic.getMathContext());
+            BigDecimal value = new BigDecimal(right.getValue().toString());
             BigDecimalCrystal right2 = new BigDecimalCrystal(right.getIdentifier(), value);
             return compare(left, right2, compareIntegers, compareLongs, compareBigIntegers, compareFloats,
                     compareDoubles, compareBigDecimals);
         } else if (right instanceof BigDecimalCrystal) {
-            BigDecimal value = new BigDecimal(left.getValue().toString(), Arithmetic.getMathContext());
+            BigDecimal value = new BigDecimal(left.getValue().toString());
             BigDecimalCrystal left2 = new BigDecimalCrystal(left.getIdentifier(), value);
             return compare(left2, right, compareIntegers, compareLongs, compareBigIntegers, compareFloats,
                     compareDoubles, compareBigDecimals);

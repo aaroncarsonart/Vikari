@@ -20,6 +20,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.number.DoubleCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.FloatCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.LongCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.LineContinuationCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.control.flow.ContinueOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
@@ -45,6 +46,7 @@ import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -72,7 +74,7 @@ public class Lexer {
     private static final String DASH_CHARACTER_STRING = "-";
 
     private static final Pattern whitespaceRegex = Pattern.compile("^[ \t]+");
-    private static final Pattern numberRegex = Pattern.compile("^\\d+(?:\\.\\d+)?(?i)[LFDB]?");
+    private static final Pattern numberRegex = Pattern.compile("(?i)^\\d+\\.\\d+[FDB]?|^\\d+[ILFDB]?");
     private static final Pattern identifierRegex = Pattern.compile("^[A-Za-z_]\\w*");
     private static final Pattern invalidCharactersRegex = Pattern.compile("^[^\t -~]+");
 
@@ -813,87 +815,133 @@ public class Lexer {
                     continue;
                 }
 
-                // Collapse a negation operator onto a following number token, if necessary and appropriate.
-                CoordinatePair negationOperatorLocation = null;
-                if (isNumberToken(stringToken) && !statementOfCrystals.isEmpty()) {
-                    int crystalCount = statementOfCrystals.size();
-                    AtonementCrystal maybeNegationOperator = statementOfCrystals.get(crystalCount - 1);
+                if (isNumberToken(stringToken)) {
+                    // Collapse a negation operator onto a following number token, if necessary and appropriate.
+                    CoordinatePair negationOperatorLocation = null;
+                    if (!statementOfCrystals.isEmpty()) {
+                        int crystalCount = statementOfCrystals.size();
+                        AtonementCrystal maybeNegationOperator = statementOfCrystals.get(crystalCount - 1);
 
-                    if (maybeNegationOperator instanceof SubtractOperatorCrystal) {
-                        AtonementCrystal previousCrystal = null;
-                        if (crystalCount >= 2) {
-                            previousCrystal = statementOfCrystals.get(crystalCount - 2);
+                        if (maybeNegationOperator instanceof SubtractOperatorCrystal) {
+                            AtonementCrystal previousCrystal = null;
+                            if (crystalCount >= 2) {
+                                previousCrystal = statementOfCrystals.get(crystalCount - 2);
+                            }
+                            if (previousCrystal == null || COLLAPSE_NEGATION_OPERATOR_CLASSES.contains(previousCrystal.getClass())) {
+                                // Remove the negation operator crystal from the list of crystals.
+                                statementOfCrystals.remove(crystalCount - 1);
+                                negationOperatorLocation = maybeNegationOperator.getCoordinates();
+
+                                // Concatenate the operator to the number token.
+                                String negationOperatorToken = TokenType.NEGATE.getIdentifier();
+                                stringToken = negationOperatorToken + stringToken;
+                            }
                         }
-                        if (previousCrystal == null || COLLAPSE_NEGATION_OPERATOR_CLASSES.contains(previousCrystal.getClass())) {
-                            // Remove the negation operator crystal from the list of crystals.
-                            statementOfCrystals.remove(crystalCount - 1);
-                            negationOperatorLocation = maybeNegationOperator.getCoordinates();
+                    }
 
-                            // Concatenate the operator to the number token.
-                            String negationOperatorToken = TokenType.NEGATE.getIdentifier();
-                            stringToken = negationOperatorToken + stringToken;
+                    // TODO: Impose maximum limits on length of Vikari number literals.
+
+                    boolean hasIntegerSuffix = Utils.hasIntegerSuffix(stringToken);
+                    if (Utils.isIntegerNumber(stringToken)) {
+                        String numericValue = stringToken;
+                        if (hasIntegerSuffix) {
+                            numericValue = Utils.trimLastCharacter(numericValue);
+                        }
+                        IntegerCrystal numberCrystal = new IntegerCrystal(stringToken, numericValue);
+                        numberCrystal.setCoordinates(tokenCoordinates);
+                        numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
+                        statementOfCrystals.add(numberCrystal);
+                        continue;
+                    } else if (hasIntegerSuffix) {
+                        handleInvalidIntegerLiteral(stringToken, tokenCoordinates, negationOperatorLocation,
+                                statementOfCrystals, Integer.class);
+                        continue;
+                    }
+
+                    boolean hasLongSuffix = Utils.hasLongSuffix(stringToken);
+                    if (Utils.isLongNumber(stringToken)) {
+                        String numericValue = stringToken;
+                        if (hasLongSuffix) {
+                            numericValue = Utils.trimLastCharacter(numericValue);
+                        }
+                        LongCrystal numberCrystal = new LongCrystal(stringToken, numericValue);
+                        numberCrystal.setCoordinates(tokenCoordinates);
+                        numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
+                        statementOfCrystals.add(numberCrystal);
+                        continue;
+                    } else if (hasLongSuffix) {
+                        handleInvalidIntegerLiteral(stringToken, tokenCoordinates, negationOperatorLocation,
+                                statementOfCrystals, Long.class);
+                        continue;
+                    }
+
+                    if (Utils.isBigIntegerNumber(stringToken)) {
+                        String numericValue = stringToken;
+                        if (Utils.hasBigSuffix(numericValue)) {
+                            numericValue = Utils.trimLastCharacter(numericValue);
+                        }
+                        BigIntegerCrystal numberCrystal = new BigIntegerCrystal(stringToken, numericValue);
+                        numberCrystal.setCoordinates(tokenCoordinates);
+                        numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
+                        statementOfCrystals.add(numberCrystal);
+                        continue;
+                    }
+
+                    if (Utils.isDoubleNumber(stringToken)) {
+                        // Double is checked first so unspecified decimal literals, aka 1.2, default to a Double type.
+                        DoubleCrystal numberCrystal = new DoubleCrystal(stringToken, stringToken);
+                        Double value = numberCrystal.getValue();
+
+                        // Numbers larger than Double or Float without a suffix need to fall through to BigDecimal.
+                        boolean hasDoubleSuffix = Utils.hasDoubleSuffix(stringToken);
+                        if (!value.isInfinite() || hasDoubleSuffix) {
+                            numberCrystal.setCoordinates(tokenCoordinates);
+                            numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
+                            statementOfCrystals.add(numberCrystal);
+                            if (hasDoubleSuffix) {
+                                if (value == Double.POSITIVE_INFINITY) {
+                                    reportError("Double literal value is too large.", tokenCoordinates);
+                                } else if (value == Double.NEGATIVE_INFINITY) {
+                                    reportError("Double literal value is too small.", tokenCoordinates);
+                                }
+                            }
+                            continue;
                         }
                     }
-                }
 
-                // TODO: Impose maximum limits on length of Vikari number literals.
+                    if (Utils.isFloatNumber(stringToken)) {
+                        FloatCrystal numberCrystal = new FloatCrystal(stringToken, stringToken);
+                        Float value = numberCrystal.getValue();
 
-                // Handle integer number literals.
-                if (Utils.isIntegerNumber(stringToken)) {
-                    IntegerCrystal numberCrystal = new IntegerCrystal(stringToken, stringToken);
-                    numberCrystal.setCoordinates(tokenCoordinates);
-                    numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
-                    statementOfCrystals.add(numberCrystal);
-                    continue;
-                } else if (Utils.isLongIntegerNumber(stringToken)) {
-                    String numericValue = stringToken;
-                    if (Utils.hasLongSuffix(numericValue)) {
-                        numericValue = Utils.trimLastCharacter(numericValue);
+                        // Numbers larger than Double or Float without a suffix need to fall through to BigDecimal.
+                        boolean hasFloatSuffix = Utils.hasFloatSuffix(stringToken);
+                        if (!value.isInfinite() || hasFloatSuffix) {
+                            numberCrystal.setCoordinates(tokenCoordinates);
+                            numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
+                            statementOfCrystals.add(numberCrystal);
+                            if (hasFloatSuffix) {
+                                if (value == Float.POSITIVE_INFINITY) {
+                                    reportError("Float literal value is too large.", tokenCoordinates);
+                                } else if (value == Float.NEGATIVE_INFINITY) {
+                                    reportError("Float literal value is too small.", tokenCoordinates);
+                                }
+                            }
+                            continue;
+                        }
                     }
-                    LongCrystal numberCrystal = new LongCrystal(stringToken, numericValue);
-                    numberCrystal.setCoordinates(tokenCoordinates);
-                    numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
-                    statementOfCrystals.add(numberCrystal);
-                    continue;
-                } else if (Utils.isBigIntegerNumber(stringToken)) {
-                    String numericValue = stringToken;
-                    if (Utils.hasBigSuffix(numericValue)) {
-                        numericValue = Utils.trimLastCharacter(numericValue);
-                    }
-                    BigIntegerCrystal numberCrystal = new BigIntegerCrystal(stringToken, numericValue);
-                    numberCrystal.setCoordinates(tokenCoordinates);
-                    numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
-                    statementOfCrystals.add(numberCrystal);
-                    continue;
-                }
 
-                // TODO: Impose maximum limits on length of Vikari number literals.
-
-                // Handle decimal number literals.
-                if (Utils.isDoubleNumber(stringToken)) {
-                    // Double is checked first so unspecified decimal literals, aka 1.2, default to a Double type.
-                    DoubleCrystal numberCrystal = new DoubleCrystal(stringToken, stringToken);
-                    numberCrystal.setCoordinates(tokenCoordinates);
-                    numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
-                    statementOfCrystals.add(numberCrystal);
-                    continue;
-                } else if (Utils.isFloatNumber(stringToken)) {
-                    FloatCrystal numberCrystal = new FloatCrystal(stringToken, stringToken);
-                    numberCrystal.setCoordinates(tokenCoordinates);
-                    numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
-                    statementOfCrystals.add(numberCrystal);
-                    continue;
-                } else if (Utils.isBigDecimalNumber(stringToken)) {
-                    String numericValue = stringToken;
-                    if (Utils.hasBigSuffix(numericValue)) {
-                        numericValue = Utils.trimLastCharacter(numericValue);
+                    if (Utils.isBigDecimalNumber(stringToken)) {
+                        String numericValue = stringToken;
+                        if (Utils.hasBigSuffix(numericValue)) {
+                            numericValue = Utils.trimLastCharacter(numericValue);
+                        }
+                        BigDecimal bigDecimal = new BigDecimal(numericValue);
+                        BigDecimalCrystal numberCrystal = new BigDecimalCrystal(stringToken, bigDecimal);
+                        numberCrystal.setCoordinates(tokenCoordinates);
+                        numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
+                        statementOfCrystals.add(numberCrystal);
+                        continue;
                     }
-                    BigDecimal bigDecimal = new BigDecimal(numericValue, Arithmetic.getMathContext());
-                    BigDecimalCrystal numberCrystal = new BigDecimalCrystal(stringToken, bigDecimal);
-                    numberCrystal.setCoordinates(tokenCoordinates);
-                    numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
-                    statementOfCrystals.add(numberCrystal);
-                    continue;
                 }
 
                 // Handle single-line string literals.
@@ -1159,5 +1207,42 @@ public class Lexer {
     private boolean isInvalidToken(String token) {
         Matcher matcher = invalidCharactersRegex.matcher(token);
         return matcher.matches();
+    }
+
+    private void handleInvalidIntegerLiteral(String stringToken,
+                                             CoordinatePair tokenCoordinates,
+                                             CoordinatePair negationOperatorLocation,
+                                             List<AtonementCrystal> statementOfCrystals,
+                                             Class<? extends Number> numberType) {
+        // Report the invalid literal error.
+        String numericValue = Utils.trimLastCharacter(stringToken);
+        BigInteger tokenBigIntegerValue = new BigInteger(numericValue);
+        boolean isLongType = numberType.equals(Long.class);
+
+        BigInteger maxValue = BigInteger.valueOf(isLongType ? Long.MAX_VALUE : Integer.MAX_VALUE);
+        BigInteger minValue = BigInteger.valueOf(isLongType ? Long.MIN_VALUE : Integer.MIN_VALUE);
+        String typeName = isLongType ? "Long" : "Integer";
+
+        if (tokenBigIntegerValue.compareTo(maxValue) > 0) {
+            reportError(typeName + " literal value is too large.", tokenCoordinates);
+        } else if (tokenBigIntegerValue.compareTo(minValue) < 0) {
+            reportError(typeName + " literal value is too small.", tokenCoordinates);
+        } else {
+            throw new IllegalStateException("Invalid " + typeName + " literal case not handled: " + stringToken);
+        }
+
+        // Add a crystal to the statement to represent the invalid literal.
+        NumberCrystal<?> numberCrystal;
+        boolean isPositive = tokenBigIntegerValue.signum() == 1;
+        if (isLongType) {
+            Long longValue = (isPositive ? maxValue : minValue).longValue();
+            numberCrystal = new LongCrystal(stringToken, longValue);
+        } else {
+            Integer integerValue = (isPositive ? maxValue : minValue).intValue();
+            numberCrystal = new IntegerCrystal(stringToken, integerValue);
+        }
+        numberCrystal.setCoordinates(tokenCoordinates);
+        numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
+        statementOfCrystals.add(numberCrystal);
     }
 }

@@ -13,7 +13,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.function.BiFunction;
 
@@ -21,23 +20,15 @@ import java.util.function.BiFunction;
  * Performs arithmetic operations for all NumberCrystal types.
  */
 public class Arithmetic {
-    private static final MathContext DEFAULT_MATH_CONTEXT = MathContext.DECIMAL128;
-    private static MathContext mathContext = DEFAULT_MATH_CONTEXT;
-    private static int precision = DEFAULT_MATH_CONTEXT.getPrecision();
-    private static RoundingMode roundingMode = DEFAULT_MATH_CONTEXT.getRoundingMode();
+    private static final RoundingMode roundingMode = RoundingMode.HALF_EVEN;
+    private static final int scale = 32;
 
-    public static void setBigDecimalPrecision(int precision) {
-        Arithmetic.precision = precision;
-        mathContext = new MathContext(precision, roundingMode);
+    public static RoundingMode getRoundingMode() {
+        return roundingMode;
     }
 
-    public static void setBigDecimalRoundingMode(RoundingMode roundingMode) {
-        Arithmetic.roundingMode = roundingMode;
-        mathContext = new MathContext(precision, roundingMode);
-    }
-
-    public static MathContext getMathContext() {
-        return mathContext;
+    public static int getScale() {
+        return scale;
     }
 
     /**
@@ -132,12 +123,12 @@ public class Arithmetic {
         // -------------------------------
         // Upcast to BigDecimal
         if (left instanceof BigDecimalCrystal) {
-            BigDecimal value = new BigDecimal(right.getValue().toString(), mathContext);
+            BigDecimal value = new BigDecimal(right.getValue().toString());
             BigDecimalCrystal right2 = new BigDecimalCrystal(right.getIdentifier(), value);
             return evaluate(left, right2, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
                     evaluateDoubles, evaluateBigDecimals);
         } else if (right instanceof BigDecimalCrystal) {
-            BigDecimal value = new BigDecimal(left.getValue().toString(), mathContext);
+            BigDecimal value = new BigDecimal(left.getValue().toString());
             BigDecimalCrystal left2 = new BigDecimalCrystal(left.getIdentifier(), value);
             return evaluate(left2, right, evaluateIntegers, evaluateLongs, evaluateBigIntegers, evaluateFloats,
                     evaluateDoubles, evaluateBigDecimals);
@@ -190,11 +181,11 @@ public class Arithmetic {
      * would overflow or underflow beyond the maximum and minimum values of said types, respectively.
      * @param left The left operand.
      * @param right The right operand.
-     * @return The result of divideing the left and right operands.
+     * @return The result of dividing the left and right operands.
      */
     public static AtonementCrystal add(NumberCrystal<?> left, NumberCrystal<?> right) {
         return evaluate(left, right, Math::addExact, Math::addExact, BigInteger::add, Float::sum, Double::sum,
-                (leftValue, rightValue) -> leftValue.add(rightValue, mathContext));
+                BigDecimal::add);
     }
 
     /**
@@ -208,7 +199,7 @@ public class Arithmetic {
         return evaluate(left, right, Math::subtractExact, Math::subtractExact, BigInteger::subtract,
                 (leftValue, rightValue) -> leftValue - rightValue,
                 (leftValue, rightValue) -> leftValue - rightValue,
-                (leftValue, rightValue) -> leftValue.subtract(rightValue, mathContext));
+                BigDecimal::subtract);
     }
 
     /**
@@ -222,7 +213,7 @@ public class Arithmetic {
         return evaluate(left, right, Math::multiplyExact, Math::multiplyExact, BigInteger::multiply,
                 (leftValue, rightValue) -> leftValue * rightValue,
                 (leftValue, rightValue) -> leftValue * rightValue,
-                (leftValue, rightValue) -> leftValue.multiply(rightValue, mathContext));
+                BigDecimal::multiply);
     }
 
     /**
@@ -239,7 +230,11 @@ public class Arithmetic {
                 BigInteger::divide,
                 (leftValue, rightValue) -> leftValue / rightValue,
                 (leftValue, rightValue) -> leftValue / rightValue,
-                (leftValue, rightValue) -> leftValue.divide(rightValue, mathContext));
+                (leftValue, rightValue) -> {
+                    int minOperandScale = Math.max(leftValue.scale(), rightValue.scale());
+                    int operationScale = Math.max(scale, minOperandScale);
+                    return leftValue.divide(rightValue, operationScale, roundingMode);
+                });
     }
 
     /**
@@ -305,7 +300,7 @@ public class Arithmetic {
             BigInteger bigIntegerValue;
             if (expressionType.isEqual(VikariType.FLOAT, VikariType.DOUBLE)) {
                 String stringValue = number.toString();
-                BigDecimal bigDecimalValue = new BigDecimal(stringValue, mathContext);
+                BigDecimal bigDecimalValue = new BigDecimal(stringValue);
                 bigIntegerValue = bigDecimalValue.toBigInteger();
             } else if (expressionType.isEqual(VikariType.BIG_DECIMAL)) {
                 BigDecimal bigDecimalValue = ((BigDecimalCrystal) numberCrystal).getValue();
@@ -329,7 +324,7 @@ public class Arithmetic {
 
         } else if (declaredType.isEqual(VikariType.BIG_DECIMAL)) {
             String stringValue = number.toString();
-            BigDecimal bigDecimalValue = new BigDecimal(stringValue, mathContext);
+            BigDecimal bigDecimalValue = new BigDecimal(stringValue);
             return new BigDecimalCrystal(bigDecimalValue);
         }
 

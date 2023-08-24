@@ -265,7 +265,7 @@ public class ParserTest_Assignment extends ParserTest_Base {
         testSimpleLeftAssignment(statements.get(8), "c", VikariType.ATONEMENT_CRYSTAL, VikariType.BIG_INTEGER, location(3, 0), new BigInteger("3"));
         testSimpleLeftAssignment(statements.get(9), "d", VikariType.ATONEMENT_CRYSTAL, VikariType.FLOAT, location(4, 0), 4.0F);
         testSimpleLeftAssignment(statements.get(10), "e", VikariType.ATONEMENT_CRYSTAL, VikariType.DOUBLE, location(5, 0), 5.0D);
-        testSimpleLeftAssignment(statements.get(11), "f", VikariType.ATONEMENT_CRYSTAL, VikariType.BIG_DECIMAL, location(6, 0), new BigDecimal("6.0", Arithmetic.getMathContext()));
+        testSimpleLeftAssignment(statements.get(11), "f", VikariType.ATONEMENT_CRYSTAL, VikariType.BIG_DECIMAL, location(6, 0), new BigDecimal("6.0"));
     }
 
     @Test
@@ -305,7 +305,7 @@ public class ParserTest_Assignment extends ParserTest_Base {
         testSimpleLeftAssignment(statements.get(8), "c", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, location(8, 0), new BigInteger("3"));
         testSimpleLeftAssignment(statements.get(9), "d", VikariType.FLOAT, VikariType.FLOAT, location(9, 0), 4.0F);
         testSimpleLeftAssignment(statements.get(10), "e", VikariType.DOUBLE, VikariType.DOUBLE, location(10, 0), 5.0D);
-        testSimpleLeftAssignment(statements.get(11), "f", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, location(11, 0), new BigDecimal("6.0", Arithmetic.getMathContext()));
+        testSimpleLeftAssignment(statements.get(11), "f", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, location(11, 0), new BigDecimal("6.0"));
     }
 
     @Test
@@ -420,24 +420,22 @@ public class ParserTest_Assignment extends ParserTest_Base {
             assertEquals(VariableDeclarationStatement.class, statements.get(i).getClass(), "Unexpected statement type.");
         }
 
-        MathContext mathContext = Arithmetic.getMathContext();
-
         // assignment statements
         testSimpleLeftAssignment(statements.get(15), "integer1", VikariType.INTEGER, VikariType.LONG, location(16, 0), 1L);
         testSimpleLeftAssignment(statements.get(16), "integer2", VikariType.INTEGER, VikariType.BIG_INTEGER, location(17, 0), new BigInteger("2"));
         testSimpleLeftAssignment(statements.get(17), "integer3", VikariType.INTEGER, VikariType.FLOAT, location(18, 0), 3.0F);
         testSimpleLeftAssignment(statements.get(18), "integer4", VikariType.INTEGER, VikariType.DOUBLE, location(19, 0), 4.0D);
-        testSimpleLeftAssignment(statements.get(19), "integer5", VikariType.INTEGER, VikariType.BIG_DECIMAL, location(20, 0), new BigDecimal("5.0", mathContext));
+        testSimpleLeftAssignment(statements.get(19), "integer5", VikariType.INTEGER, VikariType.BIG_DECIMAL, location(20, 0), new BigDecimal("5.0"));
         testSimpleLeftAssignment(statements.get(20), "long1", VikariType.LONG, VikariType.BIG_INTEGER, location(21, 0), new BigInteger("6"));
         testSimpleLeftAssignment(statements.get(21), "long2", VikariType.LONG, VikariType.FLOAT, location(22, 0), 7.0F);
         testSimpleLeftAssignment(statements.get(22), "long3", VikariType.LONG, VikariType.DOUBLE, location(23, 0), 8.0D);
-        testSimpleLeftAssignment(statements.get(23), "long4", VikariType.LONG, VikariType.BIG_DECIMAL, location(24, 0), new BigDecimal("9.0", mathContext));
+        testSimpleLeftAssignment(statements.get(23), "long4", VikariType.LONG, VikariType.BIG_DECIMAL, location(24, 0), new BigDecimal("9.0"));
         testSimpleLeftAssignment(statements.get(24), "bigInteger1", VikariType.BIG_INTEGER, VikariType.FLOAT, location(25, 0), 10.0F);
         testSimpleLeftAssignment(statements.get(25), "bigInteger2", VikariType.BIG_INTEGER, VikariType.DOUBLE, location(26, 0), 11.0D);
-        testSimpleLeftAssignment(statements.get(26), "bigInteger3", VikariType.BIG_INTEGER, VikariType.BIG_DECIMAL, location(27, 0), new BigDecimal("12.0", mathContext));
+        testSimpleLeftAssignment(statements.get(26), "bigInteger3", VikariType.BIG_INTEGER, VikariType.BIG_DECIMAL, location(27, 0), new BigDecimal("12.0"));
         testSimpleLeftAssignment(statements.get(27), "float1", VikariType.FLOAT, VikariType.DOUBLE, location(28, 0), 13.0D);
-        testSimpleLeftAssignment(statements.get(28), "float2", VikariType.FLOAT, VikariType.BIG_DECIMAL, location(29, 0), new BigDecimal("14.0", mathContext));
-        testSimpleLeftAssignment(statements.get(29), "double1", VikariType.DOUBLE, VikariType.BIG_DECIMAL, location(30, 0), new BigDecimal("15.0", mathContext));
+        testSimpleLeftAssignment(statements.get(28), "float2", VikariType.FLOAT, VikariType.BIG_DECIMAL, location(29, 0), new BigDecimal("14.0"));
+        testSimpleLeftAssignment(statements.get(29), "double1", VikariType.DOUBLE, VikariType.BIG_DECIMAL, location(30, 0), new BigDecimal("15.0"));
     }
 
     @Test
@@ -763,7 +761,7 @@ public class ParserTest_Assignment extends ParserTest_Base {
                 VikariType.DOUBLE, location(5, 8), 5.0D);
 
         testSimpleRightAssignment(statements.get(11), location(6, 0), "f", VikariType.ATONEMENT_CRYSTAL,
-                VikariType.BIG_DECIMAL, location(6, 8), new BigDecimal("6.0", Arithmetic.getMathContext()));
+                VikariType.BIG_DECIMAL, location(6, 8), new BigDecimal("6.0"));
     }
 
     @Test
@@ -814,7 +812,7 @@ public class ParserTest_Assignment extends ParserTest_Base {
                 VikariType.DOUBLE, location(10, 8), 5.0D);
 
         testSimpleRightAssignment(statements.get(11), location(11, 0), "f", VikariType.BIG_DECIMAL,
-                VikariType.BIG_DECIMAL, location(11, 8), new BigDecimal("6.0", Arithmetic.getMathContext()));
+                VikariType.BIG_DECIMAL, location(11, 8), new BigDecimal("6.0"));
     }
 
     @Test
@@ -957,8 +955,6 @@ public class ParserTest_Assignment extends ParserTest_Base {
             assertEquals(VariableDeclarationStatement.class, statements.get(i).getClass(), "Unexpected statement type.");
         }
 
-        MathContext mathContext = Arithmetic.getMathContext();
-
         // assignment statements
         testSimpleRightAssignment(statements.get(15), location(16, 0), "integer1", VikariType.INTEGER,
                 VikariType.LONG, location(16, 6), 1L);
@@ -973,7 +969,7 @@ public class ParserTest_Assignment extends ParserTest_Base {
                 VikariType.DOUBLE, location(19, 8), 4.0D);
 
         testSimpleRightAssignment(statements.get(19), location(20, 0), "integer5", VikariType.INTEGER,
-                VikariType.BIG_DECIMAL, location(20, 8), new BigDecimal("5.0", mathContext));
+                VikariType.BIG_DECIMAL, location(20, 8), new BigDecimal("5.0"));
 
         testSimpleRightAssignment(statements.get(20), location(21, 0), "long1", VikariType.LONG,
                 VikariType.BIG_INTEGER, location(21, 6), new BigInteger("6"));
@@ -985,7 +981,7 @@ public class ParserTest_Assignment extends ParserTest_Base {
                 VikariType.DOUBLE, location(23, 8), 8.0D);
 
         testSimpleRightAssignment(statements.get(23), location(24, 0), "long4", VikariType.LONG,
-                VikariType.BIG_DECIMAL, location(24, 8), new BigDecimal("9.0", mathContext));
+                VikariType.BIG_DECIMAL, location(24, 8), new BigDecimal("9.0"));
 
         testSimpleRightAssignment(statements.get(24), location(25, 0), "bigInteger1", VikariType.BIG_INTEGER,
                 VikariType.FLOAT, location(25, 9), 10.0F);
@@ -994,16 +990,16 @@ public class ParserTest_Assignment extends ParserTest_Base {
                 VikariType.DOUBLE, location(26, 9), 11.0D);
 
         testSimpleRightAssignment(statements.get(26), location(27, 0), "bigInteger3", VikariType.BIG_INTEGER,
-                VikariType.BIG_DECIMAL, location(27, 9), new BigDecimal("12.0", mathContext));
+                VikariType.BIG_DECIMAL, location(27, 9), new BigDecimal("12.0"));
 
         testSimpleRightAssignment(statements.get(27), location(28, 0), "float1", VikariType.FLOAT,
                 VikariType.DOUBLE, location(28, 9), 13.0D);
 
         testSimpleRightAssignment(statements.get(28), location(29, 0), "float2", VikariType.FLOAT,
-                VikariType.BIG_DECIMAL, location(29, 9), new BigDecimal("14.0", mathContext));
+                VikariType.BIG_DECIMAL, location(29, 9), new BigDecimal("14.0"));
 
         testSimpleRightAssignment(statements.get(29), location(30, 0), "double1", VikariType.DOUBLE,
-                VikariType.BIG_DECIMAL, location(30, 9), new BigDecimal("15.0", mathContext));
+                VikariType.BIG_DECIMAL, location(30, 9), new BigDecimal("15.0"));
     }
 
     @Test

@@ -137,7 +137,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
         testVariable("c", VikariType.ATONEMENT_CRYSTAL, VikariType.BIG_INTEGER, new BigInteger("3"));
         testVariable("d", VikariType.ATONEMENT_CRYSTAL, VikariType.FLOAT, 4.0F);
         testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.DOUBLE, 5.0D);
-        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BIG_DECIMAL, new BigDecimal("6.0", Arithmetic.getMathContext()));
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BIG_DECIMAL, new BigDecimal("6.0"));
     }
 
     @Test
@@ -164,7 +164,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
         testVariable("c", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, new BigInteger("3"));
         testVariable("d", VikariType.FLOAT, VikariType.FLOAT, 4.0F);
         testVariable("e", VikariType.DOUBLE, VikariType.DOUBLE, 5.0D);
-        testVariable("f", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("6.0", Arithmetic.getMathContext()));
+        testVariable("f", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("6.0"));
     }
 
     @Test
@@ -205,8 +205,6 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
                 """;
         lexParseAndInterpret(sourceString);
 
-        MathContext mathContext = Arithmetic.getMathContext();
-
         testVariable("long1", VikariType.LONG, VikariType.LONG, 1L);
         testVariable("bigInteger1", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, new BigInteger("2"));
         testVariable("bigInteger2", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, new BigInteger("3"));
@@ -217,11 +215,11 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
         testVariable("double2", VikariType.DOUBLE, VikariType.DOUBLE, 8.0D);
         testVariable("double3", VikariType.DOUBLE, VikariType.DOUBLE, 9.0D);
         testVariable("double4", VikariType.DOUBLE, VikariType.DOUBLE, 10.0D);
-        testVariable("bigDecimal1", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("11", mathContext));
-        testVariable("bigDecimal2", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("12", mathContext));
-        testVariable("bigDecimal3", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("13", mathContext));
-        testVariable("bigDecimal4", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("14.0", mathContext));
-        testVariable("bigDecimal5", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("15.0", mathContext));
+        testVariable("bigDecimal1", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("11"));
+        testVariable("bigDecimal2", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("12"));
+        testVariable("bigDecimal3", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("13"));
+        testVariable("bigDecimal4", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("14.0"));
+        testVariable("bigDecimal5", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("15.0"));
     }
 
     @Test
@@ -532,7 +530,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
         testVariable("c", VikariType.ATONEMENT_CRYSTAL, VikariType.BIG_INTEGER, new BigInteger("3"));
         testVariable("d", VikariType.ATONEMENT_CRYSTAL, VikariType.FLOAT, 4.0F);
         testVariable("e", VikariType.ATONEMENT_CRYSTAL, VikariType.DOUBLE, 5.0D);
-        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BIG_DECIMAL, new BigDecimal("6.0", Arithmetic.getMathContext()));
+        testVariable("f", VikariType.ATONEMENT_CRYSTAL, VikariType.BIG_DECIMAL, new BigDecimal("6.0"));
     }
 
     @Test
@@ -559,7 +557,7 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
         testVariable("c", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, new BigInteger("3"));
         testVariable("d", VikariType.FLOAT, VikariType.FLOAT, 4.0F);
         testVariable("e", VikariType.DOUBLE, VikariType.DOUBLE, 5.0D);
-        testVariable("f", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("6.0", Arithmetic.getMathContext()));
+        testVariable("f", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("6.0"));
     }
 
     @Test
@@ -600,8 +598,6 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
                 """;
         lexParseAndInterpret(sourceString);
 
-        MathContext mathContext = Arithmetic.getMathContext();
-
         testVariable("long1", VikariType.LONG, VikariType.LONG, 1L);
         testVariable("bigInteger1", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, new BigInteger("2"));
         testVariable("bigInteger2", VikariType.BIG_INTEGER, VikariType.BIG_INTEGER, new BigInteger("3"));
@@ -612,11 +608,11 @@ public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInter
         testVariable("double2", VikariType.DOUBLE, VikariType.DOUBLE, 8.0D);
         testVariable("double3", VikariType.DOUBLE, VikariType.DOUBLE, 9.0D);
         testVariable("double4", VikariType.DOUBLE, VikariType.DOUBLE, 10.0D);
-        testVariable("bigDecimal1", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("11", mathContext));
-        testVariable("bigDecimal2", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("12", mathContext));
-        testVariable("bigDecimal3", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("13", mathContext));
-        testVariable("bigDecimal4", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("14.0", mathContext));
-        testVariable("bigDecimal5", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("15.0", mathContext));
+        testVariable("bigDecimal1", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("11"));
+        testVariable("bigDecimal2", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("12"));
+        testVariable("bigDecimal3", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("13"));
+        testVariable("bigDecimal4", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("14.0"));
+        testVariable("bigDecimal5", VikariType.BIG_DECIMAL, VikariType.BIG_DECIMAL, new BigDecimal("15.0"));
     }
 
     @Test

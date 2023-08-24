@@ -241,7 +241,7 @@ public class ParserTest_VariableDeclarationStatements extends ParserTest_Base {
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
         BigInteger bigInteger = new BigInteger("3");
-        BigDecimal bigDecimal = new BigDecimal("6.0", Arithmetic.getMathContext());
+        BigDecimal bigDecimal = new BigDecimal("6.0");
 
         testDeclaration(statements.get(0), "a", VikariType.INTEGER, VikariType.INTEGER, location(0, 0), 1);
         testDeclaration(statements.get(1), "b", VikariType.LONG, VikariType.LONG, location(1, 0), 2L);
@@ -324,23 +324,21 @@ public class ParserTest_VariableDeclarationStatements extends ParserTest_Base {
         int actualSize = statements.size();
         assertEquals(expectedSize, actualSize, "Unexpected number of statements.");
 
-        MathContext mathContext = Arithmetic.getMathContext();
-
         testDeclaration(statements.get(0), "a", VikariType.INTEGER, VikariType.LONG, location(0, 0), 1L);
         testDeclaration(statements.get(1), "b", VikariType.INTEGER, VikariType.BIG_INTEGER, location(1, 0), new BigInteger("2"));
         testDeclaration(statements.get(2), "c", VikariType.INTEGER, VikariType.FLOAT, location(2, 0), 3.0F);
         testDeclaration(statements.get(3), "d", VikariType.INTEGER, VikariType.DOUBLE, location(3, 0), 4.0D);
-        testDeclaration(statements.get(4), "e", VikariType.INTEGER, VikariType.BIG_DECIMAL, location(4, 0), new BigDecimal("5.0", mathContext));
+        testDeclaration(statements.get(4), "e", VikariType.INTEGER, VikariType.BIG_DECIMAL, location(4, 0), new BigDecimal("5.0"));
         testDeclaration(statements.get(5), "f", VikariType.LONG, VikariType.BIG_INTEGER, location(5, 0), new BigInteger("6"));
         testDeclaration(statements.get(6), "g", VikariType.LONG, VikariType.FLOAT, location(6, 0), 7.0F);
         testDeclaration(statements.get(7), "h", VikariType.LONG, VikariType.DOUBLE, location(7, 0), 8.0D);
-        testDeclaration(statements.get(8), "i", VikariType.LONG, VikariType.BIG_DECIMAL, location(8, 0), new BigDecimal("9.0", mathContext));
+        testDeclaration(statements.get(8), "i", VikariType.LONG, VikariType.BIG_DECIMAL, location(8, 0), new BigDecimal("9.0"));
         testDeclaration(statements.get(9), "j", VikariType.BIG_INTEGER, VikariType.FLOAT, location(9, 0), 10.0F);
         testDeclaration(statements.get(10), "k", VikariType.BIG_INTEGER, VikariType.DOUBLE, location(10, 0), 11.0D);
-        testDeclaration(statements.get(11), "l", VikariType.BIG_INTEGER, VikariType.BIG_DECIMAL, location(11, 0), new BigDecimal("12.0", mathContext));
+        testDeclaration(statements.get(11), "l", VikariType.BIG_INTEGER, VikariType.BIG_DECIMAL, location(11, 0), new BigDecimal("12.0"));
         testDeclaration(statements.get(12), "m", VikariType.FLOAT, VikariType.DOUBLE, location(12, 0), 13.0D);
-        testDeclaration(statements.get(13), "n", VikariType.FLOAT, VikariType.BIG_DECIMAL, location(13, 0), new BigDecimal("14.0", mathContext));
-        testDeclaration(statements.get(14), "o", VikariType.DOUBLE, VikariType.BIG_DECIMAL, location(14, 0), new BigDecimal("15.0", mathContext));
+        testDeclaration(statements.get(13), "n", VikariType.FLOAT, VikariType.BIG_DECIMAL, location(13, 0), new BigDecimal("14.0"));
+        testDeclaration(statements.get(14), "o", VikariType.DOUBLE, VikariType.BIG_DECIMAL, location(14, 0), new BigDecimal("15.0"));
     }
 
     @Test

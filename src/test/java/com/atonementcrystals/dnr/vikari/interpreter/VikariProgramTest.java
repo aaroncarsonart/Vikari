@@ -93,7 +93,7 @@ class VikariProgramTest {
                 :a / 7
                 """;
         runVikariProgram(sourceString);
-        assertOutput("3.142857142857142857142857142857143");
+        assertOutput("3.14285714285714285714285714285714");
     }
 
     @Test

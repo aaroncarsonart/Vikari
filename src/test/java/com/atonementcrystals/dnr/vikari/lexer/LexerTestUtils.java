@@ -7,6 +7,7 @@ import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 
 import java.util.List;
 
+import static com.atonementcrystals.dnr.vikari.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LexerTestUtils {
@@ -35,12 +36,10 @@ public class LexerTestUtils {
 
         List<List<String>> statements = lexer.lexToStringTokens(sourceString);
 
-        if (expectedErrorCount == 0 && syntaxErrorReporter.hasErrors()) {
-            syntaxErrorReporter.reportSyntaxErrors();
-            fail("Expected no syntax errors.");
+        if (expectedErrorCount == 0) {
+            assertNoSyntaxErrors(syntaxErrorReporter);
         } else {
-            int actualErrorCount = syntaxErrorReporter.getSyntaxErrors().size();
-            assertEquals(expectedErrorCount, actualErrorCount, "Unexpected number of syntax errors.");
+            assertSyntaxErrors(syntaxErrorReporter, expectedErrorCount);
         }
 
         int actualStatementCount = statements.size();
@@ -154,12 +153,10 @@ public class LexerTestUtils {
         List<List<String>> listOfStatementTokens = lexer.lexToStringTokens(sourceString);
         List<List<AtonementCrystal>> statementsOfCrystals = lexer.convertTokensToCrystals(listOfStatementTokens);
 
-        if (expectedErrorCount == 0 && syntaxErrorReporter.hasErrors()) {
-            syntaxErrorReporter.reportSyntaxErrors();
-            fail("Expected no syntax errors.");
+        if (expectedErrorCount == 0) {
+            assertNoSyntaxErrors(syntaxErrorReporter);
         } else {
-            int actualErrorCount = syntaxErrorReporter.getSyntaxErrors().size();
-            assertEquals(expectedErrorCount, actualErrorCount, "Unexpected number of syntax errors.");
+            assertSyntaxErrors(syntaxErrorReporter, expectedErrorCount);
         }
 
         int actualStatementCount = statementsOfCrystals.size();

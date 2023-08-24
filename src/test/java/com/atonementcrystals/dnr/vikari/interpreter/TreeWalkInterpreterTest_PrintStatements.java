@@ -89,4 +89,17 @@ public class TreeWalkInterpreterTest_PrintStatements extends TreeWalkInterpreter
     public void testTreeWalkInterpreter_PrintlnExpression_Chained_MultiLine() {
         testPrintStatement(":5 + 3:\n:7 - 2:\n:\n:22:7:", "8\n5\n\n227\n");
     }
+
+    @Test
+    @Order(13)
+    public void testTreeWalkInterpreter_PrintExpression_BigDecimal_StringRepresentation() {
+        testPrintStatement(":10.0B", "10.0");
+        testPrintStatement(":10.000B", "10.0");
+        testPrintStatement(":10.1B", "10.1");
+        testPrintStatement(":10.10B", "10.1");
+        testPrintStatement(":10.001B", "10.001");
+        testPrintStatement(":10.00100B", "10.001");
+        testPrintStatement(":10.111B", "10.111");
+        testPrintStatement(":10.111000B", "10.111");
+    }
 }
