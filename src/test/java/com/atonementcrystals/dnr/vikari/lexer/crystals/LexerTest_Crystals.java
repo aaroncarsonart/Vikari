@@ -7,6 +7,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCry
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.FunctionCallOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.ListElementSeparatorCrystal;
@@ -19,7 +20,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.literal.StringLiteralCrysta
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.SwordCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.LeftAssignmentOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -42,15 +42,16 @@ public class LexerTest_Crystals {
     @Test
     @Order(1)
     public void testLexer_Crystals_BasicDefaultIdentifiers() {
-        // Enclosures can't be individually lexed.
-        Set<TokenType> enclosureTokenTypes = EnumSet.of(
+        // Some TokenTypes don't lex on their own without causing a syntax error.
+        Set<TokenType> tokenTypesToIgnore = EnumSet.of(
                 TokenType.COMMENT_PREFIX_CRYSTAL,
                 TokenType.COMMENT_SUFFIX_CRYSTAL,
                 TokenType.CAPTURE_QUOTATION,
-                TokenType.BACKTICK);
+                TokenType.BACKTICK,
+                TokenType.DELETE);
 
         List<TokenType> tokenTypesToTest = TokenType.LEXER_TOKENS.stream()
-                .filter(Predicate.not(enclosureTokenTypes::contains))
+                .filter(Predicate.not(tokenTypesToIgnore::contains))
                 .collect(Collectors.toCollection(ArrayList::new));
 
         for (TokenType tokenType : tokenTypesToTest) {
@@ -66,12 +67,13 @@ public class LexerTest_Crystals {
     @Test
     @Order(2)
     public void testLexer_Crystals_BasicAssignmentStatement() {
-        String sourceString = "a << *";
-        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 3);
+        String sourceString = "a << AtonementCrystal!";
+        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 4);
 
         testCrystal(statement.get(0), ReferenceCrystal.class, "a", location(0, 0));
         testCrystal(statement.get(1), LeftAssignmentOperatorCrystal.class, "<<", location(0, 2));
-        testCrystal(statement.get(2), MultiplyOperatorCrystal.class, "*", location(0, 5));
+        testCrystal(statement.get(2), TypeReferenceCrystal.class, "AtonementCrystal", location(0, 5));
+        testCrystal(statement.get(3), FunctionCallOperatorCrystal.class, "!", location(0, 21));
     }
 
     @Test
@@ -189,7 +191,7 @@ public class LexerTest_Crystals {
     @Test
     @Order(12)
     public void testLexer_Crystals_CaptureQuotations_EnclosingCode_SingleLine() {
-        String sourceString = "``a << *``";
+        String sourceString = "``a << AtonementCrystal!``";
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 1);
         testCrystal(statement.get(0),StringLiteralCrystal.class, sourceString, location(0, 0));
     }
@@ -198,7 +200,7 @@ public class LexerTest_Crystals {
     @Order(13)
     public void testLexer_Crystals_CaptureQuotations_EnclosingCode_OnSeparateLines_SingleLine() {
         String sourceString = "string << ``\n" +
-                              "a << *\n" +
+                              "a << AtonementCrystal!\n" +
                               "`` + foo";
 
         List<List<AtonementCrystal>> statements = lex(sourceString, 3, crystalCounts(3, 1, 3));
@@ -207,7 +209,7 @@ public class LexerTest_Crystals {
         testCrystal(statements.get(0).get(1), LeftAssignmentOperatorCrystal.class, "<<", location(0, 7));
 
         MultiLineStringLiteralCrystal string1 = testMultiLineStringLiteral(statements.get(0).get(2), "``", location(0, 10));
-        MultiLineStringLiteralCrystal string2 = testMultiLineStringLiteral(statements.get(1).get(0), "a << *", location(1, 0));
+        MultiLineStringLiteralCrystal string2 = testMultiLineStringLiteral(statements.get(1).get(0), "a << AtonementCrystal!", location(1, 0));
         MultiLineStringLiteralCrystal string3 = testMultiLineStringLiteral(statements.get(2).get(0), "``", location(2, 0));
 
         testCrystal(statements.get(2).get(1), AddOperatorCrystal.class, "+", location(2, 3));
@@ -337,5 +339,15 @@ public class LexerTest_Crystals {
         testCrystal(statement.get(4), LeftParenthesisCrystal.class, "(", location(0, 10));
         testCrystal(statement.get(5), IntegerCrystal.class, "-1", location(0, 12));
         testCrystal(statement.get(6), RightParenthesisCrystal.class, ")", location(0, 13));
+    }
+
+    @Test
+    @Order(24)
+    public void testLexer_Crystals_DeleteOperator() {
+        String sourceString = "~foo";
+        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 2);
+
+        testCrystal(statement.get(0), DeleteOperatorCrystal.class, "~", location(0, 0));
+        testCrystal(statement.get(1), ReferenceCrystal.class, "foo", location(0, 1));
     }
 }

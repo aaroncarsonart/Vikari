@@ -22,9 +22,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.LongCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.LineContinuationCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.control.flow.ContinueOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.MultiplyOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.quotation.CaptureQuotationCrystal;
@@ -91,7 +88,7 @@ public class Lexer {
      * If a negation operator preceding a number literal follows one of these tokens,
      * the operator should be collapsed together with the number literal.
      */
-    private static final HashSet<Class<? extends AtonementCrystal>> COLLAPSE_NEGATION_OPERATOR_CLASSES = Stream.of(
+    public static final HashSet<Class<? extends AtonementCrystal>> COLLAPSE_NEGATION_OPERATOR_CLASSES = Stream.of(
                     TokenType.RETURN, TokenType.BREAK, TokenType.CONTINUE, TokenType.LEFT_SQUARE_BRACKET,
                     TokenType.REGION_SEPARATOR, TokenType.LEFT_PARENTHESIS, TokenType.LIST_ELEMENT_SEPARATOR,
                     TokenType.RANGE, TokenType.TYPE_LABEL, TokenType.INDEX_OPERATOR, TokenType.COPY_CONSTRUCTOR,
@@ -106,7 +103,7 @@ public class Lexer {
                     TokenType.REFERENCE_EQUALS, TokenType.LESS_THAN, TokenType.GREATER_THAN,
                     TokenType.GREATER_THAN_OR_EQUALS, TokenType.LESS_THAN_OR_EQUALS, TokenType.KEY_VALUE_PAIR,
                     TokenType.ITERATION_ELEMENT, TokenType.INSTANCE_OF, TokenType.CATCH_ALL,
-                    TokenType.LEFT_FEATHER_FALL, TokenType.RIGHT_FEATHER_FALL)
+                    TokenType.LEFT_FEATHER_FALL, TokenType.NOT_EQUALS, TokenType.LEFT_CURLY_BRACKET, TokenType.DELETE)
             .map(TokenType::getJavaType)
             .collect(Collectors.toCollection(HashSet::new));
 
@@ -234,7 +231,6 @@ public class Lexer {
                 switch (nextChar) {
                     case '!':
                     case '#':
-                    case '$':
                     case '%':
                     case '&':
                     case '(':
@@ -247,6 +243,10 @@ public class Lexer {
                     case '{':
                     case '}':
                         token();
+                        break;
+
+                    case '$':
+                        tryMatchAndGetToken(":");
                         break;
 
                     case '\'':
@@ -808,7 +808,7 @@ public class Lexer {
                         }
                     }
 
-                    // Otherwise, handle all as SUBTRACT at first.
+                    // Otherwise, handle all "-" tokens as a SubtractCrystal at first.
                     SubtractOperatorCrystal subtractCrystal = new SubtractOperatorCrystal();
                     subtractCrystal.setCoordinates(tokenCoordinates);
                     statementOfCrystals.add(subtractCrystal);
@@ -1053,38 +1053,6 @@ public class Lexer {
                     swordCrystal.setLength(stringToken.length());
                     swordCrystal.setCoordinates(tokenCoordinates);
                     statementOfCrystals.add(swordCrystal);
-                    continue;
-                }
-
-                if (TokenType.DELETE.getIdentifier().equals(stringToken)) {
-                    // Handle all as DELETE at first.
-                    DeleteOperatorCrystal deleteOperatorCrystal = new DeleteOperatorCrystal();
-                    deleteOperatorCrystal.setCoordinates(tokenCoordinates);
-                    statementOfCrystals.add(deleteOperatorCrystal);
-                    continue;
-                }
-
-                if (TokenType.MULTIPLY.getIdentifier().equals(stringToken)) {
-                    // Handle all as MULTIPLY at first.
-                    MultiplyOperatorCrystal multiplyCrystal = new MultiplyOperatorCrystal();
-                    multiplyCrystal.setCoordinates(tokenCoordinates);
-                    statementOfCrystals.add(multiplyCrystal);
-                    continue;
-                }
-
-                if (TokenType.ADD.getIdentifier().equals(stringToken)) {
-                    // Handle all as ADD at first.
-                    AddOperatorCrystal addCrystal = new AddOperatorCrystal();
-                    addCrystal.setCoordinates(tokenCoordinates);
-                    statementOfCrystals.add(addCrystal);
-                    continue;
-                }
-
-                if (TokenType.CONTINUE.getIdentifier().equals(stringToken)) {
-                    // handle all as CONTINUE at first.
-                    ContinueOperatorCrystal addCrystal = new ContinueOperatorCrystal();
-                    addCrystal.setCoordinates(tokenCoordinates);
-                    statementOfCrystals.add(addCrystal);
                     continue;
                 }
 

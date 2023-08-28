@@ -34,13 +34,14 @@ public class LexerTest_StringTokens_Backticks {
     @Test
     @Order(2)
     public void testLexer_StringTokens_SingleBacktickQuotation_MultiCharacterIdentifier() {
-        List<String> statement = lexSingleStatementAsTokens("`foo` << *", 5);
+        List<String> statement = lexSingleStatementAsTokens("`foo` << AtonementCrystal!", 6);
 
         testToken(statement.get(0), "`foo`");
         testToken(statement.get(1), " ");
         testToken(statement.get(2), "<<");
         testToken(statement.get(3), " ");
-        testToken(statement.get(4), "*");
+        testToken(statement.get(4), "AtonementCrystal");
+        testToken(statement.get(5), "!");
     }
 
     @Test
@@ -58,7 +59,7 @@ public class LexerTest_StringTokens_Backticks {
     @Test
     @Order(4)
     public void testLexer_StringTokens_SingleBacktickQuotation_IdentifierContainingMixOfSymbols() {
-        String sourceString = "`~a.~*||_where::foo }{ ^^public ~\\\\.__.//~`:Integer << *";
+        String sourceString = "`~a.~*||_where::foo }{ ^^public ~\\\\.__.//~`:Integer << 0";
         List<String> statement = lexSingleStatementAsTokens(sourceString, 7);
 
         testToken(statement.get(0), "`~a.~*||_where::foo }{ ^^public ~\\\\.__.//~`");
@@ -67,23 +68,23 @@ public class LexerTest_StringTokens_Backticks {
         testToken(statement.get(3), " ");
         testToken(statement.get(4), "<<");
         testToken(statement.get(5), " ");
-        testToken(statement.get(6), "*");
+        testToken(statement.get(6), "0");
     }
 
     @Test
     @Order(5)
     public void testLexer_StringTokens_SingleBacktickQuotation_IdentifierContainingNewline() {
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        List<List<String>> statements = lexAsTokens("`foo\n`:Integer << *", 2, errorReporter, 2, tokenCounts(1, 1));
+        List<List<String>> statements = lexAsTokens("`foo\n`:Integer << 0", 2, errorReporter, 2, tokenCounts(1, 1));
 
         testToken(statements.get(0).get(0), "`foo");
-        testToken(statements.get(1).get(0), "`:Integer << *");
+        testToken(statements.get(1).get(0), "`:Integer << 0");
 
         List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
 
         String expectedErrorMessage = "Missing closing backtick quotation";
         testSyntaxError(syntaxErrors.get(0), location(0, 0), "`foo", expectedErrorMessage);
-        testSyntaxError(syntaxErrors.get(1), location(1, 0), "`:Integer << *", expectedErrorMessage);
+        testSyntaxError(syntaxErrors.get(1), location(1, 0), "`:Integer << 0", expectedErrorMessage);
     }
 
     @Test
@@ -195,7 +196,7 @@ public class LexerTest_StringTokens_Backticks {
         // ---------------
         // multiple spaces
         // ---------------
-        String sourceString = "`   ` << *";
+        String sourceString = "`   ` << 0";
 
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
         statement = lexSingleStatementAsTokens(sourceString, 5, errorReporter, 1);
@@ -204,7 +205,7 @@ public class LexerTest_StringTokens_Backticks {
         testToken(statement.get(1), " ");
         testToken(statement.get(2), "<<");
         testToken(statement.get(3), " ");
-        testToken(statement.get(4), "*");
+        testToken(statement.get(4), "0");
 
         List<VikariError> syntaxErrors = errorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Backtick-quoted identifiers cannot " +
@@ -213,7 +214,7 @@ public class LexerTest_StringTokens_Backticks {
         // ----------
         // single tab
         // ----------
-        sourceString = "`\t` << *";
+        sourceString = "`\t` << 0";
 
         errorReporter = new SyntaxErrorReporter();
         statement = lexSingleStatementAsTokens(sourceString, 5, errorReporter, 1);
@@ -222,7 +223,7 @@ public class LexerTest_StringTokens_Backticks {
         testToken(statement.get(1), " ");
         testToken(statement.get(2), "<<");
         testToken(statement.get(3), " ");
-        testToken(statement.get(4), "*");
+        testToken(statement.get(4), "0");
 
         syntaxErrors = errorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Backtick-quoted identifiers cannot " +
@@ -231,7 +232,7 @@ public class LexerTest_StringTokens_Backticks {
         // -------------
         // multiple tabs
         // -------------
-        sourceString = "`\t\t` << *";
+        sourceString = "`\t\t` << 0";
 
         errorReporter = new SyntaxErrorReporter();
         statement = lexSingleStatementAsTokens(sourceString, 5, errorReporter, 1);
@@ -240,7 +241,7 @@ public class LexerTest_StringTokens_Backticks {
         testToken(statement.get(1), " ");
         testToken(statement.get(2), "<<");
         testToken(statement.get(3), " ");
-        testToken(statement.get(4), "*");
+        testToken(statement.get(4), "0");
 
         syntaxErrors = errorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Backtick-quoted identifiers cannot " +
@@ -249,7 +250,7 @@ public class LexerTest_StringTokens_Backticks {
         // ----------------------
         // mix of spaces and tabs
         // ----------------------
-        sourceString = "` \t  \t\t   ` << *";
+        sourceString = "` \t  \t\t   ` << 0";
 
         errorReporter = new SyntaxErrorReporter();
         statement = lexSingleStatementAsTokens(sourceString, 5, errorReporter, 1);
@@ -258,7 +259,7 @@ public class LexerTest_StringTokens_Backticks {
         testToken(statement.get(1), " ");
         testToken(statement.get(2), "<<");
         testToken(statement.get(3), " ");
-        testToken(statement.get(4), "*");
+        testToken(statement.get(4), "0");
 
         syntaxErrors = errorReporter.getSyntaxErrors();
         testSyntaxError(syntaxErrors.get(0), location(0, 1), sourceString, "Backtick-quoted identifiers cannot " +

@@ -16,14 +16,14 @@ public class LexerTest_StringTokens_Whitespace {
     @Test
     @Order(1)
     public void testLexer_StringTokens_Whitespace_CollapsionOfSpaces() {
-        List<String> statement = lexSingleStatementAsTokens("    a <<  *", 6);
+        List<String> statement = lexSingleStatementAsTokens("    a <<  1", 6);
 
         testToken(statement.get(0), "    ");
         testToken(statement.get(1), "a");
         testToken(statement.get(2), " ");
         testToken(statement.get(3), "<<");
         testToken(statement.get(4), "  ");
-        testToken(statement.get(5), "*");
+        testToken(statement.get(5), "1");
     }
 
     @Test
@@ -70,13 +70,13 @@ public class LexerTest_StringTokens_Whitespace {
     @Test
     @Order(4)
     public void testLexer_StringTokens_Whitespace_AtEndOfLine() {
-        List<String> statement = lexSingleStatementAsTokens("a << *   ", 6);
+        List<String> statement = lexSingleStatementAsTokens("a << 1   ", 6);
 
         testToken(statement.get(0), "a");
         testToken(statement.get(1), " ");
         testToken(statement.get(2), "<<");
         testToken(statement.get(3), " ");
-        testToken(statement.get(4), "*");
+        testToken(statement.get(4), "1");
         testToken(statement.get(5), "   ");
     }
 }

@@ -1,6 +1,7 @@
 package com.atonementcrystals.dnr.vikari.core.crystal.identifier;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.CollectionLiteralOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.ExistsOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.bool.LeftLogicalAndAssignmentOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.math.LeftMultiplyAssignmentOperatorCrystal;
@@ -13,7 +14,6 @@ import com.atonementcrystals.dnr.vikari.core.crystal.keyword.error.CatchCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.keyword.error.ThrowCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.SwordCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.ConcatenateOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.operator.ConstructorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.DotOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.FunctionCallOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.KeyValuePairOperatorCrystal;
@@ -57,6 +57,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.NegateOperato
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.RightDivideOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.AnnotationOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.CastOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.CopyConstructorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.IndexOperatorCrystal;
@@ -105,9 +106,6 @@ public enum TokenType {
     CONTINUE(">>", ContinueOperatorCrystal.class),
     BREAK("vv", BreakOperatorCrystal.class),
 
-    // Literals
-    SWORD("_", SwordCrystal.class),
-
     // Separators
     BACKTICK("`", BacktickQuotationCrystal.class),
     CAPTURE_QUOTATION("``", CaptureQuotationCrystal.class),
@@ -134,20 +132,22 @@ public enum TokenType {
     TYPE_LABEL(":", TypeLabelOperatorCrystal.class),
     PRINT_STATEMENT(":", PrintStatementOperatorCrystal.class),
     FUNCTION_CALL("!", FunctionCallOperatorCrystal.class),
+    CAST("!", CastOperatorCrystal.class),
 
     INSTANCE_FIELD_ACCESS("@", InstanceFieldAccessOperatorCrystal.class),
     INSTANCE_SUPER("@", InstanceSuperOperatorCrystal.class),
     STATIC_FIELD_ACCESS("#", StaticFieldAccessOperatorCrystal.class),
     STATIC_SUPER("#", StaticSuperOperatorCrystal.class),
     INDEX_OPERATOR("$", IndexOperatorCrystal.class),
-    ANNOTATION("$", AnnotationOperatorCrystal.class),
+    ANNOTATION("$:", AnnotationOperatorCrystal.class),
+    COLLECTION_LITERAL("$:", CollectionLiteralOperatorCrystal.class),
     COPY_CONSTRUCTOR("&", CopyConstructorCrystal.class),
     MODULUS("%", ModulusOperatorCrystal.class),
     MULTIPLY("*", MultiplyOperatorCrystal.class),
-    CONSTRUCTOR("*", ConstructorCrystal.class),
     SUBTRACT("-", SubtractOperatorCrystal.class),
     NEGATE("-", NegateOperatorCrystal.class),
     EXISTS("?", ExistsOperatorCrystal.class),
+    INSTANCE_OF("?", InstanceOfOperatorCrystal.class),
 
     ADD("+", AddOperatorCrystal.class),
     CONCATENATE("+", ConcatenateOperatorCrystal.class),
@@ -194,7 +194,7 @@ public enum TokenType {
     // Miscellaneous
     KEY_VALUE_PAIR("=>", KeyValuePairOperatorCrystal.class),
     ITERATION_ELEMENT("<-", IterationElementOperatorCrystal.class),
-    INSTANCE_OF("->", InstanceOfOperatorCrystal.class),
+    SWORD("_", SwordCrystal.class),
 
     // Angel guards
     CATCH_ALL("||", CatchAllCrystal.class),
@@ -211,13 +211,13 @@ public enum TokenType {
             // duplicates
             TokenType.INSTANCE_SUPER,
             TokenType.STATIC_SUPER,
-            TokenType.ANNOTATION,
-            TokenType.CONSTRUCTOR,
             TokenType.NEGATE,
             TokenType.RIGHT_ASSIGNMENT,
             TokenType.CONCATENATE,
-            TokenType.DELETE,
             TokenType.PRINT_STATEMENT,
+            TokenType.COLLECTION_LITERAL,
+            TokenType.EXISTS,
+            TokenType.CAST,
             // special cases
             TokenType.SWORD,
             TokenType.THROW,

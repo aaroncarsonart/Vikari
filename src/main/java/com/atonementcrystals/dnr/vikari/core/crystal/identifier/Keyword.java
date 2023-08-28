@@ -13,6 +13,7 @@ public enum Keyword {
     PRIVATE("private"),
     PUBLIC("public"),
     DNR("dnr"),
+    RUNTIME("runtime"),
 
     // literals
     TRUE("true"),

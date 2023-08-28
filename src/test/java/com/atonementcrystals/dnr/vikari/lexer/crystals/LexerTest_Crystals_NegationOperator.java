@@ -20,6 +20,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.comparison.EqualsO
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.logical.LogicalNotOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.IndexOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.RangeOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionOperatorCrystal;
@@ -29,32 +30,126 @@ import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.RightSqu
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.ListElementSeparatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.RightParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.*;
 import static com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * These test cases only test the positive cases. So for all other cases not explicitly tested for here,
- * it is assumed that the token "-" is not a negation operator, and so it should not be applied to a
- * number token which immediately follows it. Either this is because it is a part of a valid expression
- * which should be kept as separate tokens (aka: `a - 5`), or it is an invalid expression which will be a
- * syntax error in which it would not be more helpful for the "-" token to be applied to the number for
- * correctly interpreting the error case result.<br/>
- * <br/>
- * "Positive cases" means all cases in which "-" is to be applied as a negation operator to a number
- * crystal's literal value and parsed as a singular token, not two. However, some cases are in fact error
- * cases, as mentioned above. For example, the expression `vv -5` is not valid Vikari code, because the
- * break operator does not accept negative numbers for its operand. But yet it must be correctly parsed
- * in this way in order to properly detect the syntax error, and to report it accurately.
+ * The negation operator - is sometimes collapsed with the following token when that
+ * token is a numeric literal. This is based on what kind of token precedes the
+ * negation operator. This test class exhaustively tests every scenario.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LexerTest_Crystals_NegationOperator {
+
+    /**
+     * Test that every TokenType either collapses the negation operator, or does not.
+     */
+    @Test
+    @Order(1)
+    public void testLexer_Crystals_NegationOperator_EnsureAllTokenTypesAreHandled() {
+        // Manually specify all TokenTypes that don't collapse the negation operator.
+        List<TokenType> nonCollapsingTokenTypes = List.of(
+                TokenType.FUNCTION_CALL,
+                TokenType.STATIC_FIELD_ACCESS,
+                TokenType.ANNOTATION,
+                TokenType.RIGHT_PARENTHESIS,
+                TokenType.CATCH,
+                TokenType.THROW,
+                TokenType.DOT,
+                TokenType.VARIABLE_ARGUMENTS_LIST,
+                TokenType.REGION_OPERATOR,
+                TokenType.LOOP,
+                TokenType.CONDITIONAL_BRANCH,
+                TokenType.INSTANCE_FIELD_ACCESS,
+                TokenType.RIGHT_SQUARE_BRACKET,
+                TokenType.SWORD,
+                TokenType.RIGHT_CURLY_BRACKET,
+                TokenType.RIGHT_FEATHER_FALL);
+
+        // Build a map of the expected crystal counts for a statement of the form "token - 1".
+        Map<TokenType, Integer> expectedTokenTypeCrystalCounts = new LinkedHashMap<>();
+        for (TokenType tokenType : TokenType.values()) {
+            if (Lexer.COLLAPSE_NEGATION_OPERATOR_CLASSES.contains(tokenType.getJavaType())) {
+                expectedTokenTypeCrystalCounts.put(tokenType, 2);
+            }
+        }
+        for (TokenType tokenType : nonCollapsingTokenTypes) {
+            expectedTokenTypeCrystalCounts.put(tokenType, 3);
+        }
+
+        // List of TokenTypes to ignore.
+        List<TokenType> duplicatesAndSpecialCases = List.of(
+                TokenType.COMMENT_PREFIX_CRYSTAL,
+                TokenType.COMMENT_SUFFIX_CRYSTAL,
+                TokenType.BACKTICK,
+                TokenType.CAPTURE_QUOTATION,
+                TokenType.LINE_CONTINUATION,
+                TokenType.MINIMIZED_LINE_CONTINUATION,
+                TokenType.STATEMENT_SEPARATOR,
+                TokenType.INSTANCE_SUPER,
+                TokenType.STATIC_SUPER,
+                TokenType.NEGATE,
+                TokenType.RIGHT_ASSIGNMENT,
+                TokenType.CONCATENATE,
+                TokenType.PRINT_STATEMENT,
+                TokenType.COLLECTION_LITERAL,
+                TokenType.EXISTS,
+                TokenType.CAST);
+
+        // Get all TokenTypes, but ignore the duplicates and special cases.
+        List<TokenType> tokenTypesToTest = Arrays.stream(TokenType.values())
+                .filter(tokenType -> !duplicatesAndSpecialCases.contains(tokenType))
+                .sorted()
+                .toList();
+
+        // Determine if any TokenTypes are not handled by this test method.
+        List<String> unhandledTokenTypes = tokenTypesToTest.stream()
+                .filter(tokenType -> !expectedTokenTypeCrystalCounts.containsKey(tokenType))
+                .map(TokenType::getIdentifier)
+                .sorted()
+                .toList();
+
+        // Detect if any new TokenTypes aren't handled by this unit test.
+        if (!unhandledTokenTypes.isEmpty()) {
+            fail("Unhandled TokenTypes in negation operator collapsion test: "  + unhandledTokenTypes);
+        }
+
+        // Test the statements for each operator.
+        for (TokenType tokenType : tokenTypesToTest) {
+            String tokenTypeIdentifier = tokenType.getIdentifier();
+            String sourceString = tokenType.getIdentifier() + " - 1";
+            int expectedCrystalCount = expectedTokenTypeCrystalCounts.get(tokenType);
+            List<AtonementCrystal> statement = lexSingleStatement(sourceString, expectedCrystalCount);
+
+            Class<? extends AtonementCrystal> expectedType = tokenType.getJavaType();
+            testCrystal(statement.get(0), expectedType, tokenTypeIdentifier, location(0, 0));
+
+            int locationOffset = tokenTypeIdentifier.length();
+
+            // Negation operator collapsion case.
+            if (expectedCrystalCount == 2) {
+                testCrystal(statement.get(1), IntegerCrystal.class, "-1", location(0, locationOffset + 3));
+            }
+
+            // Non-negation operator collapsion case.
+            else {
+                testCrystal(statement.get(1), SubtractOperatorCrystal.class, "-", location(0, locationOffset + 1));
+                testCrystal(statement.get(2), IntegerCrystal.class, "1", location(0, locationOffset + 3));
+            }
+        }
+    }
 
     private void testUnaryOperatorExpression(String sourceString, TokenType unaryOperator) {
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 2);
@@ -114,7 +209,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(1)
+    @Order(2)
     public void testLexer_Crystals_NegationOperator_Basic_NoSpace() {
         String sourceString = "-1\n-2L\n-3B\n-4.0F\n-5.0D\n-6.0B";
 
@@ -136,7 +231,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     public void testLexer_Crystals_NegationOperator_Basic_WithSpace() {
         String sourceString = "- 1\n- 2L\n- 3B\n- 4.0F\n- 5.0D\n- 6.0B";
 
@@ -158,7 +253,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     public void testLexer_Crystals_NegationOperator_AfterUnaryOperators() {
         testUnaryOperatorExpression("^^ -5", TokenType.RETURN);
         testUnaryOperatorExpression(">> -5", TokenType.CONTINUE);
@@ -169,7 +264,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     public void testLexer_Crystals_NegationOperator_AfterLeftSquareBracket() {
         List<AtonementCrystal> statement = lexSingleStatement("[-5]", 3);
 
@@ -182,7 +277,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     public void testLexer_Crystals_NegationOperator_AfterStatementSeparator() {
         List<List<AtonementCrystal>> statements = lex("5,-5", 2, crystalCounts(1, 1));
 
@@ -193,7 +288,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     public void testLexer_Crystals_NegationOperator_AfterRegionSeparator() {
         List<AtonementCrystal> statement = lexSingleStatement("?? [true] :: _; -5", 8);
 
@@ -210,7 +305,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     public void testLexer_Crystals_NegationOperator_AfterLeftParenthesis() {
         List<AtonementCrystal> statement = lexSingleStatement("(-5)", 3);
 
@@ -222,7 +317,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     public void testLexer_Crystals_NegationOperator_AfterListElementSeparator() {
         List<AtonementCrystal> statement = lexSingleStatement("(5|-5)", 5);
 
@@ -236,7 +331,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     public void testLexer_Crystals_NegationOperator_AfterRangeOperator() {
         List<AtonementCrystal> statement = lexSingleStatement("5..-5", 3);
 
@@ -248,7 +343,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     public void testLexer_Crystals_NegationOperator_AfterIndexOperator() {
         List<AtonementCrystal> statement = lexSingleStatement("foo.$-5", 4);
 
@@ -261,7 +356,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     public void testLexer_Crystals_NegationOperator_AfterBinaryOperators() {
         testBinaryOperatorExpression("foo % -5", TokenType.MODULUS);
         testBinaryOperatorExpression("foo * -5", TokenType.MULTIPLY);
@@ -270,12 +365,13 @@ public class LexerTest_Crystals_NegationOperator {
         testBinaryOperatorExpression("foo \\ -5", TokenType.RIGHT_DIVIDE);
         testBinaryOperatorExpression("foo / -5", TokenType.LEFT_DIVIDE);
         testBinaryOperatorExpression("foo <- -5", TokenType.ITERATION_ELEMENT);
-        testBinaryOperatorExpression("foo -> -5", TokenType.INSTANCE_OF);
+        testBinaryOperatorExpression("foo ? -5", TokenType.INSTANCE_OF);
+        // TODO: Update the Lexer and this test class to reflect new TokenTypes.
         testBinaryOperatorExpression("foo => -5", TokenType.KEY_VALUE_PAIR);
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     public void testLexer_Crystals_NegationOperator_AfterAssignmentOperators() {
         testAssignmentOperatorExpression("foo << -5", TokenType.LEFT_ASSIGNMENT);
         testAssignmentOperatorExpression("foo +<< -5", TokenType.LEFT_ADD_ASSIGNMENT);
@@ -289,7 +385,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(13)
+    @Order(14)
     public void testLexer_Crystals_NegationOperator_AfterLogicalAssignmentOperators() {
         testLogicalOperatorExpression("foo ^<< -5 = bar", TokenType.LEFT_LOGICAL_AND_ASSIGNMENT);
         testLogicalOperatorExpression("foo \"<< -5 = bar", TokenType.LEFT_LOGICAL_OR_ASSIGNMENT);
@@ -298,14 +394,14 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(14)
+    @Order(15)
     public void testLexer_Crystals_NegationOperator_AfterBinaryLogicalOperators() {
         testLogicalOperatorExpression("foo ^ -5 = bar", TokenType.LOGICAL_AND);
         testLogicalOperatorExpression("foo \" -5 = bar", TokenType.LOGICAL_OR);
     }
 
     @Test
-    @Order(15)
+    @Order(16)
     public void testLexer_Crystals_NegationOperator_AfterLogicalNotOperator() {
         List<AtonementCrystal> statement = lexSingleStatement("'-5 = bar", 4);
 
@@ -318,7 +414,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(16)
+    @Order(17)
     public void testLexer_Crystals_NegationOperator_AfterComparisonOperators() {
         testBinaryOperatorExpression("foo = -5", TokenType.EQUALS);
         testBinaryOperatorExpression("foo <=> -5", TokenType.REFERENCE_EQUALS);
@@ -329,7 +425,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(17)
+    @Order(18)
     public void testLexer_Crystals_NegationOperator_AfterLeftFeatherFallOperator() {
         List<AtonementCrystal> statement = lexSingleStatement("\\\\ -5 / 0 //", 5);
 
@@ -343,9 +439,9 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(18)
+    @Order(19)
     public void testLexer_Crystals_NegationOperator_AfterRightFeatherFallOperator() {
-        List<AtonementCrystal> statement = lexSingleStatement("\\\\ dangerous!() // -5", 7);
+        List<AtonementCrystal> statement = lexSingleStatement("\\\\ dangerous!() // - 5", 8);
 
         testCrystal(statement.get(0), LeftFeatherFallCrystal.class, "\\\\", location(0, 0));
         testCrystal(statement.get(1), ReferenceCrystal.class, "dangerous", location(0, 3));
@@ -353,13 +449,12 @@ public class LexerTest_Crystals_NegationOperator {
         testCrystal(statement.get(3), LeftParenthesisCrystal.class, "(", location(0, 13));
         testCrystal(statement.get(4), RightParenthesisCrystal.class, ")", location(0, 14));
         testCrystal(statement.get(5), RightFeatherFallCrystal.class, "//", location(0, 16));
-        testCrystal(statement.get(6), IntegerCrystal.class, "-5", location(0, 20));
-
-        testNegationOperatorLocation(statement.get(6), location(0, 19));
+        testCrystal(statement.get(6), SubtractOperatorCrystal.class, "-", location(0, 19));
+        testCrystal(statement.get(7), IntegerCrystal.class, "5", location(0, 21));
     }
 
     @Test
-    @Order(19)
+    @Order(20)
     public void testLexer_Crystals_NegationOperator_WithSingleLineComment_BeforeNegation() {
         List<AtonementCrystal> statement = lexSingleStatement("2 + ~:Comment.:~ -5", 3);
 
@@ -371,7 +466,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(20)
+    @Order(21)
     public void testLexer_Crystals_NegationOperator_WithSingleLineComment_AfterNegation() {
         List<AtonementCrystal> statement = lexSingleStatement("2 + -~:Comment.:~5", 3);
 
@@ -383,7 +478,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(21)
+    @Order(22)
     public void testLexer_Crystals_NegationOperator_WithMultiLineComment_BeforeNegation() {
         List<AtonementCrystal> statement = lexSingleStatement("2 + ~:Multi-line\ncomment.:~ -5", 3);
 
@@ -395,7 +490,7 @@ public class LexerTest_Crystals_NegationOperator {
     }
 
     @Test
-    @Order(22)
+    @Order(23)
     public void testLexer_Crystals_NegationOperator_WithMultiLineComment_AfterNegation() {
         List<AtonementCrystal> statement = lexSingleStatement("2 + -~:Multi-line\ncomment.:~5", 3);
 
@@ -404,5 +499,18 @@ public class LexerTest_Crystals_NegationOperator {
         testCrystal(statement.get(2), IntegerCrystal.class, "-5", location(1, 10));
 
         testNegationOperatorLocation(statement.get(2), location(0, 4));
+    }
+
+    @Test
+    @Order(24)
+    public void testLexer_Crystals_NegationOperator_AfterFunctionCallOperator() {
+        List<AtonementCrystal> statement = lexSingleStatement("crystal.castToInteger! - 5", 6);
+
+        testCrystal(statement.get(0), ReferenceCrystal.class, "crystal", location(0, 0));
+        testCrystal(statement.get(1), DotOperatorCrystal.class, ".", location(0, 7));
+        testCrystal(statement.get(2), ReferenceCrystal.class, "castToInteger", location(0, 8));
+        testCrystal(statement.get(3), FunctionCallOperatorCrystal.class, "!", location(0, 21));
+        testCrystal(statement.get(4), SubtractOperatorCrystal.class, "-", location(0, 23));
+        testCrystal(statement.get(5), IntegerCrystal.class, "5", location(0, 25));
     }
 }

@@ -2,6 +2,7 @@ package com.atonementcrystals.dnr.vikari.lexer.crystals;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.operator.FunctionCallOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
@@ -52,13 +53,13 @@ public class LexerTest_Crystals_SyntaxErrors {
     @Test
     @Order(3)
     public void testLexer_Crystals_SingleBacktickQuotation_IdentifierContainingNewline() {
-        String sourceString = "`foo\n`:Integer << *";
+        String sourceString = "`foo\n`:Integer << 0";
 
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
         List<List<AtonementCrystal>> statements = lex(sourceString, 2, syntaxErrorReporter, 2, crystalCounts(1, 1));
 
         testCrystal(statements.get(0).get(0), ReferenceCrystal.class, "`foo", location(0, 0));
-        testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "`:Integer << *", location(1, 0));
+        testCrystal(statements.get(1).get(0), ReferenceCrystal.class, "`:Integer << 0", location(1, 0));
     }
 
     @Test
@@ -110,14 +111,15 @@ public class LexerTest_Crystals_SyntaxErrors {
         // ---------------
         // multiple spaces
         // ---------------
-        sourceString = "`   ` << *";
+        sourceString = "`   ` << AtonementCrystal!";
 
         SyntaxErrorReporter syntaxErrorReporter = new SyntaxErrorReporter();
-        statement = lexSingleStatement(sourceString, 3, syntaxErrorReporter, 1);
+        statement = lexSingleStatement(sourceString, 4, syntaxErrorReporter, 1);
 
         testCrystal(statement.get(0), ReferenceCrystal.class, "`   `", location(0, 0));
         testCrystal(statement.get(1), LeftAssignmentOperatorCrystal.class, "<<", location(0, 6));
-        testCrystal(statement.get(2), MultiplyOperatorCrystal.class, "*", location(0, 9));
+        testCrystal(statement.get(2), TypeReferenceCrystal.class, "AtonementCrystal", location(0, 9));
+        testCrystal(statement.get(3), FunctionCallOperatorCrystal.class, "!", location(0, 25));
 
         // ---------------------
         // single tab (is valid)
@@ -134,26 +136,28 @@ public class LexerTest_Crystals_SyntaxErrors {
         // -------------
         // multiple tabs
         // -------------
-        sourceString = "`\t\t` << *";
+        sourceString = "`\t\t` << AtonementCrystal!";
 
         syntaxErrorReporter = new SyntaxErrorReporter();
-        statement = lexSingleStatement(sourceString, 3, syntaxErrorReporter, 1);
+        statement = lexSingleStatement(sourceString, 4, syntaxErrorReporter, 1);
 
         testCrystal(statement.get(0), ReferenceCrystal.class, "`\t\t`", location(0, 0));
         testCrystal(statement.get(1), LeftAssignmentOperatorCrystal.class, "<<", location(0, 5));
-        testCrystal(statement.get(2), MultiplyOperatorCrystal.class, "*", location(0, 8));
+        testCrystal(statement.get(2), TypeReferenceCrystal.class, "AtonementCrystal", location(0, 8));
+        testCrystal(statement.get(3), FunctionCallOperatorCrystal.class, "!", location(0, 24));
 
         // ----------------------
         // mix of spaces and tabs
         // ----------------------
-        sourceString = "` \t  \t\t   ` << *";
+        sourceString = "` \t  \t\t   ` << AtonementCrystal!";
 
         syntaxErrorReporter = new SyntaxErrorReporter();
-        statement = lexSingleStatement(sourceString, 3, syntaxErrorReporter, 1);
+        statement = lexSingleStatement(sourceString, 4, syntaxErrorReporter, 1);
 
         testCrystal(statement.get(0), ReferenceCrystal.class, "` \t  \t\t   `", location(0, 0));
         testCrystal(statement.get(1), LeftAssignmentOperatorCrystal.class, "<<", location(0, 12));
-        testCrystal(statement.get(2), MultiplyOperatorCrystal.class, "*", location(0, 15));
+        testCrystal(statement.get(2), TypeReferenceCrystal.class, "AtonementCrystal", location(0, 15));
+        testCrystal(statement.get(3), FunctionCallOperatorCrystal.class, "!", location(0, 31));
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,7 +51,17 @@ public class LexerTestUtils {
 
             int expectedStatementSize = statementSizes[i];
             int actualStatementSize = statement.size();
-            assertEquals(expectedStatementSize, actualStatementSize, "Unexpected number of tokens.");
+
+            if(expectedStatementSize != actualStatementSize) {
+                String tokensString = statement.stream()
+                        .map(token -> "\"" + token + "\"")
+                        .collect(Collectors.joining(", "));
+
+                fail("Unexpected number of tokens in statement.\n" +
+                        "Expected:  " + expectedStatementSize + "\n" +
+                        "Actual:    " + actualStatementSize + "\n" +
+                        "Statement: " + tokensString);
+            }
         }
 
         return statements;
@@ -167,7 +178,18 @@ public class LexerTestUtils {
 
             int expectedStatementSize = statementSizes[i];
             int actualStatementSize = statement.size();
-            assertEquals(expectedStatementSize, actualStatementSize, "Unexpected number of tokens.");
+
+            if(expectedStatementSize != actualStatementSize) {
+                String crystalIdentifiersString = statement.stream()
+                        .map(AtonementCrystal::getIdentifier)
+                        .map(identifier -> "\"" + identifier + "\"")
+                        .collect(Collectors.joining(", "));
+
+                fail("Unexpected number of crystals in statement.\n" +
+                        "Expected:  " + expectedStatementSize + "\n" +
+                        "Actual:    " + actualStatementSize + "\n" +
+                        "Statement: " + crystalIdentifiersString);
+            }
         }
 
         return statementsOfCrystals;

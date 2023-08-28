@@ -98,7 +98,7 @@ public class LexerTest_StringTokens_Strings {
     @Test
     @Order(7)
     public void testLexer_StringTokens_CaptureQuotations_StringLiteralContainingCodeAcrossMultipleLines() {
-        String sourceString = "function << () :: ``{foo} << *\n" +
+        String sourceString = "function << () :: ``{foo} << AtonementCrystal!\n" +
                 "{bar} << 2\n" +
                 ":foo.`baz`\n" +
                 "buzz << _``!";
@@ -115,7 +115,7 @@ public class LexerTest_StringTokens_Strings {
         testToken(statements.get(0).get(7), "::");
         testToken(statements.get(0).get(8), " ");
 
-        testToken(statements.get(0).get(9), "``{foo} << *");
+        testToken(statements.get(0).get(9), "``{foo} << AtonementCrystal!");
         testToken(statements.get(1).get(0), "{bar} << 2");
         testToken(statements.get(2).get(0), ":foo.`baz`");
         testToken(statements.get(3).get(0), "buzz << _``");
