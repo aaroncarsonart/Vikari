@@ -265,13 +265,13 @@ public class Arithmetic {
     public static NumberCrystal<?> maybeUpcastOrDowncast(NumberCrystal<?> numberCrystal, TypeCrystal declaredType) {
 
         if (declaredType.isEqual(VikariType.ATONEMENT_CRYSTAL, VikariType.VALUE, VikariType.NUMBER)) {
-            return numberCrystal;
+            return (NumberCrystal<?>) numberCrystal.copy();
         }
 
         TypeCrystal expressionType = numberCrystal.getInstantiatedType();
 
         if (declaredType == expressionType) {
-            return numberCrystal;
+            return (NumberCrystal<?>) numberCrystal.copy();
         }
 
         Number number = (Number) numberCrystal.getValue();

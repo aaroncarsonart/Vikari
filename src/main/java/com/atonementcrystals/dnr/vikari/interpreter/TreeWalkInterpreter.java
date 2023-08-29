@@ -298,8 +298,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
 
         String identifier = lvalue.getIdentifier();
         if (currentEnvironment.isDefined(identifier)) {
-            AtonementCrystal currentValue = currentEnvironment.get(identifier);
-            TypeCrystal declaredType = currentValue.getDeclaredType();
+            TypeCrystal declaredType = lvalue.getDeclaredType();
 
             AtonementCrystal variableToAssign = initializeVariableAssignment(rvalue, identifier, declaredType);
             currentEnvironment.assign(identifier, variableToAssign);
@@ -316,8 +315,7 @@ public class TreeWalkInterpreter implements Statement.Visitor<AtonementCrystal>,
 
         String identifier = lvalue.getIdentifier();
         if (currentEnvironment.isDefined(identifier)) {
-            AtonementCrystal currentValue = currentEnvironment.get(identifier);
-            TypeCrystal declaredType = currentValue.getDeclaredType();
+            TypeCrystal declaredType = lvalue.getDeclaredType();
 
             AtonementCrystal variableToAssign = initializeVariableAssignment(rvalue, identifier, declaredType);
             currentEnvironment.assign(identifier, variableToAssign);
