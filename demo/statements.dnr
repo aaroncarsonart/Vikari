@@ -1,0 +1,22 @@
+~:Vikari currently supports three kind of statements:~
+
+~:Variable declarations:~
+int:Integer << 2
+bool:Boolean << [int = 3] " [int '= 4]
+
+~:Print statements:~
+:int:
+:bool:
+
+~:Expression statements:~
+int << 3
+5 + 22 - 7 / 3
+true ^ '[false " bool]
+
+~:Expression statements currently produce no side effects
+unless they contain an assignment.:~
+int << 4
+true ^ [[int '= 4] >> bool]
+
+:int:
+:bool:

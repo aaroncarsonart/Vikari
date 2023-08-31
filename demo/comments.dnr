@@ -1,0 +1,51 @@
+~:All comments are in-line comments.:~
+~:They can be ~:nested.:~:~
+
+~:Comments can span across multiple lines
+without a line continuation operator.:~
+
+int:Integer << 2 ~:Multi-line comments function
+as a line continuation if an expression is
+continued on the same line the comment is
+terminated on.:~ + 7
+
+:int:
+
+~:Comments:~ float ~:can:~ : ~:be:~ Float~
+~:placed:~ << ~:in-between:~ 5 ~:any:~ +~
+2 ~:two:~ - ~:language:~ 5 ~:tokens.:~
+
+:float:
+
+bool:Boolean << true ~:Comments terminate a
+statement if they are the last token of a line.:~
+
+:bool:
+
+~:Nesting of comments can be as ~:complicated:~
+as you need. ~:Opening ~:and closing tokens:~ are
+matched appropriately.:~ Each unmatched opening
+comment token is reported as an error.:~
+
+~:This way you can comment out multiple lines of
+code containing comments using a bare opening and
+closing comment token on enclosing lines.:~
+
+~:
+foo << 2
+bar << 4
+baz << 7
+
+:foo:bar:baz: ~:These variables are not printed.:~
+:~
+
+~:A closing comment token is only parsed after an
+opening comment token is encountered. So you can
+safely use line continuations on a print statement
+after : without spaces.:~
+
+:~
+5 + 7:~
+9 - 2:~
+8 / 2:~
+3 * 6:

@@ -1,0 +1,36 @@
+~:Newlines terminate statements. To write a statement
+across more than one line, terminate the line with ~
+to bypass this behavior.:~
+foo << 5 - [3 / 2.0]~
++ [9.0 / 7.1926]
+
+:foo:
+
+~:Line continuations can happen between any two valid
+language tokens.:~
+bar~
+<<~
+5~
+-~
+22
+
+:bar:
+
+~:As with all tokens, non-leading, non-newline
+whitespace characters are allowed between them.:~
+:33 ~
+:44 ~
+:55 ~
+:
+
+~:Statements can begin or end with ~. But these are
+compilation warnings. (If -w is enabled.):~
+~
+:3.1415926:~
+
+~:Statements of only line continuations, while
+pointless, are also allowed. But they also issue a
+compilation warning.:~
+~
+~ ~:Comments won't disable the warnings.:~
+~

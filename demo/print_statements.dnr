@@ -1,0 +1,27 @@
+~:Print a single value.:~
+:1
+
+~:Print a few more consecutive values on the same line.:~
+:22:333:4444
+
+~:Print an empty line.:~
+:
+
+~:Print a value terminated by a newline.:~
+:3.1415926:
+
+~:Print other literals.:~
+:null:
+:true:
+
+~:Print an arithmetic statement with a grouping.:~
+:[22 / 7] + 3:
+
+~:Print some variables.:~
+phi:BigDecimal << 1.61803398874989484820B
+falseAndTrue:Boolean << false ^ true
+nullOfLengthThree:AtonementCrystal << ___
+
+:phi:
+:falseAndTrue:
+:nullOfLengthThree:

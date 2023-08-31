@@ -1,0 +1,20 @@
+~:Invalid integer literal.:~
+int:Integer << 2147483648I
+
+~:Unknown type.:~
+val:Val
+
+~:Redeclaration of existing variable.:~
+int:Boolean << true
+
+~:Missing closing square bracket in grouping.:~
+[int + 2
+
+~:Invalid assignment target.:~
+2 >> 3
+
+~:Invalid expression form.:~
++ int
+
+~:Multiple errors in same statement.:~
+[2 ^ foo]

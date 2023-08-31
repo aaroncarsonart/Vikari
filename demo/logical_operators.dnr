@@ -1,0 +1,43 @@
+~:AND operator:~
+:true ^ true:
+:true ^ false:
+:false ^ false:
+:
+
+~:OR operator:~
+:true " true:
+:true " false:
+:false " false:
+:
+
+~:NOT operator:~
+:'false:
+:'true:
+:
+
+~:With groupings and variables:~
+bool_1:Boolean << false
+bool_2:Boolean << true
+
+:[bool_1 " bool_2] ^ true:
+:bool_1 " [bool_2 ^ true]:
+:'[false " bool_1 " bool_2]:
+:
+
+~:With equality operators:~
+:bool_1 = 'bool_2:
+:bool_2 = [bool_1 ^ true]:
+:true '= [bool_1 " bool_2]:
+:
+
+long:Long << 2L
+double:Double << 3.1415926D
+
+~:Equality operators have higher precedence than logical operators.
+So `long = 2` is evaluated first. However, eliding groupings leads
+to potentially ambiguous statements to read.:~
+:long = 2 ^ double = 3.1415926:
+
+~:Grouping clarifies the intended evaluation order.:~
+:['bool_1 '= false] " bool_2:
+:'bool_1 '= [false " bool_2]:

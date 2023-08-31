@@ -1,0 +1,66 @@
+~:Integer literals:~
+integer_1:Integer << 1
+integer_2:Integer << 2i
+integer_3:Integer << 3I
+
+:integer_1:
+:integer_2:
+:integer_3:
+
+~:Long literals:~
+long_1:Long << 4000000000
+long_2:Long << 5l
+long_3:Long << 6L
+
+:long_1:
+:long_2:
+:long_3:
+
+~:BigInteger literals:~
+big_integer_1:BigInteger << 70000000000000000000
+big_integer_2:BigInteger << 8b
+big_integer_3:BigInteger << 9B
+
+:big_integer_1:
+:big_integer_2:
+:big_integer_3:
+
+~:Float literals:~
+float_1:Float << 10f
+float_2:Float << 11F
+float_3:Float << 12.12f
+float_4:Float << 13.13F
+
+:float_1:
+:float_2:
+:float_3:
+:float_4:
+
+~:Double literals:~
+double_1:Double << 14d
+double_2:Double << 15D
+double_3:Double << 16.0
+double_4:Double << 17.0d
+double_5:Double << 18.0D
+
+:double_1:
+:double_2:
+:double_3:
+:double_4:
+:double_5:
+
+~:BigDecimal literals:~
+big_decimal_1:BigDecimal << 19.0b
+big_decimal_2:BigDecimal << 20.0B
+
+:big_decimal_1:
+:big_decimal_2:
+
+~:Pi to varying precision, based on the numeric type:~
+pi_float:Float << 3.14159265F
+pi_double:Double << 3.1415926535897932D
+pi_big_decimal:BigDecimal << 3.14159265358979323846264338327950B
+
+:pi_float:
+:pi_double:
+:pi_big_decimal:

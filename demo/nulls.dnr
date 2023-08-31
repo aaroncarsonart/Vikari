@@ -1,0 +1,65 @@
+~:There are three kinds of null literal values.:~
+
+foo << null  ~:The null keyword.:~
+bar << _____ ~:Using a sword.:~
+baz << _[1]_ ~:Using a null literal expression.:~
+
+:foo:
+:bar:
+:baz:
+:
+
+~:Nulls have a length in Vikari. This enables algorithms which
+assign null values to store more information to nulls than a
+simple absence of a value.:~
+
+~:The null keyword is equal to any null value.:~
+:foo = null:
+:bar = null:
+:baz = null:
+:
+:null = null:
+:null = _:
+:null = _[7]_:
+:
+
+~:Variables initialized with null have length 0.:~
+:foo = _[0]_:
+
+~:Nulls of length zero are printed as the string null.:~
+:null:
+:_[0]_:
+:
+
+~:Sword literals have a length equal to their underscore count.:~
+:_[1]_ = _:
+:_:
+:__:
+:___:
+:____:
+:_____:
+:
+
+~:Null literal expressions can have any length. They are composed
+of a sword, a grouping, and another sword. The grouping may
+contain any expression which evaluates to a Number. This value is
+then cast to an Integer.:~
+five:Integer << 5
+
+:_[1024]_:
+:_[-1]_:
+:_[five]_:
+:_[2048 / [22 + 7] * five]_:
+:_[3.1415926]_:
+:
+
+~:Null literal expressions can be composed with swords of any
+length. Use this to format expressions for maximum readability.:~
+
+var_1 << __[1]__   ~:Are swords of length 2 preferred?:~
+var_2 << ___[1]___ ~:Perhaps length 3 is too long.:~
+var_3 << _[1]____  ~:They can also be unbalanced!:~
+
+:var_1:
+:var_2:
+:var_3:

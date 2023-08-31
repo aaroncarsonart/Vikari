@@ -1,0 +1,61 @@
+~:The equality operators compare the value of any two crystals.:~
+integer:Integer << 1
+float:Float << 3.14159F
+
+:integer = 1:
+:float = 3.14159F:
+:integer '= float: ~:Not equals operator:~
+:
+
+~:Numeric types are promoted to the greater type in order to compare their
+numeric value, regardless of the type.:~
+:3 = 3.0:
+:6.28F = 6.28D:
+:77 = 88L:
+:2.197B = 317I:
+:
+
+:1028 '= 1028B:
+:3.1415926D '= 3.1415926B:
+:128 '= 256B:
+:3.14F '= 6.28B:
+:
+
+~:Crystals of different types are not equal.:~
+boolean:Boolean << true
+
+:integer = boolean:
+:float '= boolean:
+:
+
+~:Test if a variable is null using = null.:~
+var_1:Value
+var_2:Value << _
+var_3:Value << null
+var_4:Value << __[22]__
+
+:var_1 = null:
+:var_2 = null:
+:var_3 = null:
+:var_4 = null:
+:
+
+:integer = null:
+:float '= null:
+:
+
+~:Any expression result can be compared with equals. Because of operator
+precedence, groupings are usually not necessary. But it is easier to read
+with groupings.:~
+:[5 + 2] = [17 - 10]:
+:16 / 2 = 3 * 5:
+:[boolean ^ true] '= [integer + float]:
+:false '= [boolean = null]:
+:
+
+~:Applying the not operator to a grouping around an equals comparison is
+equivalent to not equals.:~
+:[1 '= 3.1415926]:
+:'[1 = 3.1415926]:
+:[true '= true]:
+:'[true = true]:

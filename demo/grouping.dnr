@@ -1,0 +1,27 @@
+~:Arithmetic expressions:~
+foo << [5 * 2] - 7
+bar << 5 * [2 - 7]
+
+:foo: ~:prints 3:~
+:bar: ~:prints -25:~
+
+~:Nested groupings:~
+foo << [[22.0 / 7] + 5] * [18 - 6]
+bar << [7 + 8] / [19.0 - [42 * 3]]
+
+:foo: ~:prints 97.71428571428571:~
+:bar: ~:prints -0.14018691588785046:~
+
+~:Boolean logic expressions:~
+foo << [true " false] ^ true
+bar << false " [true ^ false]
+
+:foo: ~:prints true:~
+:bar: ~:prints false:~
+
+~:With NOT operator:~
+foo << '[true ^ false]
+bar << '['false " 'true]
+
+:foo: ~:prints true:~
+:bar: ~:prints false:~

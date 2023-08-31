@@ -1,0 +1,69 @@
+~:A variable must be declared before assignment expressions are evaluated.:~
+any:AtonementCrystal
+value:Value
+number:Number
+integer:Integer
+
+:any:
+:value:
+:number:
+:integer:
+:
+
+~:Left assignment expression.:~
+integer << 512
+number << 1.4142135623
+value << true
+any << __
+
+:integer:
+:number:
+:value:
+:any:
+:
+
+~:Right assignment expression.:~
+256 >> integer
+
+:integer:
+
+~:Assignments have the lowest precedence of any kind of operator.
+So any expression of the correct type can be assigned to a variable.:~
+integer / 2 >> integer
+any << [any '= __] " [[512 / 4] = integer]
+
+:integer:
+:any:
+:
+
+~:Assignment expressions can be nested.:~
+any << value << number << integer
+
+:any:
+:value:
+:number:
+:integer:
+:
+
+~:Alternate ways to assign the same value to two variables.:~
+a, b, c, d, e, f
+
+a << b << 2
+[4 >> c] >> d
+e << 6 >> f
+
+:a:b:c:d:e:f:
+
+~:Since Vikari's parser produces a leftmost derivation, nested right
+assignment expressions require groupings to force a rightmost derivation.:~
+[[8 >> a] >> b] >> c
+
+:a:b:c:
+
+~:Use groupings to ensure the proper result for lvalues and rvalues.:~
+a << b << c << [[2 >> d] >> e] >> f
+
+:a:b:c:d:e:f:
+
+~:Assignments can be used in other expressions.:~
+:8 = [value << [1024 / integer]]:

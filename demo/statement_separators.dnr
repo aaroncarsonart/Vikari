@@ -1,0 +1,9 @@
+~:Write multiple statements on the same line
+using the statement separator.:~
+x:Integer << 2, y:Integer << 4, z:Integer << 6
+
+~:Lines can be optionally terminated using it:~
+:x:, :y:, :z:,
+
+~:Multiple statement separators in a row are ignored.:~
+,,,,,,,,

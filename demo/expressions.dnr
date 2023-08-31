@@ -1,0 +1,79 @@
+~:Expressions are composed in the Parser using recursive descent.
+Expressions can contain other expressions as a sub-expression.:~
+5 + 2
+5 + [5 + 2]
+5 + [5 + [5 + 2]]
+
+~:Expression statements are bare expressions. As the above examples
+produce no side effects, they will not impact the program state.
+However you will still see the result of each expression printed out
+if they are run in the REPL.:~
+
+~:Kinds of expressions (in lowest to highest precedence order):~
+
+~:Assignment expressions:~
+int:Integer, float:Float
+int << 2
+3.14F >> float
+
+~:Logical OR expression:~
+false " true
+
+~:Logical AND expression:~
+false ^ true
+
+~:Equality expressions:~
+int = 2
+float '= 3.14F
+
+~:Term expressions:~
+5 + 2
+33.12 - 113.416
+
+~:Factor expressions:~
+int * 9
+float / 2
+2 \ float
+
+~:Unary expressions:~
+'true
+-int
+
+~:Literal expressions:~
+1024
+33.33
+true
+null
+
+~:Grouping expressions:~
+[false ^ true]
+[int = 2]
+[5 + 2]
+
+~:Variable expressions:~
+int
+float
+
+~:Other statement types are partially composed by expressions.:~
+
+~:Declaration statements accept an expression to initialize the variable.:~
+number:Number << 5 + 2
+bool:Boolean << number = 7
+any:AtonementCrystal << '[bool ^ [number << 1024] = int] " [float '= false]
+
+~:Print statements are composed of one or more print expressions. A print
+expression is a : operator followed by an ordinary expression.:~
+:number
+:33.33
+:number = 1024
+:[13 + 2]
+
+~:Terminating a print statement with : prints a newline.:~
+:
+
+~:Multiple print expressions can be chained together as one print statement.:~
+:number:
+:[true ^ bool]:
+:[number << 15]:null:
+:33 / 2 + 7:
+:1:2:3:4:5:

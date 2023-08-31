@@ -1,0 +1,6 @@
+~:Boolean literals:~
+boolean_1:Boolean << true
+boolean_2:Boolean << false
+
+:boolean_1:
+:boolean_2:

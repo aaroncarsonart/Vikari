@@ -1,0 +1,15 @@
+~:Enable warnings with -w flag.:~
+
+~:Statement contains only line continuations.:~
+~
+~
+~
+~
+~
+
+~:Statement begins with a line continuation.:~
+~
+foo:Integer << 2
+
+~:Statement ends with a line continuation.:~
+:foo:~

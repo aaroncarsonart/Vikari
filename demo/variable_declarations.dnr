@@ -1,0 +1,50 @@
+~:Vikari uses gradual typing. So untyped variables infer their types.:~
+double << 217.4
+bool << true
+negativeNull << __[-1]__
+
+:double:
+:bool:
+:negativeNull:
+:
+
+~:Typed variables limit the scope of allowable assigned values.:~
+twoPowerTen:Long << 1024L
+tau:Float << 6.2831853F
+
+:twoPowerTen:
+:tau:
+:
+
+~:Supertypes can be assigned their subtypes.:~
+number:Number << twoPowerTen + tau
+value_1:Value << twoPowerTen
+value_2:Value << bool
+
+:number:
+:value_1:
+:value_2:
+:
+
+~:AtonementCrystal is the base type. Any value can be assigned to it.:~
+any:AtonementCrystal << value_1
+
+~:Variables declared without an initializer expression are initialized to null.:~
+uninitialized_1,
+uninitialized_2:Number,
+uninitialized_3:AtonementCrystal
+
+:uninitialized_1:
+:uninitialized_2:
+:uninitialized_3:
+:
+
+~:Any kind of expression with the correct type can be assigned in a variable
+declaration.:~
+val_1 << [55 + 2] / 7.0B
+val_2 << any '= value_1
+val_3 << number = [twoPowerTen + tau]
+
+:val_1:
+:val_2:
+:val_3:

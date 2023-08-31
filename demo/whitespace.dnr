@@ -1,0 +1,21 @@
+~:Vikari is indentation sensitive. However, as code blocks, called
+regions in Vikari, are not yet implemented, all statements must
+have an indentation level of zero. Meaning no leading whitespace.:~
+foo << null
+:foo:
+
+~:All operators, variables, literals, and comments etc can be
+written equivalently with or without whitespace between them.:~
+foo<<[11+7]/2
+bar << [ 11 + 7 ] / 2
+baz  <<  [  11  +  7  ]  /  2
+
+:foo:bar:baz:
+
+~:Multiple statements chained together on the same line using the
+statement separator , can also have any arbitrary whitespace
+between , and the first token of the next statement.:~
+:1,:2,:3,
+:4, :5, :6,
+:7,  :8,  :9,
+:
