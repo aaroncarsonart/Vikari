@@ -284,7 +284,7 @@ class VikariREPLTest {
     @Test
     @Order(15)
     public void testMultiLineComment_WithStatement() {
-        repl.lexParseAndInterpret(" 5 + ~:Multi-line\ncomment.:~ 3");
+        repl.lexParseAndInterpret("5 + ~:Multi-line\ncomment.:~ 3");
         testOutput("8");
     }
 

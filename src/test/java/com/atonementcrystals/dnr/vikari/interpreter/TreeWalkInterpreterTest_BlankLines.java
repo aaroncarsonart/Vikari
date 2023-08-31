@@ -45,24 +45,12 @@ public class TreeWalkInterpreterTest_BlankLines {
 
     @Test
     @Order(2)
-    public void testTreeWalkInterpreter_EmptyStatement_WithWhitespace() {
-        testVikariStatements("    \t\t    ");
-    }
-
-    @Test
-    @Order(3)
     public void testTreeWalkInterpreter_MultipleEmptyStatements() {
         testVikariStatements("\n\n\n");
     }
 
     @Test
-    @Order(4)
-    public void testTreeWalkInterpreter_MultipleEmptyStatements_WithWhitespace() {
-        testVikariStatements("    \n    \n\t\t\n\t\t");
-    }
-
-    @Test
-    @Order(5)
+    @Order(3)
     public void testTreeWalkInterpreter_EmptyStatements_BetweenExpressionStatements() {
         testVikariStatements("5 + 7\n" +
                              "\n" +
@@ -70,7 +58,7 @@ public class TreeWalkInterpreterTest_BlankLines {
     }
 
     @Test
-    @Order(6)
+    @Order(4)
     public void testTreeWalkInterpreter_EmptyStatements_BetweenPrintStatements() {
         testVikariStatements(":7:\n" +
                              "\n" +
@@ -78,7 +66,7 @@ public class TreeWalkInterpreterTest_BlankLines {
     }
 
     @Test
-    @Order(7)
+    @Order(5)
     public void testTreeWalkInterpreter_EmptyStatements_Complex() {
         String sourceString = ":22 + 2\n" +
                 "\n" +

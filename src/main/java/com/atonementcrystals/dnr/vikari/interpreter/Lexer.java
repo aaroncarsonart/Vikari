@@ -777,6 +777,12 @@ public class Lexer {
                 if (Utils.isWhitespace(stringToken)) {
                     // All whitespace (besides indentation) is omitted in the final output of the Lexer.
                     // TODO: Produce IndentationCrystals for leading whitespace.
+                    if (column == 0 && !lineContinuation) {
+                        // For now, simply don't allow indentation of non-line-continued statements.
+                        int errorColumn = column + stringToken.length();
+                        CoordinatePair errorLocation = new CoordinatePair(row, errorColumn);
+                        reportError("Unexpected indentation level.", errorLocation);
+                    }
                     continue;
                 }
 

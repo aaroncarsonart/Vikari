@@ -265,7 +265,7 @@ public class LexerTest_Crystals_SyntaxErrors {
                               "\t\t~:Unclosed comment.";
 
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
-        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 3, errorReporter, 2);
+        List<AtonementCrystal> statement = lexSingleStatement(sourceString, 3, errorReporter, 4);
 
         testCrystal(statement.get(0), ReferenceCrystal.class, "`z`", location(0, 2));
         testCrystal(statement.get(1), LeftAssignmentOperatorCrystal.class, "<<", location(0, 6));
