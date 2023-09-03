@@ -8,9 +8,25 @@
     <artifactId>Vikari</artifactId>
     <version>0.9.4</version>
 
+    <developers>
+        <developer>
+            <name>Aaron Michael Carson</name>
+            <email>atonement.crystals@gmail.com</email>
+            <timezone>US/Central</timezone>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url> https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <vikari.main.class>com.atonementcrystals.dnr.vikari.Main</vikari.main.class>
     </properties>
 
     <build>
@@ -27,10 +43,18 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.atonementcrystals.dnr.vikari.Main</mainClass>
+                                    <mainClass>${vikari.main.class}</mainClass>
                                     <manifestEntries>
                                         <Multi-Release>true</Multi-Release>
                                     </manifestEntries>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                                    <addHeader>false</addHeader>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                    <resource>META-INF/LICENSE-vikari.txt</resource>
+                                    <file>LICENSE.txt</file>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -43,7 +67,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.atonementcrystals.dnr.vikari.Main</mainClass>
+                            <mainClass>${vikari.main.class}</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -56,13 +80,6 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-            <!--<groupId>org.apache.maven.plugins</groupId>-->
-            <!--<artifactId>maven-surefire-plugin</artifactId>-->
-            <!--<configuration>-->
-            <!--<argLine>-Xmx512m</argLine>-->
-            <!--</configuration>-->
-            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -81,6 +98,13 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>${project.basedir}</directory>
+                <includes>
+                    <include>LICENSE.txt</include>
+                </includes>
+                <targetPath>META-INF</targetPath>
             </resource>
         </resources>
     </build>
