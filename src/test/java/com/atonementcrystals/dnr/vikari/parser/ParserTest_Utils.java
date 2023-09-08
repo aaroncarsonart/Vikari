@@ -25,6 +25,7 @@ import com.atonementcrystals.dnr.vikari.core.expression.RightAssignmentExpressio
 import com.atonementcrystals.dnr.vikari.core.expression.UnaryExpression;
 import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
+import com.atonementcrystals.dnr.vikari.core.statement.SyntaxErrorStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.VariableDeclarationStatement;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
@@ -324,5 +325,12 @@ public class ParserTest_Utils {
                              CoordinatePair expectedLocation) {
         assertType(operator, expectedClass);
         assertLocation(operator, expectedLocation);
+    }
+
+    public static void testSyntaxErrorStatement(Statement statement, String expectedIdentifier,
+                                                CoordinatePair expectedLocation) {
+        SyntaxErrorStatement syntaxErrorStatement = assertType(statement, SyntaxErrorStatement.class);
+        assertEquals(expectedIdentifier, syntaxErrorStatement.getStatement());
+        assertLocation(syntaxErrorStatement, expectedLocation);
     }
 }

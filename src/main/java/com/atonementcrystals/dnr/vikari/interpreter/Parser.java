@@ -649,10 +649,11 @@ public class Parser {
         }
         AtonementCrystal errorCrystal;
         if (isAtEndOfStatement() || isAtEnd()) {
-            CoordinatePair location = previous().getCoordinates();
+            AtonementCrystal previous = previous();
+            CoordinatePair location = previous.getCoordinates();
             errorCrystal = new AtonementCrystal("");
             int row = location.getRow();
-            int nextCol = location.getColumn() + 1;
+            int nextCol = location.getColumn() + previous.getIdentifier().length();
             errorCrystal.setCoordinates(new CoordinatePair(row, nextCol));
         } else {
             errorCrystal = peek();
