@@ -1,0 +1,91 @@
+~:The following arithmetic operators are currently supported.:~
+
+add << 5 + 2
+subtract << 5 - 2
+multiply << 5 * 2
+divide << 5 / 2
+
+:add:
+:subtract:
+:multiply:
+:divide:
+:
+
+~:An additional right divide operator is supported. Right divide
+is the same as left divide, except the right operand is divided
+by the left.:~
+
+leftDivide << 10.0 / 5
+rightDivide << 10.0 \ 5
+
+:leftDivide:
+:rightDivide:
+:
+
+~:Arithmetic operations automatically promote types to the largest
+enclosing type before evaluating the expression. This prevents loss
+of information in most cases.:~
+
+:5 + 2:       ~:Result is an Integer.:~
+:5 + 2L:      ~:Result is a Long.:~
+:5L + 2B:     ~:Result is a BigInteger.:~
+:5B + 2.0F:   ~:Result is a Float.:~
+:5.0F + 2.0D: ~:Result is a Double.:~
+:5.0D + 2.0B: ~:Result is a BigDecimal.:~
+:
+
+~:Therefore, overflow or underflow does not occur unless you
+specifically type a variable to a smaller type and then assign
+the result of the arithmetic expression to it.:~
+
+overflow:Integer << 3000000000L
+underflow:Integer << -3000000000L
+
+:overflow:
+:underflow:
+:
+
+~:You can cast any numeric type to another numeric type by simply
+assigning that value (or any arithmetic expression) to a variable
+of that type. The cast happens after the expression is evaluated.:~
+
+integer:Integer << 1B + 2B
+long:Long << 3I + 4I
+bigInteger:BigInteger <<51L + 6L
+float:Float << 7.0B + 8.0B
+double:Double << 9.0F + 10.0F
+bigDecimal:BigDecimal << 11.0F + 12.0F
+
+:integer:
+:long:
+:bigInteger:
+:float:
+:double:
+:bigDecimal:
+:
+
+~:The decimal portion of a floating point type is truncated when
+casting it to an integral type.:~
+
+pi:Integer << 3.14
+tau:Long << 6.28
+
+:pi:
+:tau:
+:
+
+~:To require a type to be a number, ensure no precision is lost,
+and keep types as small as possible, use the Number type.:~
+
+number:Number << [1 + 3L] / 29.86
+:number:
+:
+
+~:Division will be integer division unless at least one operand
+is a floating-point type.:~
+
+:5 / 2:
+:5.0 / 2:
+:5 / 2.0:
+:5.0 / 2.0:
+:
