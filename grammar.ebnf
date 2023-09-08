@@ -3,14 +3,14 @@
 (* Only presently implemented features are modeled. *)
 (* So this is currently but a subset of the entire Vikari language. *)
 
-(* A = denotes the definition of a rule. *)
-(* A ; denotes the end of a rule. *)
-(* A ( and ) denotes grouping. *)
-(* A ? denotes an optional element. *)
-(* A + denotes one or more elements. *)
-(* A * denotes an zero or more elements. *)
-(* A , denotes concatenation of successive elements. *)
-(* A | denotes an OR operation between successive elements. *)
+(* = denotes the definition of a rule. *)
+(* ; denotes the end of a rule. *)
+(* ( and ) denotes grouping. *)
+(* ? denotes an optional element. *)
+(* + denotes one or more elements. *)
+(* * denotes an zero or more elements. *)
+(* , denotes concatenation of successive elements. *)
+(* | denotes an OR operation between successive elements. *)
 (* A sequence enclosed in ? denotes a special sequence. (Used for regular expressions.) *)
 
 REFERENCE = ? [a-z_][A-Za-z0-9_]* ? ;
@@ -26,11 +26,11 @@ NUMBER = INTEGER
 
 DIGIT_SEQUENCE = ? [0-9]+ ? ;
 
-INTEGER     = DIGIT_SEQUENCE ;
+INTEGER     = DIGIT_SEQUENCE, "I" ? ;
 LONG        = DIGIT_SEQUENCE, "L" ;
 BIG_INTEGER = DIGIT_SEQUENCE, "B" ;
-FLOAT       = ( DIGIT_SEQUENCE, "F" | DIGIT_SEQUENCE, ".", DIGIT_SEQUENCE, "F" ;
-DOUBLE      = ( DIGIT_SEQUENCE, "D" | DIGIT_SEQUENCE, ".", DIGIT_SEQUENCE, "D" ? ;
+FLOAT       = DIGIT_SEQUENCE, "F" | DIGIT_SEQUENCE, ".", DIGIT_SEQUENCE, "F" ;
+DOUBLE      = DIGIT_SEQUENCE, "D" | DIGIT_SEQUENCE, ".", DIGIT_SEQUENCE, "D" ? ;
 BIG_DECIMAL = DIGIT_SEQUENCE, ".", DIGIT_SEQUENCE, "B" ;
 
 BOOLEAN = "true" | "false" ;
@@ -43,8 +43,8 @@ NEWLINE = "\n" ;
 
 WHITESPACE = ( " " | "\t" )+ ;
 
-(* Line continuations is allowed between any two tokens to cause the statement parsing *)
-(* to flow over to the following line. end of any line to continue *)
+(* Line continuations are allowed between any two tokens to cause parsing of that statement *)
+(* to flow over to the following line. *)
 
 LINE_CONTINUATION = "~", NEWLINE ;
 
@@ -59,7 +59,7 @@ statement = ( variableDeclarationStatement
           | ""
           ), ( ",", statement ? ) *, NEWLINE ;
 
-variableDeclarationStatement = REFERENCE, ( ":", TYPE )*, ("<<", expression )? ;
+variableDeclarationStatement = REFERENCE, ( ":", TYPE )?, ("<<", expression )? ;
 expressionStatement = expression ;
 printStatement = printExpression+ ;
 
