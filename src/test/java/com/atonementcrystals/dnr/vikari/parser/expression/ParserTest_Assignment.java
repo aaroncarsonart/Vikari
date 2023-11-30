@@ -22,7 +22,6 @@ import com.atonementcrystals.dnr.vikari.core.statement.ExpressionStatement;
 import com.atonementcrystals.dnr.vikari.core.statement.Statement;
 import com.atonementcrystals.dnr.vikari.core.statement.VariableDeclarationStatement;
 import com.atonementcrystals.dnr.vikari.error.VikariError;
-import com.atonementcrystals.dnr.vikari.interpreter.Arithmetic;
 import com.atonementcrystals.dnr.vikari.parser.ParserTest_Base;
 import com.atonementcrystals.dnr.vikari.parser.ParserTest_Utils;
 import org.junit.jupiter.api.MethodOrderer;
@@ -32,7 +31,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.util.List;
 
 import static com.atonementcrystals.dnr.vikari.TestUtils.*;

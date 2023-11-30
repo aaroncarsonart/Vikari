@@ -12,10 +12,10 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorC
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.LeftDivideOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.LeftSquareBracketCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.RightSquareBracketCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.RightParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.LeftSquareBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.RightSquareBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.LeftParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.RightParenthesisCrystal;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.lexer.LexerTestUtils;

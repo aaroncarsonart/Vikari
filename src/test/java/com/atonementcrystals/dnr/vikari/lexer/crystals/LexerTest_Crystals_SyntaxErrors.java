@@ -1,6 +1,7 @@
 package com.atonementcrystals.dnr.vikari.lexer.crystals;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.CharacterCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.FunctionCallOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
@@ -106,7 +107,7 @@ public class LexerTest_Crystals_SyntaxErrors {
         testCrystal(statement.get(1), TypeLabelOperatorCrystal.class, ":", location(0, 5));
         testCrystal(statement.get(2), TypeReferenceCrystal.class, "Character", location(0, 6));
         testCrystal(statement.get(3), LeftAssignmentOperatorCrystal.class, "<<", location(0, 16));
-        testCrystal(statement.get(4), ReferenceCrystal.class, "` `", location(0, 19));
+        testCrystal(statement.get(4), CharacterCrystal.class, "` `", location(0, 19));
 
         // ---------------
         // multiple spaces
@@ -127,11 +128,11 @@ public class LexerTest_Crystals_SyntaxErrors {
         sourceString = "foo << `\t`";
 
         syntaxErrorReporter = new SyntaxErrorReporter();
-        statement = lexSingleStatement(sourceString, 3, syntaxErrorReporter, 1);
+        statement = lexSingleStatement(sourceString, 3, syntaxErrorReporter, 2);
 
         testCrystal(statement.get(0), ReferenceCrystal.class, "foo", location(0, 0));
         testCrystal(statement.get(1), LeftAssignmentOperatorCrystal.class, "<<", location(0, 4));
-        testCrystal(statement.get(2), ReferenceCrystal.class, "`\t`", location(0, 7));
+        testCrystal(statement.get(2), CharacterCrystal.class, "`\t`", location(0, 7));
 
         // -------------
         // multiple tabs
@@ -267,7 +268,7 @@ public class LexerTest_Crystals_SyntaxErrors {
         SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
         List<AtonementCrystal> statement = lexSingleStatement(sourceString, 3, errorReporter, 4);
 
-        testCrystal(statement.get(0), ReferenceCrystal.class, "`z`", location(0, 2));
+        testCrystal(statement.get(0), CharacterCrystal.class, "`z`", location(0, 2));
         testCrystal(statement.get(1), LeftAssignmentOperatorCrystal.class, "<<", location(0, 6));
         testCrystal(statement.get(2), ReferenceCrystal.class, "`foo", location(0, 9));
     }

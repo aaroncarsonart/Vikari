@@ -25,11 +25,11 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.IndexOperat
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.RangeOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionSeparatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.LeftSquareBracketCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.RightSquareBracketCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.ListElementSeparatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.RightParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.LeftSquareBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.RightSquareBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.LeftParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.ListElementSeparatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.RightParenthesisCrystal;
 import com.atonementcrystals.dnr.vikari.interpreter.Lexer;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -106,7 +106,24 @@ public class LexerTest_Crystals_NegationOperator {
                 TokenType.PRINT_STATEMENT,
                 TokenType.COLLECTION_LITERAL,
                 TokenType.EXISTS,
-                TokenType.CAST);
+                TokenType.CAST,
+                TokenType.FUNCTION_PARAMETER_LIST_OPENING_BRACKET,
+                TokenType.FUNCTION_PARAMETER_LIST_CLOSING_BRACKET,
+                TokenType.FUNCTION_PARAMETER_LIST_ELEMENT_SEPARATOR,
+                TokenType.FUNCTION_ARGUMENT_LIST_OPENING_BRACKET,
+                TokenType.FUNCTION_ARGUMENT_LIST_CLOSING_BRACKET,
+                TokenType.FUNCTION_ARGUMENT_LIST_ELEMENT_SEPARATOR,
+                TokenType.LIST_LITERAL_OPENING_BRACKET,
+                TokenType.LIST_LITERAL_CLOSING_BRACKET,
+                TokenType.SET_LITERAL_OPENING_BRACKET,
+                TokenType.SET_LITERAL_CLOSING_BRACKET,
+                TokenType.ARRAY_LITERAL_OPENING_BRACKET,
+                TokenType.ARRAY_LITERAL_CLOSING_BRACKET,
+                TokenType.COLLECTION_LITERAL_ELEMENT_SEPARATOR,
+                TokenType.ANNOTATION_OPENING_BRACKET,
+                TokenType.ANNOTATION_CLOSING_BRACKET,
+                TokenType.ANNOTATION_ELEMENT_SEPARATOR
+        );
 
         // Get all TokenTypes, but ignore the duplicates and special cases.
         List<TokenType> tokenTypesToTest = Arrays.stream(TokenType.values())

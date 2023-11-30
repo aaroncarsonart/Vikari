@@ -81,6 +81,8 @@ public class Parser {
     private AtonementField rootEnvironment;
     private AtonementField currentEnvironment;
 
+    private boolean errorReportingEnabled = true;
+
     public Parser() {
         typeResolver = new TypeResolver();
         rootEnvironments = new HashMap<>();
@@ -102,6 +104,21 @@ public class Parser {
         return lineNumber;
     }
 
+    @SuppressWarnings("unused")
+    public void reset() {
+        currentFile = null;
+        lexedStatements = null;
+        lineNumber = 0;
+        tokenNumber = 0;
+        lineCount = 0;
+        lastLineLength = 0;
+        currentLine = null;
+        typeResolver.clear();
+        rootEnvironments.clear();
+        rootEnvironment = null;
+        currentEnvironment = null;
+    }
+
     public void resetTo(int lineNumber) {
         this.lineNumber = lineNumber;
         for (int i = lexedStatements.size() - 1; i >= lineNumber; i--) {
@@ -111,6 +128,11 @@ public class Parser {
 
     public TypeResolver getTypeResolver() {
         return typeResolver;
+    }
+
+    @SuppressWarnings("unused")
+    public void setErrorReportingEnabled(boolean errorReportingEnabled) {
+        this.errorReportingEnabled = errorReportingEnabled;
     }
 
     public List<Statement> parse(File file, List<List<AtonementCrystal>> lexedStatements) {
@@ -148,8 +170,10 @@ public class Parser {
         }
 
         // Visit the Resolvers.
-        typeResolver.resolve(statements);
-        typeResolver.reportErrors(syntaxErrorReporter, file);
+        if (errorReportingEnabled) {
+            typeResolver.resolve(statements);
+            typeResolver.reportErrors(syntaxErrorReporter, file);
+        }
 
         currentFile = null;
         return statements;
@@ -667,8 +691,10 @@ public class Parser {
     }
 
     private Vikari_ParserException error(CoordinatePair location, String errorMessage) {
-        SyntaxError syntaxError = new SyntaxError(currentFile, location, errorMessage);
-        syntaxErrorReporter.add(syntaxError);
+        if (errorReportingEnabled) {
+            SyntaxError syntaxError = new SyntaxError(currentFile, location, errorMessage);
+            syntaxErrorReporter.add(syntaxError);
+        }
         return new Vikari_ParserException(errorMessage);
     }
 

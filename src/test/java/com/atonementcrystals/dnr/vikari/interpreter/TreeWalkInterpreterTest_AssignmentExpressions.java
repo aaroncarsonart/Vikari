@@ -8,7 +8,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TreeWalkInterpreterTest_AssignmentExpressions extends TreeWalkInterpreterTest_Base {

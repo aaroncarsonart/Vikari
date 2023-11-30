@@ -9,7 +9,7 @@ import com.atonementcrystals.dnr.vikari.util.CoordinatePair;
  * which holds all state of that crystal's instance in the program.
  */
 public class AtonementCrystal {
-    private String identifier;
+    protected String identifier;
     private AtonementField field = new AtonementField();
     private CoordinatePair coordinates;
 
@@ -41,6 +41,10 @@ public class AtonementCrystal {
 
     public CoordinatePair getCoordinates() {
         return coordinates;
+    }
+
+    public void setCoordinates(int row, int column) {
+        this.coordinates = new CoordinatePair(row, column);
     }
 
     public void setCoordinates(CoordinatePair coordinates) {

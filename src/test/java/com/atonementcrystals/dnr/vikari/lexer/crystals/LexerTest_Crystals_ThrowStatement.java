@@ -11,11 +11,11 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCr
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionSeparatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.LeftSquareBracketCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.RightSquareBracketCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.ListElementSeparatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.RightParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.LeftSquareBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.RightSquareBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.LeftParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.ListElementSeparatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.RightParenthesisCrystal;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;

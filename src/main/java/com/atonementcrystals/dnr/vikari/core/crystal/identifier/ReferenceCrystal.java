@@ -12,4 +12,10 @@ public class ReferenceCrystal extends AtonementCrystal {
         super(identifier);
     }
 
+    @SuppressWarnings("unused")
+    public boolean isQuotedIdentifier() {
+        return identifier.length() >= 4 &&
+                identifier.charAt(0) == '`' &&
+                identifier.charAt(identifier.length() - 1) == '`';
+    }
 }

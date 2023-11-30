@@ -9,9 +9,9 @@ import com.atonementcrystals.dnr.vikari.core.crystal.operator.FunctionCallOperat
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.TypeLabelOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.ListElementSeparatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.RightParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.LeftParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.ListElementSeparatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.RightParenthesisCrystal;
 import com.atonementcrystals.dnr.vikari.error.VikariError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;

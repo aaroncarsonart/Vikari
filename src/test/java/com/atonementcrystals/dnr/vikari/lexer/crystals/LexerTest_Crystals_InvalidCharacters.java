@@ -2,6 +2,7 @@ package com.atonementcrystals.dnr.vikari.lexer.crystals;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.CharacterCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.StringLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.number.DoubleCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.assignment.LeftAssignmentOperatorCrystal;
@@ -103,7 +104,7 @@ public class LexerTest_Crystals_InvalidCharacters {
             List<AtonementCrystal> crystals = lexSingleStatement(sourceString, 1);
 
             // TODO: Change expectation to a character literal crystal once they are supported by Vikari.
-            testCrystal(crystals.get(0), ReferenceCrystal.class, sourceString, location(0, 0));
+            testCrystal(crystals.get(0), CharacterCrystal.class, sourceString, location(0, 0));
         }
     }
 

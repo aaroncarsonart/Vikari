@@ -1,4 +1,4 @@
-package com.atonementcrystals.dnr.vikari.core.crystal.separator.list;
+package com.atonementcrystals.dnr.vikari.core.crystal.separator;
 
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;

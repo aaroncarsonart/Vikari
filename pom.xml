@@ -6,7 +6,7 @@
 
     <groupId>com.atonementcrystals</groupId>
     <artifactId>Vikari</artifactId>
-    <version>0.9.4</version>
+    <version>0.9.5</version>
 
     <developers>
         <developer>
@@ -54,7 +54,7 @@
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>META-INF/LICENSE-vikari.txt</resource>
-                                    <file>LICENSE.txt</file>
+                                    <file>LICENSE-vikari.txt</file>
                                 </transformer>
                             </transformers>
                         </configuration>

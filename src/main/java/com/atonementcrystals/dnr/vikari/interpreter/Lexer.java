@@ -1,6 +1,8 @@
 package com.atonementcrystals.dnr.vikari.interpreter;
 
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.CommentCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.MultiLineCommentCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.TypeHierarchy;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.Keyword;
@@ -10,6 +12,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.TypeReferenceCry
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
 import com.atonementcrystals.dnr.vikari.core.crystal.keyword.error.ThrowCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.BooleanCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.literal.CharacterCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.MultiLineStringLiteralCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.NullKeywordCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.literal.StringLiteralCrystal;
@@ -24,7 +27,7 @@ import com.atonementcrystals.dnr.vikari.core.crystal.number.NumberCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.LineContinuationCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.SubtractOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.prefix.DeleteOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.quotation.CaptureQuotationCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.StatementSeparatorCrystal;
 import com.atonementcrystals.dnr.vikari.error.CompilationWarning;
 import com.atonementcrystals.dnr.vikari.error.SyntaxError;
 import com.atonementcrystals.dnr.vikari.error.SyntaxErrorReporter;
@@ -84,6 +87,8 @@ public class Lexer {
             .map(TokenType::getJavaType)
             .collect(Collectors.toCollection(HashSet::new));
 
+    private static final HashSet<String> ESCAPED_CHARACTER_LITERALS = Stream.of("\\\\", "\\`", "\\t", "\\n")
+            .collect(Collectors.toCollection(HashSet::new));
     /**
      * If a negation operator preceding a number literal follows one of these tokens,
      * the operator should be collapsed together with the number literal.
@@ -123,7 +128,13 @@ public class Lexer {
     private List<List<String>> statementsOfStringTokens;
 
     private int startLineNumber;
+    private int lineNumberOffset;
     private boolean compilationWarningsEnabled;
+
+    private boolean lexUnparsableTokens = false;
+    private boolean errorReportingEnabled = true;
+
+    private List<AtonementCrystal> unparsableTokens;
 
     /** For detecting line continuations in the VikariJLineParser. */
     private CoordinatePair terminatingLineContinuationLocation;
@@ -142,6 +153,21 @@ public class Lexer {
 
     public CoordinatePair getTerminatingLineContinuationLocation() {
         return terminatingLineContinuationLocation;
+    }
+
+    @SuppressWarnings("unused")
+    public void setLexUnparsableTokens(boolean lexUnparsableTokens) {
+        this.lexUnparsableTokens = lexUnparsableTokens;
+    }
+
+    @SuppressWarnings("unused")
+    public void setErrorReportingEnabled(boolean errorReportingEnabled) {
+        this.errorReportingEnabled = errorReportingEnabled;
+    }
+
+    @SuppressWarnings("unused")
+    public List<AtonementCrystal> getUnparsableTokens() {
+        return unparsableTokens;
     }
 
     /**
@@ -221,6 +247,10 @@ public class Lexer {
         line = readNextLine();
         lineLength = atEndOfFile() ? 0 : line.length();
         startLineNumber = lineNumber;
+
+        if (lexUnparsableTokens && unparsableTokens == null) {
+            unparsableTokens = new ArrayList<>();
+        }
 
         while (!atEndOfFile()) {
 
@@ -343,10 +373,40 @@ public class Lexer {
     }
 
     private void prepareLineDataCache() {
-        if (syntaxErrorReporter == null) {
-            syntaxErrorReporter = new SyntaxErrorReporter();
+        if (errorReportingEnabled) {
+            if (syntaxErrorReporter == null) {
+                syntaxErrorReporter = new SyntaxErrorReporter();
+            }
+            lines = syntaxErrorReporter.getLineCacheFor(currentFile);
+        } else {
+            lines = new ArrayList<>();
         }
-        lines = syntaxErrorReporter.getLineCacheFor(currentFile);
+    }
+
+    @SuppressWarnings("unused")
+    public void setLineNumberOffset(int lineNumberOffset) {
+        this.lineNumberOffset = lineNumberOffset;
+    }
+
+    @SuppressWarnings("unused")
+    public void reset() {
+        lineNumber = 0;
+        startIndex = 0;
+        currentIndex = 0;
+        line = null;
+        lineLength = 0;
+        nextChar = 0;
+
+        lines = null;
+        stringTokens = null;
+        statementsOfStringTokens = null;
+
+        startLineNumber = 0;
+        lineNumberOffset = 0;
+
+        if (lexUnparsableTokens && unparsableTokens != null) {
+            unparsableTokens.clear();
+        }
     }
 
     public void resetTo(int lineNumber) {
@@ -573,7 +633,7 @@ public class Lexer {
             }
 
             currentIndex = nextMatch;
-           if (nextOpeningTokenIndex == currentIndex) {
+            if (nextOpeningTokenIndex == currentIndex) {
                 currentIndex += openingToken.length();
                 if (!Utils.isEscapedByBackslash(line, nextMatch)) {
                     unclosedOpeningTokens.push(new CoordinatePair(lineNumber, nextMatch));
@@ -621,6 +681,14 @@ public class Lexer {
 
         String nextToken = openingToken + dashes + closingToken;
         stringTokens.add(nextToken);
+
+        if (lexUnparsableTokens) {
+            String actualToken = line.substring(startIndex, currentIndex);
+            CommentCrystal commentCrystal = new CommentCrystal(actualToken);
+            int rowNumber = lineNumber + lineNumberOffset;
+            commentCrystal.setCoordinates(rowNumber, startIndex);
+            unparsableTokens.add(commentCrystal);
+        }
     }
 
     private void openingCommentToken() {
@@ -632,12 +700,29 @@ public class Lexer {
 
         String nextToken = openingToken + dashes;
         stringTokens.add(nextToken);
+
+        if (lexUnparsableTokens) {
+            String actualToken = line.substring(startIndex, currentIndex);
+            MultiLineCommentCrystal multiLineCommentCrystal = new MultiLineCommentCrystal(actualToken);
+            int rowNumber = lineNumber + lineNumberOffset;
+            multiLineCommentCrystal.setCoordinates(rowNumber, startIndex);
+            multiLineCommentCrystal.setOpeningToken(true);
+            unparsableTokens.add(multiLineCommentCrystal);
+        }
     }
 
     private void middleCommentToken() {
         int tokenLength = currentIndex - startIndex;
         String nextToken = DASH_CHARACTER_STRING.repeat(tokenLength);
         stringTokens.add(nextToken);
+
+        if (lexUnparsableTokens) {
+            String actualToken = line.substring(startIndex, currentIndex);
+            MultiLineCommentCrystal multiLineCommentCrystal = new MultiLineCommentCrystal(actualToken);
+            int rowNumber = lineNumber + lineNumberOffset;
+            multiLineCommentCrystal.setCoordinates(rowNumber, startIndex);
+            unparsableTokens.add(multiLineCommentCrystal);
+        }
     }
 
     private void closingCommentToken() {
@@ -649,6 +734,15 @@ public class Lexer {
 
         String nextToken = dashes + closingToken;
         stringTokens.add(nextToken);
+
+        if (lexUnparsableTokens) {
+            String actualToken = line.substring(startIndex, currentIndex);
+            MultiLineCommentCrystal multiLineCommentCrystal = new MultiLineCommentCrystal(actualToken);
+            int rowNumber = lineNumber + lineNumberOffset;
+            multiLineCommentCrystal.setCoordinates(rowNumber, startIndex);
+            multiLineCommentCrystal.setClosingToken(true);
+            unparsableTokens.add(multiLineCommentCrystal);
+        }
     }
 
     private void whitespaceToken() {
@@ -708,8 +802,10 @@ public class Lexer {
      * @param location The location of the error.
      */
     private void reportError(String message, CoordinatePair location) {
-        SyntaxError syntaxError = new SyntaxError(currentFile, location, message);
-        syntaxErrorReporter.add(syntaxError);
+        if (errorReportingEnabled) {
+            SyntaxError syntaxError = new SyntaxError(currentFile, location, message);
+            syntaxErrorReporter.add(syntaxError);
+        }
     }
 
     /**
@@ -718,8 +814,10 @@ public class Lexer {
      * @param location The location of the warning.
      */
     private void reportWarning(String message, CoordinatePair location) {
-        CompilationWarning compilationWarning = new CompilationWarning(currentFile, location, message);
-        syntaxErrorReporter.add(compilationWarning);
+        if (errorReportingEnabled) {
+            CompilationWarning compilationWarning = new CompilationWarning(currentFile, location, message);
+            syntaxErrorReporter.add(compilationWarning);
+        }
     }
 
     /**
@@ -760,7 +858,7 @@ public class Lexer {
                     column += previousToken.length();
                 }
 
-                int row = startLineNumber + statementNumber;
+                int row = startLineNumber + statementNumber + lineNumberOffset;
                 CoordinatePair tokenCoordinates = new CoordinatePair(row, column);
 
                 if (TokenType.STATEMENT_SEPARATOR.getIdentifier().equals(stringToken)) {
@@ -769,6 +867,12 @@ public class Lexer {
                     if (!statementOfCrystals.isEmpty()) {
                         statementsOfCrystals.add(statementOfCrystals);
                         statementOfCrystals = new ArrayList<>();
+                    }
+
+                    if (lexUnparsableTokens) {
+                        StatementSeparatorCrystal statementSeparator = new StatementSeparatorCrystal();
+                        statementSeparator.setCoordinates(tokenCoordinates);
+                        unparsableTokens.add(statementSeparator);
                     }
 
                     continue;
@@ -970,6 +1074,7 @@ public class Lexer {
                     String contents = stringToken.substring(captureQuotation.length());
                     stringCrystal.setString(contents);
                     stringCrystal.setCoordinates(tokenCoordinates);
+                    stringCrystal.setOpeningToken(true);
                     statementOfCrystals.add(stringCrystal);
                     MultiLineStringLiteralCrystal prevStringCrystal = stringCrystal;
                     boolean atFirstTokenAsCaptureQuotation = stringToken.equals(captureQuotation);
@@ -979,7 +1084,7 @@ public class Lexer {
                         statementNumber++;
                         tokenNumber = 0;
                         column = 0;
-                        row = startLineNumber + statementNumber;
+                        row = startLineNumber + statementNumber + lineNumberOffset;
                         tokenCoordinates = new CoordinatePair(row, column);
                         statementOfStringTokens = statementsOfStringTokens.get(statementNumber);
                         statementsOfCrystals.add(statementOfCrystals);
@@ -988,6 +1093,7 @@ public class Lexer {
                         MultiLineStringLiteralCrystal nextStringCrystal = new MultiLineStringLiteralCrystal(stringToken);
                         contents = stringToken;
                         if (Utils.isEndOfStringLiteral(stringToken)) {
+                            nextStringCrystal.setClosingToken(true);
                             contents = stringToken.substring(0, stringToken.length() - captureQuotation.length());
                         }
                         nextStringCrystal.setString(contents);
@@ -1013,13 +1119,19 @@ public class Lexer {
                         statementOfStringTokens = statementsOfStringTokens.get(statementNumber);
                         stringToken = statementOfStringTokens.get(tokenNumber);
                     }
+                    // If lexUnparsableTokens == true, these tokens are lexed as crystals in their respective token()
+                    // methods. As info for if a multiline comment token is a closing token is readily available there.
                     continue;
                 }
 
-                if (TokenType.CAPTURE_QUOTATION.getIdentifier().equals(stringToken)) {
-                    CaptureQuotationCrystal captureQuotationCrystal = new CaptureQuotationCrystal();
-                    captureQuotationCrystal.setCoordinates(tokenCoordinates);
-                    statementOfCrystals.add(captureQuotationCrystal);
+                if (isCharacterLiteral(stringToken)) {
+                    if (stringToken.equals("`\t`")) {
+                        reportError("A tab character literal must use the escaped form of `\\t`, not a tab character.", tokenCoordinates);
+                    }
+
+                    CharacterCrystal characterCrystal = new CharacterCrystal(stringToken);
+                    characterCrystal.setCoordinates(tokenCoordinates);
+                    statementOfCrystals.add(characterCrystal);
                     continue;
                 }
 
@@ -1101,11 +1213,17 @@ public class Lexer {
                 // Remove the unneeded line continuation operator.
                 AtonementCrystal deleteCrystal = statementOfCrystals.remove(statementOfCrystals.size() - 1);
 
-                // Add it back temporarily as the proper type to detect warning cases.
-                if (compilationWarningsEnabled) {
+                if (compilationWarningsEnabled || lexUnparsableTokens) {
                     LineContinuationCrystal lineContinuationCrystal = new LineContinuationCrystal();
                     lineContinuationCrystal.setCoordinates(deleteCrystal.getCoordinates());
-                    statementOfCrystals.add(lineContinuationCrystal);
+
+                    // Add it back temporarily as the proper type to detect warning cases.
+                    if (compilationWarningsEnabled) {
+                        statementOfCrystals.add(lineContinuationCrystal);
+                    }
+                    if (lexUnparsableTokens) {
+                        unparsableTokens.add(lineContinuationCrystal);
+                    }
                 }
             }
 
@@ -1218,5 +1336,26 @@ public class Lexer {
         numberCrystal.setCoordinates(tokenCoordinates);
         numberCrystal.setNegationOperatorLocation(negationOperatorLocation);
         statementOfCrystals.add(numberCrystal);
+    }
+
+    /**
+     * Checks if the given backtick-quoted identifier is representing a single character literal.
+     * @param token The token to check.
+     * @return True, if the token represents a single character literal.
+     */
+    private boolean isCharacterLiteral(String token) {
+        if (Utils.isBacktickQuotedIdentifier(token)) {
+            String unquotedToken = token.substring(1, token.length() - 1);
+
+            // Check for escaped character literals.
+            if (ESCAPED_CHARACTER_LITERALS.contains(unquotedToken)) {
+                return true;
+            }
+
+            // Otherwise, check that it simply has length 1.
+            return unquotedToken.length() == 1;
+        }
+
+        return false;
     }
 }

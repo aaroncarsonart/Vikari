@@ -71,11 +71,27 @@ import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionOperatorCry
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RegionSeparatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.RightCurlyBracketCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.StatementSeparatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.LeftSquareBracketCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.RightSquareBracketCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.LeftParenthesisCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.ListElementSeparatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.list.RightParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.LeftSquareBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.RightSquareBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.LeftParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.ListElementSeparatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.RightParenthesisCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.annotation.AnnotationClosingBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.annotation.AnnotationElementSeparatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.annotation.AnnotationOpeningBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.collection.literal.ArrayLiteralClosingBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.collection.literal.ArrayLiteralOpeningBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.collection.literal.CollectionLiteralElementSeparatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.collection.literal.ListLiteralClosingBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.collection.literal.ListLiteralOpeningBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.collection.literal.SetLiteralClosingBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.collection.literal.SetLiteralOpeningBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.function.FunctionArgumentListClosingBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.function.FunctionArgumentListElementSeparatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.function.FunctionArgumentListOpeningBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.function.FunctionParameterListClosingBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.function.FunctionParameterListElementSeparatorCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.function.FunctionParameterListOpeningBracketCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.quotation.BacktickQuotationCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.separator.quotation.CaptureQuotationCrystal;
 
@@ -109,21 +125,42 @@ public enum TokenType {
     // Separators
     BACKTICK("`", BacktickQuotationCrystal.class),
     CAPTURE_QUOTATION("``", CaptureQuotationCrystal.class),
+    LEFT_PARENTHESIS("(",LeftParenthesisCrystal.class),
+    RIGHT_PARENTHESIS(")", RightParenthesisCrystal.class),
+    LEFT_CURLY_BRACKET("{", LeftCurlyBracketCrystal.class),
+    RIGHT_CURLY_BRACKET("}", RightCurlyBracketCrystal.class),
     LEFT_SQUARE_BRACKET("[", LeftSquareBracketCrystal.class),
     RIGHT_SQUARE_BRACKET("]", RightSquareBracketCrystal.class),
+    LIST_ELEMENT_SEPARATOR("|", ListElementSeparatorCrystal.class),
 
     REGION_OPERATOR("::", RegionOperatorCrystal.class),
     STATEMENT_SEPARATOR(",", StatementSeparatorCrystal.class),
     REGION_SEPARATOR(";", RegionSeparatorCrystal.class),
 
-    // List constructor literals
-    LEFT_PARENTHESIS("(",LeftParenthesisCrystal.class),
-    RIGHT_PARENTHESIS(")", RightParenthesisCrystal.class),
-    LIST_ELEMENT_SEPARATOR("|", ListElementSeparatorCrystal.class),
+    // Function parameter and argument lists
+    FUNCTION_PARAMETER_LIST_OPENING_BRACKET("(", FunctionParameterListOpeningBracketCrystal.class),
+    FUNCTION_PARAMETER_LIST_CLOSING_BRACKET(")", FunctionParameterListClosingBracketCrystal.class),
+    FUNCTION_PARAMETER_LIST_ELEMENT_SEPARATOR("|", FunctionParameterListElementSeparatorCrystal.class),
 
-    // Other enclosures
-    LEFT_CURLY_BRACKET("{", LeftCurlyBracketCrystal.class),
-    RIGHT_CURLY_BRACKET("}", RightCurlyBracketCrystal.class),
+    FUNCTION_ARGUMENT_LIST_OPENING_BRACKET("(", FunctionArgumentListOpeningBracketCrystal.class),
+    FUNCTION_ARGUMENT_LIST_CLOSING_BRACKET(")", FunctionArgumentListClosingBracketCrystal.class),
+    FUNCTION_ARGUMENT_LIST_ELEMENT_SEPARATOR("|", FunctionArgumentListElementSeparatorCrystal.class),
+
+    // List constructor literals
+    COLLECTION_LITERAL("$:", CollectionLiteralOperatorCrystal.class),
+    LIST_LITERAL_OPENING_BRACKET("(", ListLiteralOpeningBracketCrystal.class),
+    LIST_LITERAL_CLOSING_BRACKET(")", ListLiteralClosingBracketCrystal.class),
+    SET_LITERAL_OPENING_BRACKET("{", SetLiteralOpeningBracketCrystal.class),
+    SET_LITERAL_CLOSING_BRACKET("}", SetLiteralClosingBracketCrystal.class),
+    ARRAY_LITERAL_OPENING_BRACKET("[", ArrayLiteralOpeningBracketCrystal.class),
+    ARRAY_LITERAL_CLOSING_BRACKET("]",ArrayLiteralClosingBracketCrystal.class),
+    COLLECTION_LITERAL_ELEMENT_SEPARATOR("|", CollectionLiteralElementSeparatorCrystal.class),
+
+    // Annotations
+    ANNOTATION("$:", AnnotationOperatorCrystal.class),
+    ANNOTATION_OPENING_BRACKET("{", AnnotationOpeningBracketCrystal.class),
+    ANNOTATION_CLOSING_BRACKET("}", AnnotationClosingBracketCrystal.class),
+    ANNOTATION_ELEMENT_SEPARATOR("|", AnnotationElementSeparatorCrystal.class),
 
     // Operators
     DOT(".", DotOperatorCrystal.class),
@@ -139,8 +176,7 @@ public enum TokenType {
     STATIC_FIELD_ACCESS("#", StaticFieldAccessOperatorCrystal.class),
     STATIC_SUPER("#", StaticSuperOperatorCrystal.class),
     INDEX_OPERATOR("$", IndexOperatorCrystal.class),
-    ANNOTATION("$:", AnnotationOperatorCrystal.class),
-    COLLECTION_LITERAL("$:", CollectionLiteralOperatorCrystal.class),
+
     COPY_CONSTRUCTOR("&", CopyConstructorCrystal.class),
     MODULUS("%", ModulusOperatorCrystal.class),
     MULTIPLY("*", MultiplyOperatorCrystal.class),
@@ -218,6 +254,22 @@ public enum TokenType {
             TokenType.COLLECTION_LITERAL,
             TokenType.EXISTS,
             TokenType.CAST,
+            TokenType.FUNCTION_PARAMETER_LIST_OPENING_BRACKET,
+            TokenType.FUNCTION_PARAMETER_LIST_CLOSING_BRACKET,
+            TokenType.FUNCTION_PARAMETER_LIST_ELEMENT_SEPARATOR,
+            TokenType.FUNCTION_ARGUMENT_LIST_OPENING_BRACKET,
+            TokenType.FUNCTION_ARGUMENT_LIST_CLOSING_BRACKET,
+            TokenType.FUNCTION_ARGUMENT_LIST_ELEMENT_SEPARATOR,
+            TokenType.LIST_LITERAL_OPENING_BRACKET,
+            TokenType.LIST_LITERAL_CLOSING_BRACKET,
+            TokenType.SET_LITERAL_OPENING_BRACKET,
+            TokenType.SET_LITERAL_CLOSING_BRACKET,
+            TokenType.ARRAY_LITERAL_OPENING_BRACKET,
+            TokenType.ARRAY_LITERAL_CLOSING_BRACKET,
+            TokenType.COLLECTION_LITERAL_ELEMENT_SEPARATOR,
+            TokenType.ANNOTATION_OPENING_BRACKET,
+            TokenType.ANNOTATION_CLOSING_BRACKET,
+            TokenType.ANNOTATION_ELEMENT_SEPARATOR,
             // special cases
             TokenType.SWORD,
             TokenType.THROW,

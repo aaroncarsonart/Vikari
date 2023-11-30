@@ -122,7 +122,7 @@ Any Syntax errors will always be automatically reported, preventing the program 
 Use `-l` to check any valid language construct against only the Lexer phase.
 
 ```zsh
-vikari -lc ':``foo' 
+vikari -lc ':``foo'
 ```
 
 This reports an error for an unterminated string:

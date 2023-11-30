@@ -5,8 +5,8 @@ import com.atonementcrystals.dnr.vikari.core.crystal.identifier.ReferenceCrystal
 import com.atonementcrystals.dnr.vikari.core.crystal.number.IntegerCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.control.flow.BreakOperatorCrystal;
 import com.atonementcrystals.dnr.vikari.core.crystal.operator.math.AddOperatorCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.LeftSquareBracketCrystal;
-import com.atonementcrystals.dnr.vikari.core.crystal.separator.grouping.RightSquareBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.LeftSquareBracketCrystal;
+import com.atonementcrystals.dnr.vikari.core.crystal.separator.RightSquareBracketCrystal;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
