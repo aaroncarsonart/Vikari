@@ -3,34 +3,16 @@ package com.atonementcrystals.dnr.vikari.interpreter;
 import com.atonementcrystals.dnr.vikari.Main;
 import com.atonementcrystals.dnr.vikari.core.crystal.AtonementField;
 import com.atonementcrystals.dnr.vikari.core.crystal.identifier.VikariType;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class VikariProgramTest {
-
-    private final PrintStream originalOut = System.out;
-    private final ByteArrayOutputStream testOut = new ByteArrayOutputStream();
-
-    @BeforeEach
-    public void setupPrintStream() {
-        System.setOut(new PrintStream(testOut));
-    }
-
-    @AfterEach
-    public void restorePrintStream() {
-        System.setOut(originalOut);
-    }
+class VikariProgramTest extends PrintTest_Base {
 
     private void runVikariProgram(String sourceString) {
         Main.runSourceString(sourceString, Phase.EXECUTE, null, null, false);
@@ -40,9 +22,9 @@ class VikariProgramTest {
         Main.main(args);
     }
 
-    private void assertOutput(String expectedOutput) {
-        String actualOutput = testOut.toString();
-        assertEquals(expectedOutput, actualOutput, "Unexpected output of print statements.");
+    @Override
+    protected String getTestOutputErrorMessage() {
+        return "Unexpected output of print statements.";
     }
 
     @Test
@@ -70,7 +52,7 @@ class VikariProgramTest {
                 :a
                 """;
         runVikariProgram(sourceString);
-        assertOutput("2");
+        testOutput("2");
     }
 
     @Test
@@ -81,7 +63,7 @@ class VikariProgramTest {
                 :a
                 """;
         runVikariProgram(sourceString);
-        assertOutput("null");
+        testOutput("null");
     }
 
     @Test
@@ -93,7 +75,7 @@ class VikariProgramTest {
                 :a / 7
                 """;
         runVikariProgram(sourceString);
-        assertOutput("3.14285714285714285714285714285714");
+        testOutput("3.14285714285714285714285714285714");
     }
 
     @Test
@@ -105,7 +87,7 @@ class VikariProgramTest {
                 :4.0F >> a:
                 """;
         runVikariProgram(sourceString);
-        assertOutput("2\n4.0\n");
+        testOutput("2\n4.0\n");
     }
 
     // The following 8 tests test all combinations of the following conditions for VikariProgram:
@@ -132,7 +114,7 @@ class VikariProgramTest {
                     Unnecessary line continuation at start of statement.
 
                 """;
-        assertOutput(expectedOutput);
+        testOutput(expectedOutput);
     }
 
     @Test
@@ -144,7 +126,7 @@ class VikariProgramTest {
                 """;
         String[] args = { "-w", "-c", sourceString };
         runMain(args);
-        assertOutput("2\n");
+        testOutput("2\n");
     }
 
     @Test
@@ -157,7 +139,7 @@ class VikariProgramTest {
                 """;
         String[] args = { "-c", sourceString };
         runMain(args);
-        assertOutput("2\n");
+        testOutput("2\n");
     }
 
     @Test
@@ -169,7 +151,7 @@ class VikariProgramTest {
                 """;
         String[] args = { "-c", sourceString };
         runMain(args);
-        assertOutput("2\n");
+        testOutput("2\n");
     }
 
     @Test
@@ -202,7 +184,7 @@ class VikariProgramTest {
                     Unnecessary line continuation at start of statement.
 
                 """;
-        assertOutput(expectedOutput);
+        testOutput(expectedOutput);
     }
 
     @Test
@@ -226,7 +208,7 @@ class VikariProgramTest {
                     Expected expression.
 
                 """;
-        assertOutput(expectedOutput);
+        testOutput(expectedOutput);
     }
 
     @Test
@@ -251,7 +233,7 @@ class VikariProgramTest {
                     Expected expression.
 
                 """;
-        assertOutput(expectedOutput);
+        testOutput(expectedOutput);
     }
 
     @Test
@@ -275,7 +257,7 @@ class VikariProgramTest {
                     Expected expression.
 
                 """;
-        assertOutput(expectedOutput);
+        testOutput(expectedOutput);
     }
 
     @Test
@@ -303,7 +285,7 @@ class VikariProgramTest {
                 ---------------
                 2
                 """;
-        assertOutput(expectedOutput);
+        testOutput(expectedOutput);
     }
 
     @Test
@@ -315,6 +297,6 @@ class VikariProgramTest {
                 """;
         String[] args = { "-E", "w", "-c", sourceString };
         runMain(args);
-        assertOutput("2\n");
+        testOutput("2\n");
     }
 }

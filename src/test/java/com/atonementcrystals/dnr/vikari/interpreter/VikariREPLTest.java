@@ -7,40 +7,40 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import com.atonementcrystals.dnr.vikari.TestUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class VikariREPLTest {
+class VikariREPLTest extends PrintTest_Base {
     private VikariREPL repl;
-    private final PrintStream originalOut = System.out;
-    private final ByteArrayOutputStream testOut = new ByteArrayOutputStream();
-
+ 
+    @Override
     @BeforeEach
     public void setupPrintStream() {
         repl = new VikariREPL();
-        System.setOut(new PrintStream(testOut));
+        super.setupPrintStream();
     }
 
-    @AfterEach
-    public void restorePrintStream() {
-        System.setOut(originalOut);
+    @Override
+    protected String getTestOutputErrorMessage() {
+        return "Unexpected REPL output.";
     }
 
     /**
      * Test the input string against the output of the REPL.
      * @param expectedOutput The string to test. A trailing newline may be omitted.
      */
-    private void testOutput(String expectedOutput) {
+    @Override
+    public void testOutput(String expectedOutput) {
         if (!expectedOutput.isEmpty() && !expectedOutput.endsWith("\n"))  {
             expectedOutput += "\n";
         }
-        assertEquals(expectedOutput, testOut.toString(), "Unexpected REPL output.");
 
-        // Clear the output buffer.
-        testOut.reset();
+        super.testOutput(expectedOutput);
     }
 
     /**
