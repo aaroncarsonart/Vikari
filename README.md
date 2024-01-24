@@ -18,7 +18,7 @@ The parser utilizes [recursive descent][8] to parse the language's [grammar prod
 
 ### Implemented Features
 
-The following language features are fully implemented: _numeric types, arithmetic expressions, grouping, print statements, statement separators, variable declarations, assignments, comments, line continuations, boolean types, null types, logical operators, and equality operators_. Other features of the interpreter also include syntax error and compilation warning reporting, different phases of execution, REPL mode, and more. See the [Usage](#Basic Usage) section for details.
+The following language features are fully implemented: _numeric types, arithmetic expressions, grouping, print statements, statement separators, variable declarations, assignments, comments, line continuations, boolean types, null types, logical operators, and equality operators_. Other features of the interpreter also include syntax error and compilation warning reporting, different phases of execution, REPL mode, and more. See the [Usage](#basic-usage) section for details.
 
 ### Planned Features
 
@@ -77,7 +77,15 @@ vikari> !exit
 
 Vikari has many options. See `-h` or `--help` for basic usage, or [USAGE.md](USAGE.md) for more details.
 
-## Addendum: Design Notes
+# Cross-Platform Use
+
+Vikari builds and runs on macOS, Linux, and Windows. It has been tested on macOS 12.6, [ZorinOS 16][14], and Windows 10.
+
+# Code Editor
+
+The project [Vide][15] was developed specifically as the official Vikari IDE. Its features are somewhat minimum. But it features full syntax highlighting support for all language features.
+
+# Addendum: Design Notes
 
 ### Terminology
 
@@ -115,3 +123,5 @@ If DNR is meant to be the programming language for all of existence, then Vikari
 [11]: https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
 [12]: https://openjdk.org/projects/jdk/17/
 [13]: https://maven.apache.org/download.cgi
+[14]: https://zorin.com/os/download/
+[15]: https://github.com/atonement-crystals/Vide
