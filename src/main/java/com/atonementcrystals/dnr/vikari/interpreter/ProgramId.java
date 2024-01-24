@@ -5,17 +5,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
 
 /**
  * Handles generation of a unique program id for each instance of Vikari to ensure
@@ -55,8 +53,24 @@ public class ProgramId {
      * @return The next program id to use.
      */
     private static int getNextProgramId() {
+        String osName = System.getProperty("os.name");
+        boolean isPlatformWindows = osName.contains("Windows");
+        if (isPlatformWindows) {
+            return getNextProgramId_DontLockFile();
+        } else {
+            return getNextProgramId_LockFile();
+        }
+    }
+
+    /**
+     * On macOS and Linux, lock the program.id file before reading it to ensure that each unique
+     * Vikari always has a unique program id in the logs.
+     * @return The next program id to use.
+     */
+    private static int getNextProgramId_LockFile() {
         String homeDirPath = System.getProperty("user.home");
-        String programIdFilePath = homeDirPath + "/.vikari/vikari.program_id";
+        String fileSeparator = File.separator;
+        String programIdFilePath = homeDirPath + fileSeparator + ".vikari" + fileSeparator + "vikari.program_id";
         try {
             File file = new File(programIdFilePath);
             boolean fileExists = file.exists();
@@ -70,15 +84,9 @@ public class ProgramId {
                  FileLock lock = channel.lock()) {
 
                 // Fetch current value of number in file.
-                FileInputStream inputStream = new FileInputStream(file);
-                InputStreamReader reader = new InputStreamReader(inputStream);
-
-                StringBuilder sb = new StringBuilder();
-                try (BufferedReader bufferedReader = new BufferedReader(reader)) {
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        sb.append(line);
-                    }
+                String currentValue = null;
+                try {
+                    currentValue = Files.readString(file.toPath());
                 } catch (IOException e) {
                     log.error("Error reading from ``{}``.", programIdFilePath);
                     log.error(e);
@@ -86,7 +94,6 @@ public class ProgramId {
                     return ERROR_READING_FROM_FILE;
                 }
 
-                String currentValue = sb.toString();
                 int programId = 0;
                 if (Utils.isIntegerNumber(currentValue)) {
                     programId = Integer.parseInt(currentValue);
@@ -122,6 +129,74 @@ public class ProgramId {
 
                 return ERROR_ACQUIRING_LOCK;
             }
+        } catch (IOException e) {
+            log.error("Error opening file ``{}``.", programIdFilePath);
+            log.error(e);
+
+            return ERROR_OPENING_FILE;
+        }
+    }
+
+    /**
+     * OpenJDK has a bug on Windows where FileLock causes an IOException on Windows only. So to
+     * circumvent this issue, the fix is to not use FileLocks for Windows. This means that if
+     * many Vikari programs are executed in quick succession, different programs may share the
+     * same program id in the logs on Windows systems.
+     *
+     * @see <a href="https://bugs.openjdk.org/browse/JDK-8225473">OpenJDK Bug Report</a>
+     * @return The next program id to use.
+     */
+    private static int getNextProgramId_DontLockFile() {
+        String homeDirPath = System.getProperty("user.home");
+        String fileSeparator = File.separator;
+        String programIdFilePath = homeDirPath + fileSeparator + ".vikari" + fileSeparator + "vikari.program_id";
+        try {
+            File file = new File(programIdFilePath);
+            boolean fileExists = file.exists();
+            if (!fileExists) {
+                file.createNewFile();
+            }
+
+            // Fetch current value of number in file.
+            String currentValue = null;
+            try {
+                currentValue = Files.readString(file.toPath());
+            } catch (IOException e) {
+                log.error("Error reading from ``{}``.", programIdFilePath);
+                log.error(e);
+
+                return ERROR_READING_FROM_FILE;
+            }
+
+            int programId = 0;
+            if (Utils.isIntegerNumber(currentValue)) {
+                programId = Integer.parseInt(currentValue);
+            }
+
+            // Increment the number to get the next valid program id.
+            if (programId < Integer.MAX_VALUE) {
+                programId++;
+            } else {
+                programId = 1;
+            }
+
+            // Write the new program id back to the file.
+            FileOutputStream outputStream = new FileOutputStream(file);
+            OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+
+            try (BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+                String output = String.valueOf(programId);
+                bufferedWriter.write(output);
+            } catch (IOException e) {
+                log.error("Error writing to ``{}``.", programIdFilePath);
+                log.error(e);
+
+                return ERROR_WRITING_TO_FILE;
+            }
+
+            // Return the program id.
+            return programId;
+
         } catch (IOException e) {
             log.error("Error opening file ``{}``.", programIdFilePath);
             log.error(e);
