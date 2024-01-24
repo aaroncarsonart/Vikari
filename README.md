@@ -55,7 +55,7 @@ chmod +x vikari.sh
 I recommend aliasing one of these two commands as `vikari`.  From my `.zshrc`:
 
 ```zsh
-alias vikari="java -jar `ls -r ${VIKARI_PROJECT_DIR}/target/Vikari* | head -n1`"
+alias vikari="java -jar `ls -r ${VIKARI_PROJECT_DIR}/target/Vikari*.jar | head -n1`"
 ```
 
 ### Run the REPL
